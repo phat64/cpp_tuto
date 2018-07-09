@@ -34,4 +34,5 @@
 # My specific executables
 01_testsmartpointer
 02_testbenchmarkduration
+03_testexitcallback
 
