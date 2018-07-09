@@ -2,7 +2,7 @@
 #include <string>
 #include <unistd.h>
 
-using namespace std;
+#define BENCHMARK_DURATION_SCOPE(name) BenchmarkDuration _benchmarkDurationScope(name);
 
 class BenchmarkDuration
 {
@@ -51,15 +51,15 @@ int BenchmarkDuration::s_depth = 0;
 
 int main(int argc, char ** argv)
 {
-	BenchmarkDuration m("main()");
+	BENCHMARK_DURATION_SCOPE("main()");
 
 	{
-		BenchmarkDuration m("sleep(4)");
+		BENCHMARK_DURATION_SCOPE("sleep(4)");
 		sleep(4);
 	}
 
 	{
-		BenchmarkDuration m("sleep(3)");
+		BENCHMARK_DURATION_SCOPE("sleep(3)");
 		sleep(3);
 	}
 
