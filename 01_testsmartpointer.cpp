@@ -62,6 +62,7 @@ void test_shared_vector()
 	{
 		v.push_back(a);
 	}
+	cout << "use_count == " << a.use_count() <<endl; // use_count == 5 + 1
 
 	for (int i = 0; i < N; i++)
 	{
@@ -111,6 +112,7 @@ A::dtor1
 --- test_shared : end ---
 --- test_shared_vector : start ---
 A::ctor99
+use_count == 6
 id == 99
 id == 99
 id == 99
