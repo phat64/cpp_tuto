@@ -1,2 +1,2 @@
 all:
-	g++ -std=c++11 main.cpp -o test
+	g++ -std=c++11 01_testsmartpointer.cpp -o 01_testsmartpointer
