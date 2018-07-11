@@ -35,4 +35,5 @@
 01_testsmartpointer
 02_testbenchmarkduration
 03_testexitcallback
+04_testmemorymanager
 
