@@ -55,6 +55,28 @@ public:
 		return m_allocs_count;
 	}
 
+	void dump()
+	{
+		std::cout << "--- Memory Manager Info ---" << std::endl;
+		std::cout << "used mem : " << usedmem() <<std::endl;
+		std::cout << "alloc count : " << alloccount() <<std::endl;
+		if (m_allocs_count == 0)
+		{
+			return;
+		}
+
+		std::cout << "--- Memory Alloc Info ---" << std::endl;
+		struct AllocInfo* current = m_alloc_info_array;
+		for(size_t i = 0; i < m_allocs_count; i++, current++)
+		{
+			std::cout
+			<< "addr=" << current->mem
+			<< ", offset="<< int64_t(current->mem) - int64_t(m_memory)
+			<< ", size=" << current->size
+			<< std::endl;
+		}
+	}
+
 private:
 	void* _searchFreeMemChunck(size_t size)
 	{
@@ -173,47 +195,35 @@ int main(int argc, char ** argv)
 	memmgr->init(mem, size_max);
 
 	std::cout << "--- init ---" << std::endl;
-	std::cout << "used mem : " << memmgr->usedmem() << std::endl;
-	std::cout << "alloc count : " << memmgr->alloccount() << std::endl;
-
+	memmgr->dump();
 
 	std::cout << "--- alloc : 2 ints + 1 int ---" << std::endl;
 	int * i = new int[2];
 	int * j = new int;
-	std::cout << "used mem : " << memmgr->usedmem() << std::endl;
-	std::cout << "alloc count : " << memmgr->alloccount() << std::endl;
-
-	std::cout << "--- mem ---" << std::endl;
-	std::cout << "addr=" << (int*)(mem) << " offset=" << int64_t(mem) - int64_t(mem)<<std::endl;
-	std::cout << "--- i ---" << std::endl;
-	std::cout << "addr=" << i << " offset=" << int64_t(i) - int64_t(mem)<<std::endl;
-	std::cout << "--- j ---" << std::endl;
-	std::cout << "addr=" << j << " offset=" <<  int64_t(j) - int64_t(mem) <<std::endl;
+	memmgr->dump();
 
 	std::cout << "--- free : 2 ints + 1 int ---" << std::endl;
 	delete [] i;
 	delete j;
-
-	std::cout << "used mem : " << memmgr->usedmem() << std::endl;
-	std::cout << "alloc count : " << memmgr->alloccount() << std::endl;
+	memmgr->dump();
 
 	return 0;
 }
 
 /* output :
 --- init ---
+--- Memory Manager Info ---
 used mem : 0
 alloc count : 0
 --- alloc : 2 ints + 1 int ---
+--- Memory Manager Info ---
 used mem : 12
 alloc count : 2
---- mem ---
-addr=0x602220 offset=0
---- i ---
-addr=0x602220 offset=0
---- j ---
-addr=0x602228 offset=8
+--- Memory Alloc Info ---
+addr=0x602220, offset=0, size=8
+addr=0x602228, offset=8, size=4
 --- free : 2 ints + 1 int ---
+--- Memory Manager Info ---
 used mem : 0
 alloc count : 0
 */
