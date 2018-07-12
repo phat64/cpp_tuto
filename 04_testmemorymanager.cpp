@@ -201,8 +201,10 @@ int main(int argc, char ** argv)
 }
 
 /* output :
+--- init ---
 used mem : 0
 alloc count : 0
+--- alloc : 2 ints + 1 int ---
 used mem : 12
 alloc count : 2
 --- mem ---
@@ -211,6 +213,7 @@ addr=0x602220 offset=0
 addr=0x602220 offset=0
 --- j ---
 addr=0x602228 offset=8
+--- free : 2 ints + 1 int ---
 used mem : 0
 alloc count : 0
 */
