@@ -171,7 +171,7 @@ void ShowZipFileListFromFile(FILE * f)
 		return;
 	}
 
-	printf("numEntries = %d \n", endRecord.numEntries);
+	printf("numEntries = %d\n", endRecord.numEntries);
 
 	fseek(f, endRecord.centralDirectoryOffset, SEEK_SET);
 	for (i = 0; i < endRecord.numEntries; i++)
@@ -303,8 +303,22 @@ int main(int argc, char ** argv)
 /*
 > 05_testlistzip test.zip
 list files in test.zip
+show zip list from a buffer
 file size 38908
 numEntries = 11 
+cpp_tuto/01_testsmartpointer.cpp, 598 bytes / 1774 bytes (33 %)
+cpp_tuto/02_testbenchmarkduration.cpp, 602 bytes / 1400 bytes (43 %)
+cpp_tuto/03_testexitcallback.cpp, 271 bytes / 605 bytes (44 %)
+cpp_tuto/04_testmemorymanager.cpp, 1611 bytes / 5735 bytes (28 %)
+cpp_tuto/05_testlistzip.cpp, 1475 bytes / 4205 bytes (35 %)
+cpp_tuto/Makefile, 130 bytes / 323 bytes (40 %)
+cpp_tuto/01_testsmartpointer, 11947 bytes / 42224 bytes (28 %)
+cpp_tuto/02_testbenchmarkduration, 4900 bytes / 15240 bytes (32 %)
+cpp_tuto/03_testexitcallback, 6362 bytes / 22208 bytes (28 %)
+cpp_tuto/04_testmemorymanager, 5016 bytes / 14648 bytes (34 %)
+cpp_tuto/05_testlistzip, 3928 bytes / 13480 bytes (29 %)
+show zip list from a file
+numEntries = 11
 cpp_tuto/01_testsmartpointer.cpp, 598 bytes / 1774 bytes (33 %)
 cpp_tuto/02_testbenchmarkduration.cpp, 602 bytes / 1400 bytes (43 %)
 cpp_tuto/03_testexitcallback.cpp, 271 bytes / 605 bytes (44 %)
