@@ -46,21 +46,22 @@ struct ZipEndRecord {
 
 struct ZipEndRecord* FindZipEndRecord(void* buffer, int size)
 {
+	int i;
  	struct ZipEndRecord * endRecord;
 
 	// search from the end
-	for(int i = size - sizeof(struct ZipEndRecord); i >= 0; i--) {
-        	endRecord = (struct ZipEndRecord *)(((uint8_t*)buffer) + i);
-        	if(endRecord->signature == 0x06054B50)
-           	 	return endRecord;
+	for(i = size - sizeof(struct ZipEndRecord); i >= 0; i--) {
+		endRecord = (struct ZipEndRecord *)(((uint8_t*)buffer) + i);
+		if(endRecord->signature == 0x06054B50)
+			return endRecord;
 	}
 
 	return NULL;
 }
 
-void ShowZipFileList(void * buffer, int size, struct ZipEndRecord* endRecord)
+void ShowZipFileListFromBuffer(void * buffer, int size, struct ZipEndRecord* endRecord)
 {
-	int16_t i;
+	uint16_t i;
 	char filename[FILENAME_MAX_LEN + 1];
 	struct ZipGlobalFileHeader* current;
 
@@ -75,6 +76,7 @@ void ShowZipFileList(void * buffer, int size, struct ZipEndRecord* endRecord)
 		}
 	}
 
+	printf("numEntries = %d \n", endRecord->numEntries);
 	current = (struct ZipGlobalFileHeader*) (((uint8_t*)buffer) + endRecord->centralDirectoryOffset);
 
 	for (i = 0; i < endRecord->numEntries; i++)
@@ -102,24 +104,107 @@ void ShowZipFileList(void * buffer, int size, struct ZipEndRecord* endRecord)
 	}
 }
 
-void printZipInfo(void * buffer, int size)
+bool ReadDataFromFile(FILE * f, void* buffer, int n)
 {
-	if (buffer != NULL)
+	int idx;
+	int ret;
+	int nbTries;
+	uint8_t* data = (uint8_t*)buffer;
+
+	idx = 0;
+	nbTries = 99;
+	while (n > 0)
 	{
-	 	struct ZipEndRecord * endRecord = FindZipEndRecord(buffer, size);
-	  	if (endRecord == NULL)
+		ret = fread((void*)&data[idx], 1, n, f);
+		if (ret <= 0)
 		{
-			printf("[printZipInfo] end record not found\n");
+			if (--nbTries == 0)
+			{
+				break;
+			}
+		}
+		else
+		{
+			n -= ret;
+			idx += ret;
+		}
+	}
+
+	return n == 0;
+}
+
+void ShowZipFileListFromFile(FILE * f)
+{
+	int i;
+	char filename[FILENAME_MAX_LEN + 1];
+	struct ZipGlobalFileHeader current;
+	struct ZipEndRecord endRecord;
+	int size;
+
+	// get size
+	fseek(f, 0 ,SEEK_END);
+	size = ftell(f);
+	fseek(f, 0 ,SEEK_SET);
+
+
+	i = size - sizeof(struct ZipEndRecord) + 1;
+	fseek(f , i, SEEK_SET);
+
+	while(i >= 0)
+	{
+		fseek(f, -1, SEEK_CUR);
+		if (!ReadDataFromFile(f, &endRecord, sizeof(struct ZipEndRecord)))
+		{
+			break;
+		}
+		if(endRecord.signature == 0x06054B50)
+		{
+			break;
+		}
+		i--;
+	}
+
+	// simple check
+	if (endRecord.signature != 0x06054B50)
+	{
+		printf("[ShowZipFileList] end record not found\n");
+		return;
+	}
+
+	printf("numEntries = %d \n", endRecord.numEntries);
+
+	fseek(f, endRecord.centralDirectoryOffset, SEEK_SET);
+	for (i = 0; i < endRecord.numEntries; i++)
+	{
+		int filenamelen;
+		int percent;
+
+		if (!ReadDataFromFile(f, &current, sizeof(struct ZipGlobalFileHeader)))
+		{
+			printf("[ShowZipFileList] read data error in ZipGlobalFileHeader\n");
 			return;
 		}
 
-		printf("numEntries = %d \n", endRecord->numEntries);
+		// simple check
+		if (current.signature != 0x02014B50)
+		{
+			printf("[ShowZipFileList] error signature ZipGlobalFileHeader\n");
+			return;
+		}
 
-		ShowZipFileList(buffer, size, endRecord);
-	}
-	else
-	{
-		printf("[printZipInfo] buffer = NULL\n");
+		filenamelen = MIN(current.fileNameLength, FILENAME_MAX_LEN);
+		if (!ReadDataFromFile(f, filename, filenamelen))
+		{
+			printf("[ShowZipFileList] read data error in ZipGlobalFileHeader\n");
+			return;
+		}
+		filename[filenamelen] = '\0';
+
+		percent = current.uncompressedSize == 0? 100 : 100 * current.compressedSize / current.uncompressedSize;
+
+		printf("%s, %d bytes / %d bytes (%d %%)\n", filename, current.compressedSize, current.uncompressedSize, percent);
+
+		fseek(f, current.fileNameLength - filenamelen + current.extraFieldLength, SEEK_CUR);
 	}
 }
 
@@ -132,11 +217,12 @@ void* LoadFILE(const char * filename, int * size)
 	int idx;
 	int nbTry;	
 
+	data = NULL;
 	f = fopen(filename, "rb");
 	if (f == NULL)
 	{
 		printf("[LoadFILE]  failed to open file %s\n", filename);
-		return NULL;
+		goto err;
 	}
 
 	// get size
@@ -146,34 +232,30 @@ void* LoadFILE(const char * filename, int * size)
 	fseek(f, 0 ,SEEK_SET);
 
 	data = (uint8_t*)malloc(n);
-
-	idx = 0;
-	nbTry = 99;
-	while (n > 0)
+	if (data == NULL)
 	{
-		ret = fread(&data[idx], 1, n, f);
-		if (ret <= 0)
-		{
-			nbTry--;
-			if (nbTry < 0)
-			{
-				printf("[LoadFILE]  %s file cannot be readen\n", filename);
-	
-				free((void*)data);
-				fclose(f);
-				return NULL;
-			}
-		}
-		else 
-		{
-			idx += ret;
-			n -= ret;
-		}
+		goto err;
 	}
 
-	fclose(f);
-	return (void*)data;
+	if (!ReadDataFromFile(f, data, n))
+	{
+		printf("[LoadFILE]  failed to alloc for file %s\n", filename);
+		goto err;
+	}
 
+	return (void*)data;
+err:
+	if (data != NULL)
+	{
+		free((void*)data);
+		data = NULL;
+	}
+
+	if (f != NULL)
+	{
+		fclose(f);
+	}
+	return NULL;
 }
 
 int main(int argc, char ** argv)
@@ -184,24 +266,37 @@ int main(int argc, char ** argv)
 
 	if (argc != 2)
 	{
-		printf("error need 1 param\nusage : ./test file.zip\n");
+		printf("error need 1 param\n");
+		printf("usage : ./test file.zip\n");
 		return -1;
 	}
 
 	filename = argv[1];
 	printf("list files in %s\n", filename);
 
+
+	printf("show zip list from a buffer\n");
 	zip = LoadFILE(filename, &size);
 	if (zip == NULL)
 	{
-		printf("open zip file failed\n");
+		printf("open or load zip file failed\n");
 		return -2;
 	}
 
 	printf("file size %d\n", size);
-	printZipInfo(zip, size);
-
+	ShowZipFileListFromBuffer(zip, size, NULL);
 	free((void*)zip);
+
+	printf("show zip list from a file\n");
+	FILE* f = fopen(filename, "rb");
+	if (f == NULL)
+	{
+		printf("open zip file failed\n");
+		return -3;
+	}
+	ShowZipFileListFromFile(f);
+	fclose(f);
+
 	return 0;
 }
 
