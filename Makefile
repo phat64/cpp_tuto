@@ -4,4 +4,5 @@ all:
 	g++ -std=c++11 03_testexitcallback.cpp -o 03_testexitcallback
 	g++ -std=c++11 04_testmemorymanager.cpp -o 04_testmemorymanager
 	g++ -std=c++11 05_testlistzip.cpp -o 05_testlistzip
+	g++ -std=c++11 06_testimage2ascii.cpp -o 06_testimage2ascii
 
