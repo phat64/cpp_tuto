@@ -5,3 +5,4 @@ C++ tutorials
 3. Exit Callback : How to call a callback at the exit (without to use atexit) ?
 4. Memory Manager (allocator) : How to write your own memory manager (allocator) ?
 5. Zip File Format : How to list files inside a Zip file ?
+6. Image To ASCII : How to diplay an image in text ?
