@@ -36,4 +36,6 @@
 02_testbenchmarkduration
 03_testexitcallback
 04_testmemorymanager
-
+05_testlistzip
+06_testimage2ascii
+07_testoop
