@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+// Code exemple for OOP in C but imcomplete (need inherence)
 
 enum ACTOR_TYPE
 {
@@ -22,6 +23,8 @@ typedef struct actor
 #define INSTANCE_ACTOR(this) (ACTOR_THIS = this)
 
 actor_t* ACTOR_THIS = NULL;
+
+// ---------------------- HERO ----------------------------
 
 void hero_update(float deltaTime);
 void hero_render();
@@ -58,6 +61,8 @@ void hero_destroy()
 	free((void*)ACTOR_THIS);
 }
 
+// ---------------------- COIN ----------------------------
+
 void coin_update(float deltaTime);
 void coin_render();
 void coin_destroy();
@@ -92,6 +97,8 @@ void coin_destroy()
 	printf("coin_destroy\n");
 	free((void*)ACTOR_THIS);
 }
+
+// ---------------------- ENEMI ----------------------------
 
 void enemi_update(float deltaTime);
 void enemi_render();
@@ -128,6 +135,8 @@ void enemi_destroy()
 	free((void*)ACTOR_THIS);
 }
 
+// ---------------------- BOSS ----------------------------
+
 void boss_update(float deltaTime);
 void boss_render();
 void boss_destroy();
@@ -163,7 +172,9 @@ void boss_destroy()
 	free((void*)ACTOR_THIS);
 }
 
-// actor factory
+// ----------------------------------------------------------
+
+// actor factory - optimized version
 actor_t * actor_create(int type)
 {
 	typedef actor_t* (*actor_new_callback)();
@@ -179,14 +190,86 @@ actor_t * actor_create(int type)
 	return actor_new_array[type]();
 }
 
+// -----------------------------------------------------------
+
+void update_all_actors(actor_t* list[], int n, float deltaTime)
+{
+	int i;
+
+	for (i = 0; i < n; i++)
+	{
+		INSTANCE_ACTOR(list[i])->update(deltaTime);
+	}
+}
+
+void render_all_actors(actor_t* list[], int n)
+{
+	int i;
+
+	for (i = 0; i < n; i++)
+	{
+		INSTANCE_ACTOR(list[i])->render();
+	}
+
+}
+
+void destroy_all_actors(actor_t* list[], int n)
+{
+	int i;
+
+	for (i = 0; i < n; i++)
+	{
+		INSTANCE_ACTOR(list[i])->destroy();
+	}
+
+}
+
+// -----------------------------------------------------------
+
 int main()
 {
-	actor_t * hero = actor_create(0);
-	actor_t * list[8];
+	actor_t * list[7];
 
-	INSTANCE_ACTOR(hero)->update(1.0f/60.0f);
-	INSTANCE_ACTOR(hero)->render();
-	INSTANCE_ACTOR(hero)->destroy();
+	//INSTANCE_ACTOR(hero)->update(1.0f/60.0f);
+	//INSTANCE_ACTOR(hero)->render();
+	//INSTANCE_ACTOR(hero)->destroy();
+
+	list[0] = actor_create(HERO);
+	list[1] = actor_create(COIN);
+	list[2] = actor_create(COIN);
+	list[3] = actor_create(COIN);
+	list[4] = actor_create(ENEMI);
+	list[5] = actor_create(ENEMI);
+	list[6] = actor_create(BOSS);
+
+	update_all_actors(list, 7, 1.0f / 60.0f);
+	render_all_actors(list, 7);
+	destroy_all_actors(list, 7);
 
 	return 0;
 }
+
+/*
+output :
+hero_update
+coin_update
+coin_update
+coin_update
+enemi_update
+enemi_update
+boss_update
+hero_render
+coin_render
+coin_render
+coin_render
+enemi_render
+enemi_render
+boss_render
+hero_destroy
+coin_destroy
+coin_destroy
+coin_destroy
+enemi_destroy
+enemi_destroy
+boss_destroy
+*/
