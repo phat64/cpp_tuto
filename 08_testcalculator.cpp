@@ -167,7 +167,9 @@ bool Check3(const vector<Token> & tokens, int idx)
 
 	for (int i = 0; validcombo[i]; i++)
 	{
-		if (tokens[idx + 0].cvalue == validcombo[i][0] && tokens[idx + 1].cvalue == validcombo[i][1] && tokens[idx + 2].cvalue == validcombo[i][2])
+		if (tokens[idx + 0].cvalue == validcombo[i][0]
+			&& tokens[idx + 1].cvalue == validcombo[i][1]
+			&& tokens[idx + 2].cvalue == validcombo[i][2])
 		{
 			return true;
 		}
@@ -182,7 +184,8 @@ bool CheckCombo(const vector<Token> & tokens, int idx0, int idx1)
 
 	for (int i = 0; validcombo[i]; i++)
 	{
-		if (tokens[idx0].cvalue == validcombo[i][0] && tokens[idx1].cvalue == validcombo[i][1])
+		if (tokens[idx0].cvalue == validcombo[i][0]
+			&& tokens[idx1].cvalue == validcombo[i][1])
 		{
 			return true;
 		}
@@ -247,7 +250,7 @@ bool Check(const vector<Token> & tokens, int first, int last)
 
 // ------------------------------ COMPUTER -----------------------------------
 
-bool Compute2(double & result, double val, vector<Token> & tokens, int first)
+bool Compute2(double & result, double val, const vector<Token> & tokens, int first)
 {
 	//if (Check3(tokens, first))
 	{
@@ -273,7 +276,7 @@ bool Compute3(double & result, const vector<Token> & tokens, int first)
 {
 	if (Check3(tokens, first))
 	{
-		// IOI
+		// NON
 		if (tokens[first + 1].type == OPERATOR)
 		{
 			double a = tokens[first].dvalue;
@@ -287,7 +290,7 @@ bool Compute3(double & result, const vector<Token> & tokens, int first)
 			}
 			return true;
 		}
-		// (I)
+		// (N)
 		if (tokens[first + 1].type == NUMBER)
 		{
 			result = tokens[first+1].dvalue;
