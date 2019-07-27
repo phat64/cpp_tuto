@@ -7,3 +7,4 @@ C++ tutorials
 5. Zip File Format : How to list files inside a Zip file ?
 6. Image To ASCII : How to display an image in text ?
 7. Object Oriented Programming in C : How to dev with the OOP paradigm in C ?
+8. Calculator : How to write a calculator (with 4 operators and parenthesis) in C++ ?
