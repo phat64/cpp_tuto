@@ -9,7 +9,7 @@ using namespace std;
 
 enum TokenType
 {
-	NONE, INTEGER, OPERATOR, PARENTHESIS
+	NONE, NUMBER, OPERATOR, PARENTHESIS
 };
 
 struct Token
@@ -21,7 +21,7 @@ struct Token
 		type = NONE;
 		strvalue[0] = '\0';
 		cvalue = '?';
-		ivalue = 0;
+		dvalue = 0.0;
 	}
 
 	Token(char c)
@@ -43,7 +43,7 @@ struct Token
 		}
 		strvalue[0] = c;
 		strvalue[1] = '\0';
-		ivalue = 0;
+		dvalue = 0.0;
 	}
 
 	Token(const char * str)
@@ -56,19 +56,19 @@ struct Token
 		{
 			type = PARENTHESIS;
 			cvalue = c;
-			ivalue = 0;
+			dvalue = 0.0;
 		}
 		else if (c == '+' || c == '-' || c == '*' || c == '/')
 		{
 			type = OPERATOR;
 			cvalue = 'O';
-			ivalue = 0;
+			dvalue = 0.0;
 		}
 		else if (isdigit(c))
 		{
-			type = INTEGER;
+			type = NUMBER;
 			cvalue = 'I';
-			ivalue = atoi(str);
+			dvalue = atof(str);
 		}
 		else
 		{
@@ -79,7 +79,7 @@ struct Token
 
 	char strvalue[16];
 	char cvalue;
-	int ivalue;
+	double dvalue;
 };
 
 
@@ -138,7 +138,7 @@ void Tokenize(vector<Token> & tokens, const string & str)
 
 bool Check1(const vector<Token> & tokens, int idx)
 {
-	return tokens[idx].type == INTEGER;
+	return tokens[idx].type == NUMBER;
 }
 
 bool Check2(const vector<Token> & tokens, int idx)
@@ -230,14 +230,14 @@ bool Check(const vector<Token> & tokens, int first, int last)
 	return true;
 }
 
-bool Compute2(int & result, int val, vector<Token> & tokens, int first)
+bool Compute2(double & result, double val, vector<Token> & tokens, int first)
 {
 	//if (Check3(tokens, first))
 	{
 		if (tokens[first].type == OPERATOR)
 		{
-			int a = val;
-			int b = tokens[first+1].ivalue;
+			double a = val;
+			double b = tokens[first+1].dvalue;
 			switch(tokens[first].strvalue[0])
 			{
 				case '+': result = a + b; break;
@@ -252,15 +252,15 @@ bool Compute2(int & result, int val, vector<Token> & tokens, int first)
 }
 
 
-bool Compute3(int & result, const vector<Token> & tokens, int first)
+bool Compute3(double & result, const vector<Token> & tokens, int first)
 {
 	if (Check3(tokens, first))
 	{
 		// IOI
 		if (tokens[first + 1].type == OPERATOR)
 		{
-			int a = tokens[first].ivalue;
-			int b = tokens[first+2].ivalue;
+			double a = tokens[first].dvalue;
+			double b = tokens[first+2].dvalue;
 			switch(tokens[first + 1].strvalue[0])
 			{
 				case '+': result = a + b; break;
@@ -271,9 +271,9 @@ bool Compute3(int & result, const vector<Token> & tokens, int first)
 			return true;
 		}
 		// (I)
-		if (tokens[first + 1].type == INTEGER)
+		if (tokens[first + 1].type == NUMBER)
 		{
-			result = tokens[first+1].ivalue;
+			result = tokens[first+1].dvalue;
 			return true;
 		}
 	}
@@ -305,11 +305,11 @@ int FindChar(const vector<Token> & tokens, int first, int last, char c, int dir)
 
 int EvaluateWithoutParenthesis(const vector<Token> & tokens, int first, int last)
 {
-	int result = tokens[first].ivalue;
+	double result = tokens[first].dvalue;
 
 	for (int i = first + 1; i < last; i+= 2)
 	{
-		int nextValue = tokens[i+1].ivalue;
+		double nextValue = tokens[i+1].dvalue;
 		switch(tokens[i].strvalue[0])
 		{
 			case '+': result += nextValue; break;
@@ -322,7 +322,7 @@ int EvaluateWithoutParenthesis(const vector<Token> & tokens, int first, int last
 	return result;
 }
 
-int Evaluate(const vector<Token> & tokens, int first, int last)
+double Evaluate(const vector<Token> & tokens, int first, int last)
 {
 	for (int i = first; i < last; i++)
 	{
@@ -331,11 +331,11 @@ int Evaluate(const vector<Token> & tokens, int first, int last)
 	cout << endl;
 	int size = last - first;
 
-	int result = 0;
+	double result = 0.0;
 
 	if (size == 1)
 	{
-		return tokens[first].ivalue;
+		return tokens[first].dvalue;
 	}
 	else if (size == 2)
 	{
@@ -365,15 +365,15 @@ int Evaluate(const vector<Token> & tokens, int first, int last)
 			first = expressionLastIdx;
 		}
 	}
-	else if (tokens[first].type == INTEGER)
+	else if (tokens[first].type == NUMBER)
 	{
-		result = tokens[first].ivalue;
+		result = tokens[first].dvalue;
 		first++;
 	}
 
 	if (first != last)
 	{
-		int nextValue = Evaluate(tokens, first + 1, last);
+		double nextValue = Evaluate(tokens, first + 1, last);
 		switch(tokens[first].strvalue[0])
 		{
 			case '+': result += nextValue; break;
@@ -459,14 +459,14 @@ void Priorize(vector<Token> & tokens, int first, int last)
 	int mulDivIdx = (mulIdx != -1 && divIdx != -1 ? std::min(mulIdx, divIdx): (mulIdx != -1? mulIdx : divIdx));  
 	while (mulDivIdx != -1)
 	{
-		if (tokens[mulDivIdx - 1].type == INTEGER && tokens[mulDivIdx + 1].type == INTEGER)
+		if (tokens[mulDivIdx - 1].type == NUMBER && tokens[mulDivIdx + 1].type == NUMBER)
 		{
 			tokens.insert(tokens.begin() + mulDivIdx - 1, Token('('));
 			tokens.insert(tokens.begin() + mulDivIdx + 3, Token(')'));
 			last += 2;
 			mulDivIdx += 2;
 		}
-		else if (tokens[mulDivIdx - 1].type == INTEGER && tokens[mulDivIdx + 1].type == PARENTHESIS)
+		else if (tokens[mulDivIdx - 1].type == NUMBER && tokens[mulDivIdx + 1].type == PARENTHESIS)
 		{
 			int expressionFirstIdx;
 			int expressionLastIdx;
@@ -479,7 +479,7 @@ void Priorize(vector<Token> & tokens, int first, int last)
 				mulDivIdx += 2;
 			}
 		}
-		else if (tokens[mulDivIdx - 1].type == PARENTHESIS && tokens[mulDivIdx + 1].type == INTEGER)
+		else if (tokens[mulDivIdx - 1].type == PARENTHESIS && tokens[mulDivIdx + 1].type == NUMBER)
 		{
 			int expressionFirstIdx;
 			int expressionLastIdx;
@@ -514,7 +514,7 @@ void Priorize(vector<Token> & tokens, int first, int last)
 	divIdx = FindChar(tokens, first, last, '/', 1);
 	while (divIdx != -1)
 	{
-		if (tokens[divIdx - 1].type == INTEGER && tokens[divIdx + 1].type == INTEGER)
+		if (tokens[divIdx - 1].type == NUMBER && tokens[divIdx + 1].type == NUMBER)
 		{
 			tokens.insert(tokens.begin() + divIdx - 1, Token('('));
 			tokens.insert(tokens.begin() + divIdx + 3, Token(')'));
@@ -537,7 +537,7 @@ void Priorize(vector<Token> & tokens, int first, int last)
 	cout <<endl;
 }
 
-int Evaluate(const string & str)
+double Evaluate(const string & str)
 {
 	vector<Token> tokens;
 	Tokenize(tokens, str);
@@ -553,9 +553,11 @@ int Evaluate(const string & str)
 
 int main(int argc, char ** argv)
 {
-	assert(36 + 50 * 100 / 2 * 3 == Evaluate("36 + 50 * 100 / 2 * 3"));
+	assert(36.0 + 50.0 * 100.0 / 2.0 * 3.0 == Evaluate("36 + 50 * 100 / 2 * 3"));
 
-	assert(99 * 56 + 25 * 37 / 3 * 5 == Evaluate("99 * 56 + 25 * 37 / 3 * 5"));
+	assert(99.0 * 56.0 + 25.0 * 37.0 / 3.0 * 5.0 == Evaluate("99 * 56 + 25 * 37 / 3 * 5"));
+
+	assert(2.5 == Evaluate("5/2"));
 
 
 	/*assert(42 == Evaluate("42"));
@@ -573,7 +575,7 @@ int main(int argc, char ** argv)
 		cout << "expr ?" << endl;
 		cin >> in; 
 
-		int result = Evaluate(in);
+		double result = Evaluate(in);
 		cout << "result = "<<  result <<endl;
 	}
 
