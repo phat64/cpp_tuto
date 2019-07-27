@@ -6,4 +6,4 @@ all:
 	g++ -std=c++11 05_testlistzip.cpp -o 05_testlistzip
 	g++ -std=c++11 06_testimage2ascii.cpp -o 06_testimage2ascii
 	gcc 07_testoop.c -o 07_testoop
-
+	g++ 08_testcalculator.cpp -o 08_testcalculator
