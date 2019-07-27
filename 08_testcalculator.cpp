@@ -7,6 +7,8 @@
 
 using namespace std;
 
+// ------------------------------- TOKEN -------------------------------------
+
 enum TokenType
 {
 	NONE, NUMBER, OPERATOR, PARENTHESIS
@@ -86,6 +88,8 @@ struct Token
 bool GetParenthesedExpression(const vector<Token> & tokens, int first, int last, int idx, int &firstIdx, int &lastIdx);
 
 
+// ------------------------------ TOKENIZER ----------------------------------
+
 void Tokenize(vector<Token> & tokens, const string & str)
 {
 	char * s = (char*)str.c_str();
@@ -143,6 +147,8 @@ void Tokenize(vector<Token> & tokens, const string & str)
 		}
 	}
 }
+
+// ------------------------------ CHECKER ------------------------------------
 
 bool Check1(const vector<Token> & tokens, int idx)
 {
@@ -238,6 +244,8 @@ bool Check(const vector<Token> & tokens, int first, int last)
 	return true;
 }
 
+// ------------------------------ COMPUTER -----------------------------------
+
 bool Compute2(double & result, double val, vector<Token> & tokens, int first)
 {
 	//if (Check3(tokens, first))
@@ -288,6 +296,7 @@ bool Compute3(double & result, const vector<Token> & tokens, int first)
 	return false;
 }
 
+// -------------------------------- MISC -------------------------------------
 
 int FindChar(const vector<Token> & tokens, int first, int last, char c, int dir)
 {
@@ -310,6 +319,8 @@ int FindChar(const vector<Token> & tokens, int first, int last, char c, int dir)
 
 	return -1;
 }
+
+// ------------------------------ EVALUATOR ----------------------------------
 
 int EvaluateWithoutParenthesis(const vector<Token> & tokens, int first, int last)
 {
@@ -558,6 +569,7 @@ double Evaluate(const string & str)
 	return 0;
 }
 
+// -------------------------------- TESTER -----------------------------------
 
 int main(int argc, char ** argv)
 {
