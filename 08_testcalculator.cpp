@@ -5,6 +5,16 @@
 #include <iostream>
 #include <assert.h>
 
+/*
+ * A simple calculator with 4 binary operations *, /, +, - and parenthesis ( and ).
+ * It works fine.
+ * [TODO] => it's for educationnal purpose
+ *	- It's my old code. It needs more OOP.
+ * 	- need the negative (unary operator)
+ *	- need math functions like sine or cosine
+ */
+
+
 using namespace std;
 
 // ---------------------------- CONSTANTES -----------------------------------
