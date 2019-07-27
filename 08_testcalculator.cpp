@@ -46,6 +46,37 @@ struct Token
 		ivalue = 0;
 	}
 
+	Token(const char * str)
+	{
+		cout << (str) << endl;
+		strcpy(strvalue, str);
+
+		char c = *str;
+		if (c == '(' || c == ')')
+		{
+			type = PARENTHESIS;
+			cvalue = c;
+			ivalue = 0;
+		}
+		else if (c == '+' || c == '-' || c == '*' || c == '/')
+		{
+			type = OPERATOR;
+			cvalue = 'O';
+			ivalue = 0;
+		}
+		else if (isdigit(c))
+		{
+			type = INTEGER;
+			cvalue = 'I';
+			ivalue = atoi(str);
+		}
+		else
+		{
+			assert(0);
+		}
+	}
+
+
 	char strvalue[16];
 	char cvalue;
 	int ivalue;
@@ -73,6 +104,9 @@ void Tokenize(vector<Token> & tokens, const string & str)
 		}
 		else if (isdigit(c))
 		{
+			const size_t NUMBER_DIGITS_MAX = 15;
+			char numberstr[NUMBER_DIGITS_MAX + 1] = {0};
+			size_t numberstrlen = 0;
 			char * start;
 			char * end;
 			start = end = s-1;
@@ -81,33 +115,18 @@ void Tokenize(vector<Token> & tokens, const string & str)
 			{
 				c = *++end;
 			}
-
-			Token t;
-			t.type = INTEGER;
-			t.cvalue = 'I';
 			s = end;
-			strncpy(t.strvalue, start, end - start);
-			t.strvalue[end - start] = '\0';
-			t.ivalue = atoi(t.strvalue);
-			tokens.push_back(t);
+			numberstrlen = min(size_t(end - start), NUMBER_DIGITS_MAX); 
+			strncpy(numberstr, start, numberstrlen);
+			tokens.push_back(Token(numberstr));
 		}
 		else if (c == '+' || c == '-' || c == '*' || c == '/')
 		{
-			Token t;
-			t.type = OPERATOR;
-			t.cvalue = t.ivalue = 'O';
-			t.strvalue[0] = c;
-			t.strvalue[1] = '\0';
-			tokens.push_back(t);
+			tokens.push_back(Token(c));
 		}
 		else if (c == '(' || c ==')')
 		{
-			Token t;
-			t.type = PARENTHESIS;
-			t.cvalue = t.ivalue = c;
-			t.strvalue[0] = c;
-			t.strvalue[1] = '\0';
-			tokens.push_back(t);
+			tokens.push_back(Token(c));
 		}
 		else
 		{
