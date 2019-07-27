@@ -50,21 +50,18 @@ struct Token
 
 	Token(const char * str)
 	{
-		cout << (str) << endl;
-		strcpy(strvalue, str);
+		assert(str != NULL);
+		strncpy(strvalue, str, sizeof(strvalue) - 1); 	// strncpy is safer than strcpy
+		strvalue[sizeof(strvalue) - 1] = '\0';		// mandatory if str is bigger than strvalue
 
 		char c = *str;
 		if (c == '(' || c == ')')
 		{
-			type = PARENTHESIS;
-			cvalue = c;
-			dvalue = 0.0;
+			*this = Token(c);
 		}
 		else if (c == '+' || c == '-' || c == '*' || c == '/')
 		{
-			type = OPERATOR;
-			cvalue = 'O';
-			dvalue = 0.0;
+			*this = Token(c);
 		}
 		else if (isdigit(c))
 		{
@@ -74,6 +71,7 @@ struct Token
 		}
 		else
 		{
+			cerr << "unknown token : " << str << endl;
 			assert(0);
 		}
 	}
