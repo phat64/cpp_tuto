@@ -67,7 +67,7 @@ struct Token
 		else if (isdigit(c))
 		{
 			type = NUMBER;
-			cvalue = 'I';
+			cvalue = 'N';
 			dvalue = atof(str);
 		}
 		else
@@ -156,7 +156,7 @@ bool Check2(const vector<Token> & tokens, int idx)
 
 bool Check3(const vector<Token> & tokens, int idx)
 {
-	const char * validcombo[] = {"(I)", "IOI", NULL};
+	const char * validcombo[] = {"(N)", "NON", NULL};
 
 	for (int i = 0; validcombo[i]; i++)
 	{
@@ -171,7 +171,7 @@ bool Check3(const vector<Token> & tokens, int idx)
 
 bool CheckCombo(const vector<Token> & tokens, int idx0, int idx1)
 {
-	const char * validcombo[] = {"((", "))", "(I", "I)", "IO", "OI", "O(", ")O", NULL};
+	const char * validcombo[] = {"((", "))", "(N", "N)", "NO", "ON", "O(", ")O", NULL};
 
 	for (int i = 0; validcombo[i]; i++)
 	{
