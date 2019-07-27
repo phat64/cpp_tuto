@@ -7,6 +7,10 @@
 
 using namespace std;
 
+// ---------------------------- CONSTANTES -----------------------------------
+
+static const size_t NUMBER_DIGITS_MAX = 32;
+
 // ------------------------------- TOKEN -------------------------------------
 
 enum TokenType
@@ -77,7 +81,7 @@ struct Token
 	}
 
 
-	char strvalue[32 + 1];
+	char strvalue[NUMBER_DIGITS_MAX + 1];
 	char cvalue;
 	double dvalue;
 };
@@ -106,7 +110,6 @@ void Tokenize(vector<Token> & tokens, const string & str)
 		}
 		else if (isdigit(c))
 		{
-			const size_t NUMBER_DIGITS_MAX = 32;
 			char numberstr[NUMBER_DIGITS_MAX + 1] = {0};
 			size_t numberstrlen = 0;
 			char * start;
