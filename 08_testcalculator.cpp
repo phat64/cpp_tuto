@@ -388,7 +388,7 @@ double Evaluate(const vector<Token> & tokens, int first, int last)
 	}
 
 	// evaluate the first expression
-	if (tokens[first].type == PARENTHESIS && tokens[first].strvalue[0] == '(')
+	if (tokens[first].type == PARENTHESIS && tokens[first].cvalue == '(')
 	{
 		int expressionFirstIdx;
 		int expressionLastIdx;
@@ -433,7 +433,7 @@ bool GetParenthesedExpression(const vector<Token> & tokens, int first, int last,
 	if (tokens[idx].type == PARENTHESIS)
 	{
 		int depth = 0;
-		if (tokens[idx].strvalue[0] == '(')
+		if (tokens[idx].cvalue == '(')
 		{
 			firstIdx = idx;
 			for(;idx < last;idx++)
