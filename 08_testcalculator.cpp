@@ -489,7 +489,7 @@ void Priorize(vector<Token> & tokens, int first, int last)
 {
 	int mulIdx = FindChar(tokens, first, last, '*', 1);
 	int divIdx = FindChar(tokens, first, last, '/', 1);
-	int mulDivIdx = (mulIdx != -1 && divIdx != -1 ? std::min(mulIdx, divIdx): (mulIdx != -1? mulIdx : divIdx));  
+	int mulDivIdx = (mulIdx != -1 && divIdx != -1 ? std::min(mulIdx, divIdx): std::max(mulIdx, divIdx));
 	while (mulDivIdx != -1)
 	{
 		if (tokens[mulDivIdx - 1].type == NUMBER && tokens[mulDivIdx + 1].type == NUMBER)
@@ -530,9 +530,7 @@ void Priorize(vector<Token> & tokens, int first, int last)
 
 		mulIdx = FindChar(tokens, mulDivIdx, last, '*', 1);
 		divIdx = FindChar(tokens, mulDivIdx, last, '/', 1);
-		mulDivIdx = (mulIdx != -1 && divIdx != -1 ? std::min(mulIdx, divIdx): (mulIdx != -1? mulIdx : divIdx));  
-
-		//mulIdx = FindChar(tokens, mulIdx, last, '*', 1);
+		mulDivIdx = (mulIdx != -1 && divIdx != -1 ? std::min(mulIdx, divIdx): std::max(mulIdx, divIdx));
 
 		cout << "mulIdx = " << mulIdx << endl;
 		cout <<endl;
