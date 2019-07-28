@@ -560,32 +560,6 @@ void Priorize(vector<Token> & tokens, int first, int last)
 		}
 		cout <<endl;
 	}
-
-	return;
-	divIdx = FindChar(tokens, first, last, '/', 1);
-	while (divIdx != -1)
-	{
-		if (tokens[divIdx - 1].type == NUMBER && tokens[divIdx + 1].type == NUMBER)
-		{
-			tokens.insert(tokens.begin() + divIdx - 1, Token('('));
-			tokens.insert(tokens.begin() + divIdx + 3, Token(')'));
-			last += 2;
-		}
-		divIdx += 2;
-		divIdx = FindChar(tokens, divIdx, last, '/', 1);
-
-		cout << "divIdx = " << divIdx << endl;
-		for (size_t i = 0; i < tokens.size(); i++)
-		{
-			cout << tokens[i].strvalue <<endl;
-		}
-	}
-
-	for (size_t i = 0; i < tokens.size(); i++)
-	{
-		cout << tokens[i].strvalue;
-	}
-	cout <<endl;
 }
 
 double Evaluate(const string & str)
