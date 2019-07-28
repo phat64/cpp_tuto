@@ -440,11 +440,11 @@ bool GetParenthesedExpression(const vector<Token> & tokens, int first, int last,
 			{
 				if (tokens[idx].type == PARENTHESIS)
 				{
-					if (tokens[idx].strvalue[0] == '(')
+					if (tokens[idx].cvalue == '(')
 					{
 						depth++;
 					}
-					else if (tokens[idx].strvalue[0] == ')')
+					else if (tokens[idx].cvalue == ')')
 					{
 						depth--;
 						if (depth == 0)
@@ -456,14 +456,14 @@ bool GetParenthesedExpression(const vector<Token> & tokens, int first, int last,
 				}
 			}
 		}
-		else if (tokens[idx].strvalue[0] == ')')
+		else if (tokens[idx].cvalue == ')')
 		{
 			lastIdx = idx + 1;
 			for(;idx >= first;idx--)
 			{
 				if (tokens[idx].type == PARENTHESIS)
 				{
-					if (tokens[idx].strvalue[0] == '(')
+					if (tokens[idx].cvalue == '(')
 					{
 						depth++;
 						if (depth == 0)
@@ -473,7 +473,7 @@ bool GetParenthesedExpression(const vector<Token> & tokens, int first, int last,
 						}
 
 					}
-					else if (tokens[idx].strvalue[0] == ')')
+					else if (tokens[idx].cvalue == ')')
 					{
 						depth--;
 					}
