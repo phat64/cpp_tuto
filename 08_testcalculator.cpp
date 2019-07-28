@@ -330,7 +330,7 @@ bool Compute3(double & result, const vector<Token> & tokens, int first)
 
 // -------------------------------- MISC -------------------------------------
 
-int FindChar(const vector<Token> & tokens, int first, int last, char c, int dir)
+int FindChar(const vector<Token> & tokens, int first, int last, char c, int dir = 1)
 {
 	if (dir > 0)
 	{
@@ -400,7 +400,7 @@ double Evaluate(const vector<Token> & tokens, int first, int last)
 	}
 
 	// no parenthesis => easy to evaluate
-	if (FindChar(tokens, first, last, '(', 1) < 0)
+	if (FindChar(tokens, first, last, '(') < 0)
 	{
 		result = EvaluateWithoutParenthesis(tokens, first, last);
 		return result;
@@ -507,8 +507,8 @@ bool GetParenthesedExpression(const vector<Token> & tokens, int first, int last,
 
 void Priorize(vector<Token> & tokens, int first, int last)
 {
-	int mulIdx = FindChar(tokens, first, last, '*', 1);
-	int divIdx = FindChar(tokens, first, last, '/', 1);
+	int mulIdx = FindChar(tokens, first, last, '*');
+	int divIdx = FindChar(tokens, first, last, '/');
 	int mulDivIdx = (mulIdx != -1 && divIdx != -1 ? std::min(mulIdx, divIdx): std::max(mulIdx, divIdx));
 	while (mulDivIdx != -1)
 	{
@@ -548,8 +548,8 @@ void Priorize(vector<Token> & tokens, int first, int last)
 
 		
 
-		mulIdx = FindChar(tokens, mulDivIdx, last, '*', 1);
-		divIdx = FindChar(tokens, mulDivIdx, last, '/', 1);
+		mulIdx = FindChar(tokens, mulDivIdx, last, '*');
+		divIdx = FindChar(tokens, mulDivIdx, last, '/');
 		mulDivIdx = (mulIdx != -1 && divIdx != -1 ? std::min(mulIdx, divIdx): std::max(mulIdx, divIdx));
 
 		cout << "mulIdx = " << mulIdx << endl;
