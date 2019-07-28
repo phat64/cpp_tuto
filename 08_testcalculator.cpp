@@ -260,6 +260,22 @@ bool Check(const vector<Token> & tokens, int first, int last)
 
 // ------------------------------ COMPUTER -----------------------------------
 
+double Compute(double a, char op, double b)
+{
+	double result = 0.0;
+
+	switch(op)
+	{
+		case '+': result = a + b; break;
+		case '-': result = a - b; break;
+		case '*': result = a * b; break;
+		case '/': result = a / b; break;
+		default : cout << "[Compute] unknown operator " << op << endl;
+	}
+
+	return result;
+}
+
 bool Compute2(double & result, double val, const vector<Token> & tokens, int first)
 {
 	//if (Check3(tokens, first))
@@ -268,13 +284,14 @@ bool Compute2(double & result, double val, const vector<Token> & tokens, int fir
 		{
 			double a = val;
 			double b = tokens[first+1].dvalue;
-			switch(tokens[first].strvalue[0])
+			result = Compute(a, tokens[first].strvalue[0], b);
+			/*switch(tokens[first].strvalue[0])
 			{
 				case '+': result = a + b; break;
 				case '-': result = a - b; break;
 				case '*': result = a * b; break;
 				case '/': result = a / b; break;
-			}
+			}*/
 			return true;
 		}
 	}
@@ -291,13 +308,14 @@ bool Compute3(double & result, const vector<Token> & tokens, int first)
 		{
 			double a = tokens[first].dvalue;
 			double b = tokens[first+2].dvalue;
-			switch(tokens[first + 1].strvalue[0])
+			result = Compute(a, tokens[first + 1].strvalue[0], b);
+			/*switch(tokens[first + 1].strvalue[0])
 			{
 				case '+': result = a + b; break;
 				case '-': result = a - b; break;
 				case '*': result = a * b; break;
 				case '/': result = a / b; break;
-			}
+			}*/
 			return true;
 		}
 		// (N)
@@ -343,13 +361,14 @@ int EvaluateWithoutParenthesis(const vector<Token> & tokens, int first, int last
 	for (int i = first + 1; i < last; i+= 2)
 	{
 		double nextValue = tokens[i+1].dvalue;
-		switch(tokens[i].strvalue[0])
+		result = Compute(result, tokens[i].strvalue[0], nextValue);
+		/*switch(tokens[i].strvalue[0])
 		{
 			case '+': result += nextValue; break;
 			case '-': result -= nextValue; break;
 			case '*': result *= nextValue; break;
 			case '/': result /= nextValue; break;
-		}
+		}*/
 	}
 
 	return result;
@@ -407,13 +426,14 @@ double Evaluate(const vector<Token> & tokens, int first, int last)
 	if (first != last)
 	{
 		double nextValue = Evaluate(tokens, first + 1, last);
-		switch(tokens[first].strvalue[0])
+		result = Compute(result, tokens[first].strvalue[0], nextValue);
+		/*switch(tokens[first].strvalue[0])
 		{
 			case '+': result += nextValue; break;
 			case '-': result -= nextValue; break;
 			case '*': result *= nextValue; break;
 			case '/': result /= nextValue; break;
-		}
+		}*/
 	}
 	return result;
 }
