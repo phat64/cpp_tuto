@@ -8,9 +8,9 @@
 /*
  * A simple calculator with 4 binary operations *, /, +, - and parenthesis ( and ).
  * It works fine.
- * [TODO] => it's for educationnal purpose
+ * [TODO] => It's only for the tutorial. It's not for advanced developers and it's obviously not high optimized ^^
  *	- It's my old code. It needs more OOP.
- * 	- need the negative (unary operator)
+ * 	- need the negative operator (unary operator)
  *	- need math functions like sine or cosine
  */
 
