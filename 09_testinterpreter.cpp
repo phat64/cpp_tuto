@@ -20,6 +20,7 @@ using namespace std;
 // ---------------------------- CONSTANTES -----------------------------------
 
 static const size_t NUMBER_DIGITS_MAX = 32;
+static const size_t NAME_NB_CHARS_MAX = 32;
 
 // ------------------------------- TOKEN -------------------------------------
 
@@ -99,7 +100,7 @@ struct Token
 	}
 
 
-	char strvalue[NUMBER_DIGITS_MAX + 1];
+	char strvalue[NAME_NB_CHARS_MAX + 1];
 	char cvalue;
 	double dvalue;
 };
@@ -150,6 +151,23 @@ void Tokenize(vector<Token> & tokens, const string & str)
 			numberstrlen = min(size_t(end - start), NUMBER_DIGITS_MAX); 
 			strncpy(numberstr, start, numberstrlen);
 			tokens.push_back(Token(numberstr));
+		}
+		else if (isalpha(c))
+		{
+			char namestr[NAME_NB_CHARS_MAX + 1] = {0};
+			size_t namestrlen = 0;
+			char * start;
+			char * end;
+			start = end = s-1;
+
+			while(isalnum(c))
+			{
+				c = *++end;
+			}
+			s = end;
+			namestrlen = min(size_t(end - start), NAME_NB_CHARS_MAX);
+			strncpy(namestr, start, namestrlen);
+			tokens.push_back(Token(namestr));
 		}
 		else if (c == '+' || c == '-' || c == '*' || c == '/')
 		{
