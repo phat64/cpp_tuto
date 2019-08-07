@@ -213,9 +213,10 @@ void Tokenize(vector<Token> & tokens, const string & str)
 
 		// Step 2.2
 		// check the last Token for a VARIABLE_NAME
-		if (tokens[tokens.size() - 1].type == NAME)
+		Token & lastToken = tokens[tokens.size() - 1];
+		if (lastToken.type == NAME)
 		{
-			tokens[tokens.size() - 1].type == VARIABLE_NAME;
+			lastToken.type == VARIABLE_NAME;
 		}
 	}
 }
