@@ -116,6 +116,7 @@ void Tokenize(vector<Token> & tokens, const string & str)
 	char * s = (char*)str.c_str();
 	char c;
 
+	// Step 1 : simple tokenization
 	while (c = *s++)
 	{
 		while (c && (c == ' ' || c == '\t'))
@@ -181,6 +182,40 @@ void Tokenize(vector<Token> & tokens, const string & str)
 		{
 			cout << "UNKNOW CHARACTER" << c << endl;
 			exit(-1);
+		}
+	}
+
+	// Step 2
+	// Post process :
+	// convert NAME to VARIABLE_NAME or FUNCTION_NAME
+
+	if (tokens.size() > 0)
+	{
+		// Step 2.1
+		// check if the next Token is a '(' for a FUNCTION_NAME
+		for (size_t i = 0; i < tokens.size() - 1; i++)
+		{
+			Token & currentToken = tokens[i];
+			Token & nextToken = tokens[i + 1];
+
+			if (currentToken.type == NAME)
+			{
+				if (nextToken.cvalue == '(')
+				{
+					currentToken.type == FUNCTION_NAME;
+				}
+				else
+				{
+					currentToken.type == VARIABLE_NAME;
+				}
+			}
+		}
+
+		// Step 2.2
+		// check the last Token for a VARIABLE_NAME
+		if (tokens[tokens.size() - 1].type == NAME)
+		{
+			tokens[tokens.size() - 1].type == VARIABLE_NAME;
 		}
 	}
 }
