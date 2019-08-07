@@ -89,7 +89,7 @@ struct Token
 		else if (isalpha(c))
 		{
 			type = NAME; // NAME =  VARIABLE_NAME or FUNCTION_NAME
-			cvalue = 'A';
+			cvalue = 'N';
 			dvalue = 0.0;
 		}
 		else
@@ -201,11 +201,11 @@ void Tokenize(vector<Token> & tokens, const string & str)
 			{
 				if (nextToken.cvalue == '(')
 				{
-					currentToken.type == FUNCTION_NAME;
+					currentToken.type = FUNCTION_NAME;
 				}
 				else
 				{
-					currentToken.type == VARIABLE_NAME;
+					currentToken.type = VARIABLE_NAME;
 					currentToken.cvalue = 'N';
 				}
 			}
@@ -216,7 +216,7 @@ void Tokenize(vector<Token> & tokens, const string & str)
 		Token & lastToken = tokens[tokens.size() - 1];
 		if (lastToken.type == NAME)
 		{
-			lastToken.type == VARIABLE_NAME;
+			lastToken.type = VARIABLE_NAME;
 		}
 	}
 }
@@ -225,7 +225,7 @@ void Tokenize(vector<Token> & tokens, const string & str)
 
 bool Check1(const vector<Token> & tokens, int idx)
 {
-	return tokens[idx].type == NUMBER;
+	return tokens[idx].type == NUMBER || tokens[idx].type == VARIABLE_NAME;
 }
 
 bool Check2(const vector<Token> & tokens, int idx)
@@ -310,15 +310,15 @@ bool Check(const vector<Token> & tokens, int first, int last)
 	int size = last - first;
 	if (size == 1)
 	{
-		return Check1(tokens, first);
+		return Check1(tokens, first) && CheckVariables(tokens, first, last);
 	}
 	else if (size == 2)
 	{
-		return Check2(tokens, first);
+		return Check2(tokens, first) && CheckVariables(tokens, first, last);
 	}
 	else if (size == 3)
 	{
-		return Check3(tokens, first);
+		return Check3(tokens, first) && CheckVariables(tokens, first, last);
 	}
 
 	if (!CheckParenthesis(tokens, first, last))
@@ -403,7 +403,7 @@ bool Compute3(double & result, const vector<Token> & tokens, int first)
 			return true;
 		}
 		// (N)
-		if (tokens[first + 1].type == NUMBER)
+		if (tokens[first + 1].type == NUMBER || tokens[first + 1].type == VARIABLE_NAME)
 		{
 			result = tokens[first+1].dvalue;
 			return true;
@@ -436,7 +436,7 @@ int FindChar(const vector<Token> & tokens, int first, int last, char c, int dir 
 	return -1;
 }
 
-// ------------------------------ EVALUATOR ----------------------------------
+// ------------------------------ VARIABLES ----------------------------------
 
 void UpdateVariables(vector<Token> & tokens, int first, int last)
 {
@@ -508,7 +508,7 @@ double Evaluate(const vector<Token> & tokens, int first, int last)
 			first = expressionLastIdx;
 		}
 	}
-	else if (tokens[first].type == NUMBER)
+	else if (tokens[first].type == NUMBER || tokens[first].type == VARIABLE_NAME)
 	{
 		result = tokens[first].dvalue;
 		first++;
@@ -603,14 +603,16 @@ void Priorize(vector<Token> & tokens, int first, int last)
 	int mulDivIdx = (mulIdx != -1 && divIdx != -1 ? std::min(mulIdx, divIdx): std::max(mulIdx, divIdx));
 	while (mulDivIdx != -1)
 	{
-		if (tokens[mulDivIdx - 1].type == NUMBER && tokens[mulDivIdx + 1].type == NUMBER)
+		if ((tokens[mulDivIdx - 1].type == NUMBER || tokens[mulDivIdx - 1].type == VARIABLE_NAME)
+		&& (tokens[mulDivIdx + 1].type == NUMBER || tokens[mulDivIdx + 1].type == VARIABLE_NAME))
 		{
 			tokens.insert(tokens.begin() + mulDivIdx - 1, Token('('));
 			tokens.insert(tokens.begin() + mulDivIdx + 3, Token(')'));
 			last += 2;
 			mulDivIdx += 2;
 		}
-		else if (tokens[mulDivIdx - 1].type == NUMBER && tokens[mulDivIdx + 1].type == PARENTHESIS)
+		else if ((tokens[mulDivIdx - 1].type == NUMBER || tokens[mulDivIdx - 1].type == VARIABLE_NAME)
+			&& tokens[mulDivIdx + 1].type == PARENTHESIS)
 		{
 			int expressionFirstIdx;
 			int expressionLastIdx;
@@ -623,7 +625,8 @@ void Priorize(vector<Token> & tokens, int first, int last)
 				mulDivIdx += 2;
 			}
 		}
-		else if (tokens[mulDivIdx - 1].type == PARENTHESIS && tokens[mulDivIdx + 1].type == NUMBER)
+		else if (tokens[mulDivIdx - 1].type == PARENTHESIS
+			&& (tokens[mulDivIdx + 1].type == NUMBER || tokens[mulDivIdx + 1].type == VARIABLE_NAME))
 		{
 			int expressionFirstIdx;
 			int expressionLastIdx;
