@@ -23,9 +23,11 @@ static const size_t NUMBER_DIGITS_MAX = 32;
 
 // ------------------------------- TOKEN -------------------------------------
 
+
 enum TokenType
 {
-	NONE, NUMBER, OPERATOR, PARENTHESIS
+	NONE, NUMBER, OPERATOR, PARENTHESIS,
+	NAME, VARIABLE_NAME, FUNCTION_NAME /* NAME =  VARIABLE_NAME or FUNCTION_NAME*/
 };
 
 struct Token
@@ -82,6 +84,12 @@ struct Token
 			type = NUMBER;
 			cvalue = 'N';
 			dvalue = atof(str);
+		}
+		else if (isalpha(c))
+		{
+			type = NAME; // NAME =  VARIABLE_NAME or FUNCTION_NAME
+			cvalue = 'A';
+			dvalue = 0.0;
 		}
 		else
 		{
