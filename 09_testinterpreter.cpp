@@ -99,7 +99,6 @@ struct Token
 		}
 	}
 
-
 	char strvalue[NAME_NB_CHARS_MAX + 1];
 	char cvalue;
 	double dvalue;
@@ -207,6 +206,7 @@ void Tokenize(vector<Token> & tokens, const string & str)
 				else
 				{
 					currentToken.type == VARIABLE_NAME;
+					currentToken.cvalue = 'N';
 				}
 			}
 		}
@@ -288,6 +288,23 @@ bool CheckParenthesis(const vector<Token> & tokens, int first, int last)
 	return depth == 0;
 }
 
+bool CheckVariables(const vector<Token> & tokens, int first, int last)
+{
+	for (int i = first; i < last; i++)
+	{
+		const Token & currentToken = tokens[i];
+		if (currentToken.type == VARIABLE_NAME)
+		{
+			if (strcmp(currentToken.strvalue, "pi") != 0)
+			{
+				cout << "error : variable not found : " << currentToken.strvalue << endl;
+				return false;
+			}
+		}
+	}
+	return true;
+}
+
 bool Check(const vector<Token> & tokens, int first, int last)
 {
 	int size = last - first;
@@ -315,6 +332,11 @@ bool Check(const vector<Token> & tokens, int first, int last)
 		{
 			return false;
 		}
+	}
+
+	if (!CheckVariables(tokens, first, last))
+	{
+		return false;
 	}
 
 	return true;
@@ -412,6 +434,13 @@ int FindChar(const vector<Token> & tokens, int first, int last, char c, int dir 
 	}
 
 	return -1;
+}
+
+// ------------------------------ EVALUATOR ----------------------------------
+
+void UpdateVariables(vector<Token> & tokens, int first, int last)
+{
+	// implement it
 }
 
 // ------------------------------ EVALUATOR ----------------------------------
