@@ -440,7 +440,17 @@ int FindChar(const vector<Token> & tokens, int first, int last, char c, int dir 
 
 void UpdateVariables(vector<Token> & tokens, int first, int last)
 {
-	// implement it
+	for (int i = first; i < last; i++)
+	{
+		Token & currentToken = tokens[i];
+		if (currentToken.type == VARIABLE_NAME)
+		{
+			if (strcmp(currentToken.strvalue, "pi") == 0)
+			{
+				currentToken.dvalue = 3.1415;
+			}
+		}
+	}
 }
 
 // ------------------------------ EVALUATOR ----------------------------------
@@ -662,6 +672,7 @@ double Evaluate(const string & str)
 	Tokenize(tokens, str);
 	if (Check(tokens, 0, tokens.size()))
 	{
+		UpdateVariables(tokens, 0, tokens.size());
 		Priorize(tokens, 0, tokens.size());
 		return Evaluate(tokens, 0, tokens.size());
 	}
