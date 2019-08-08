@@ -28,7 +28,7 @@ static const size_t NAME_NB_CHARS_MAX = 32;
 enum TokenType
 {
 	NONE, NUMBER, OPERATOR, PARENTHESIS, COMMA,
-	NAME, VARIABLE_NAME, FUNCTION_NAME /* NAME =  VARIABLE_NAME or FUNCTION_NAME*/
+	NAME, VARIABLE_NAME, FUNCTION_NAME, /* NAME =  VARIABLE_NAME or FUNCTION_NAME*/
 	FUNCTION_ARGS_BEGIN, FUNCTION_ARGS_SEPARATOR, FUNCTION_ARGS_END /* ( , ) */
 };
 
@@ -56,6 +56,11 @@ struct Token
 			type = OPERATOR;
 			cvalue = 'O';
 		}
+		else if (c == ',')
+		{
+			type = COMMA;
+			cvalue = ',';
+		}
 		else
 		{
 			type = NONE;
@@ -78,6 +83,10 @@ struct Token
 			*this = Token(c);
 		}
 		else if (c == '+' || c == '-' || c == '*' || c == '/')
+		{
+			*this = Token(c);
+		}
+		else if (c == ',')
 		{
 			*this = Token(c);
 		}
@@ -175,6 +184,10 @@ void Tokenize(vector<Token> & tokens, const string & str)
 			tokens.push_back(Token(c));
 		}
 		else if (c == '(' || c ==')')
+		{
+			tokens.push_back(Token(c));
+		}
+		else if (c == ',')
 		{
 			tokens.push_back(Token(c));
 		}
