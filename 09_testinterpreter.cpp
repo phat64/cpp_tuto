@@ -119,6 +119,7 @@ bool GetParenthesedExpression(const vector<Token> & tokens, int first, int last,
 
 
 // ------------------------------ TOKENIZER ----------------------------------
+void TokenizePostProcess(vector<Token> & tokens);
 
 void Tokenize(vector<Token> & tokens, const string & str)
 {
@@ -198,12 +199,18 @@ void Tokenize(vector<Token> & tokens, const string & str)
 		}
 	}
 
-	// Step 2
-	// Post process :
-	// convert NAME to VARIABLE_NAME or FUNCTION_NAME
+	TokenizePostProcess(tokens);
+}
 
+void TokenizePostProcess(vector<Token> & tokens)
+{
 	if (tokens.size() > 0)
 	{
+		// Step 2
+		// Post process :
+		// convert NAME to VARIABLE_NAME or FUNCTION_NAME
+
+
 		// Step 2.1
 		// check if the next Token is a '(' for a FUNCTION_NAME
 		for (size_t i = 0; i < tokens.size() - 1; i++)
