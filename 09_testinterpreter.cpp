@@ -223,12 +223,14 @@ void TokenizePostProcess(vector<Token> & tokens)
 				if (nextToken.cvalue == '(')
 				{
 					currentToken.type = FUNCTION_NAME;
+					currentToken.cvalue = 'F';
 					nextToken.type = FUNCTION_ARGS_BEGIN;
 					size_t depth = 1;
 					size_t nbSeparators = 0;
+					size_t nbLoops = 0;
 
 					// Manage the FUNCTION ARGS LIST
-					for (size_t j = i + 1; j < tokens.size() && depth != 0; j++)
+					for (size_t j = i + 1; j < tokens.size() && depth != 0; j++, nbLoops++)
 					{
 						Token & currentToken2 = tokens[j];
 
@@ -256,7 +258,7 @@ void TokenizePostProcess(vector<Token> & tokens)
 					}
 
 					// dvalue contains the nb of args of the function
-					if (nbSeparators == 0)
+					if (nbSeparators == 0 && nbLoops <= 2)
 					{
 						// function()
 						currentToken.dvalue = 0;
@@ -267,6 +269,12 @@ void TokenizePostProcess(vector<Token> & tokens)
 						size_t nbArgs = nbSeparators + 1;
 						currentToken.dvalue = double(nbArgs);
 					}
+#if 0
+					// debug function
+					cout << "fname = " << currentToken.strvalue;
+					cout << " nbArgs = "<< currentToken.dvalue;
+					cout << " nbLoops = "<< nbLoops << endl;
+#endif
 				}
 				else
 				{
@@ -370,20 +378,44 @@ bool CheckVariables(const vector<Token> & tokens, int first, int last)
 	return true;
 }
 
+bool CheckFunctions(const vector<Token> & tokens, int first, int last)
+{
+	for (int i = first; i < last; i++)
+	{
+		const Token & currentToken = tokens[i];
+		if (currentToken.type == FUNCTION_NAME)
+		{
+			cout << "toto" << endl;
+			if (strcmp(currentToken.strvalue, "max") != 0 || currentToken.dvalue != 2.0)
+			{
+				cout << "error : function not found : " << currentToken.strvalue << endl;
+				return false;
+			}
+		}
+	}
+	return true;
+}
+
 bool Check(const vector<Token> & tokens, int first, int last)
 {
 	int size = last - first;
 	if (size == 1)
 	{
-		return Check1(tokens, first) && CheckVariables(tokens, first, last);
+		return Check1(tokens, first)
+			&& CheckVariables(tokens, first, last)
+			&& CheckFunctions(tokens, first, last);
 	}
 	else if (size == 2)
 	{
-		return Check2(tokens, first) && CheckVariables(tokens, first, last);
+		return Check2(tokens, first)
+			&& CheckVariables(tokens, first, last)
+			&& CheckFunctions(tokens, first, last);
 	}
 	else if (size == 3)
 	{
-		return Check3(tokens, first) && CheckVariables(tokens, first, last);
+		return Check3(tokens, first)
+			&& CheckVariables(tokens, first, last)
+			&& CheckFunctions(tokens, first, last);
 	}
 
 	if (!CheckParenthesis(tokens, first, last))
@@ -400,6 +432,11 @@ bool Check(const vector<Token> & tokens, int first, int last)
 	}
 
 	if (!CheckVariables(tokens, first, last))
+	{
+		return false;
+	}
+
+	if (!CheckFunctions(tokens, first, last))
 	{
 		return false;
 	}
