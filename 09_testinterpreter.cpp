@@ -223,6 +223,18 @@ void TokenizePostProcess(vector<Token> & tokens)
 				if (nextToken.cvalue == '(')
 				{
 					currentToken.type = FUNCTION_NAME;
+					nextToken.type = FUNCTION_ARGS_BEGIN;
+
+					for (size_t j = i + 1; j < tokens.size(); j++)
+					{
+						Token & currentToken2 = tokens[j];
+
+						// convert COMMA to FUNCTION ARGS SEPARATOR
+						if (currentToken2.type == COMMA)
+						{
+							currentToken2.type = FUNCTION_ARGS_SEPARATOR;
+						}
+					}
 				}
 				else
 				{
