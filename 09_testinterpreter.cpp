@@ -224,13 +224,30 @@ void TokenizePostProcess(vector<Token> & tokens)
 				{
 					currentToken.type = FUNCTION_NAME;
 					nextToken.type = FUNCTION_ARGS_BEGIN;
+					size_t depth = 1;
 
-					for (size_t j = i + 1; j < tokens.size(); j++)
+					// Manage the FUNCTION ARGS LIST
+					for (size_t j = i + 1; j < tokens.size() && depth != 0; j++)
 					{
 						Token & currentToken2 = tokens[j];
 
-						// convert COMMA to FUNCTION ARGS SEPARATOR
-						if (currentToken2.type == COMMA)
+						if (currentToken2.type == PARENTHESIS)
+						{
+							if (currentToken2.cvalue == '(')
+							{
+								depth++;
+							}
+							else if (currentToken2.cvalue == ')')
+							{
+								depth--;
+								if (depth == 0)
+								{
+									currentToken2.type = FUNCTION_ARGS_END;
+								}
+							}
+						}
+						// smart convert COMMA to FUNCTION ARGS SEPARATOR
+						else if (currentToken2.type == COMMA && depth == 1)
 						{
 							currentToken2.type = FUNCTION_ARGS_SEPARATOR;
 						}
