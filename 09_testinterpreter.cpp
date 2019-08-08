@@ -225,6 +225,7 @@ void TokenizePostProcess(vector<Token> & tokens)
 					currentToken.type = FUNCTION_NAME;
 					nextToken.type = FUNCTION_ARGS_BEGIN;
 					size_t depth = 1;
+					size_t nbSeparators = 0;
 
 					// Manage the FUNCTION ARGS LIST
 					for (size_t j = i + 1; j < tokens.size() && depth != 0; j++)
@@ -250,7 +251,21 @@ void TokenizePostProcess(vector<Token> & tokens)
 						else if (currentToken2.type == COMMA && depth == 1)
 						{
 							currentToken2.type = FUNCTION_ARGS_SEPARATOR;
+							nbSeparators++;
 						}
+					}
+
+					// dvalue contains the nb of args of the function
+					if (nbSeparators == 0)
+					{
+						// function()
+						currentToken.dvalue = 0;
+					}
+					else
+					{
+						// function(1,2,3,...,nbArgs)
+						size_t nbArgs = nbSeparators + 1;
+						currentToken.dvalue = double(nbArgs);
 					}
 				}
 				else
