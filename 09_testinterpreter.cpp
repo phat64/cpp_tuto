@@ -851,14 +851,27 @@ double Evaluate(const string & str)
 
 int main(int argc, char ** argv)
 {
+	// assertion for constants check
 	assert(42 == Evaluate("42"));
 	assert(2.5 == Evaluate("5/2"));
+
+	// assertion of binary operations check
 	assert(99 + 42 == Evaluate("99 + 42"));
 	assert(99 * 42 == Evaluate("99 * 42"));
 	assert(11 + 22 * 33 == Evaluate("11 + 22 * 33"));
 	assert(36.0 + 50.0 * 100.0 / 2.0 * 3.0 == Evaluate("36 + 50 * 100 / 2 * 3"));
 	assert(99.0 * 56.0 + 25.0 * 37.0 / 3.0 * 5.0 == Evaluate("99 * 56 + 25 * 37 / 3 * 5"));
 
+	// assertion for variables check
+	assert(3.1415 == Evaluate("pi"));
+	assert(2.0 * 3.1415 == Evaluate("2 * pi"));
+
+	// assertion for functions check
+	assert(55.0 == Evaluate("max(55,22)"));
+	assert(55.0 == Evaluate("max(22,55)"));
+	assert(1.0 == Evaluate("cos(0)"));
+	assert(cos(3.1415) == Evaluate("cos(pi)"));
+	assert(cos(2 * 3.1415) == Evaluate("cos(2 * pi)"));
 
 	while (true)
 	{
