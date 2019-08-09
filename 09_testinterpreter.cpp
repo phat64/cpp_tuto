@@ -225,6 +225,7 @@ void TokenizePostProcess(vector<Token> & tokens)
 					currentToken.type = FUNCTION_NAME;
 					currentToken.cvalue = 'F';
 					nextToken.type = FUNCTION_ARGS_BEGIN;
+					nextToken.cvalue = '[';
 					size_t depth = 1;
 					size_t nbSeparators = 0;
 					size_t nbLoops = 0;
@@ -246,6 +247,7 @@ void TokenizePostProcess(vector<Token> & tokens)
 								if (depth == 0)
 								{
 									currentToken2.type = FUNCTION_ARGS_END;
+									currentToken2.cvalue = ']';
 								}
 							}
 						}
@@ -308,7 +310,7 @@ bool Check2(const vector<Token> & tokens, int idx)
 
 bool Check3(const vector<Token> & tokens, int idx)
 {
-	const char * validcombo[] = {"(N)", "NON", "F()", NULL};
+	const char * validcombo[] = {"(N)", "NON", "F[]", NULL};
 
 	for (int i = 0; validcombo[i]; i++)
 	{
@@ -325,7 +327,10 @@ bool Check3(const vector<Token> & tokens, int idx)
 
 bool CheckCombo(const vector<Token> & tokens, int idx0, int idx1)
 {
-	const char * validcombo[] = {"((", "))", "(N", "N)", "NO", "ON", "O(", ")O", "F(", ",(", "),", "N,", ",N", NULL};
+	const char * validcombo[] = {"((", "))",
+		"(N", "N)", "NO", "ON", "O(", ")O",
+		"F[", ")]", "[(", "[]", ",(", "),",
+		"[N", "N]", "N,", ",N", NULL};
 
 	for (int i = 0; validcombo[i]; i++)
 	{
