@@ -535,7 +535,7 @@ int FindChar(const vector<Token> & tokens, int first, int last, char c, int dir 
 	{
 		for (int idx = first; idx < last; idx++)
 		{
-			if (tokens[idx].strvalue[0] == c)
+			if (tokens[idx].strvalue[0] == c || tokens[idx].cvalue == c)
 				return idx;
 		}
 	}
@@ -543,7 +543,7 @@ int FindChar(const vector<Token> & tokens, int first, int last, char c, int dir 
 	{
 		for (int idx = last-1; idx >= first; idx--)
 		{
-			if (tokens[idx].strvalue[0] == c)
+			if (tokens[idx].strvalue[0] == c || tokens[idx].cvalue == c)
 				return idx;
 		}
 	}
@@ -637,6 +637,36 @@ double Evaluate(const vector<Token> & tokens, int first, int last)
 	{
 		result = tokens[first].dvalue;
 		first++;
+	}
+	else if (tokens[first].type == FUNCTION_NAME)
+	{
+		vector<double> args;
+
+		// parse args list
+		int token_idx_in_args_list = (first += 2);
+		assert(token_idx_in_args_list < last);
+		int end_idx_args_list = FindChar(tokens, token_idx_in_args_list, last, ']');
+		assert(end_idx_args_list > 0);
+		assert(end_idx_args_list <= last);
+
+		int next_token_idx_in_args_list = FindChar(tokens, token_idx_in_args_list + 1, last, ',');
+		while (next_token_idx_in_args_list > 0)
+		{
+			double currentArg = Evaluate(tokens, token_idx_in_args_list, next_token_idx_in_args_list);
+			args.push_back(currentArg);
+			token_idx_in_args_list = next_token_idx_in_args_list + 1;
+			next_token_idx_in_args_list = FindChar(tokens, token_idx_in_args_list + 1, last, ',');
+			cout << "arg = " << currentArg;
+		}
+		if (token_idx_in_args_list != end_idx_args_list)
+		{
+			double currentArg = Evaluate(tokens, token_idx_in_args_list, end_idx_args_list);
+			args.push_back(currentArg);
+			cout << "arg = " << currentArg;
+		}
+		cout << "args.size() = " << args.size();
+		result = 123.0;
+		first = end_idx_args_list + 1;
 	}
 
 	if (first != last)
