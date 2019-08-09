@@ -390,8 +390,12 @@ bool CheckFunctions(const vector<Token> & tokens, int first, int last)
 		const Token & currentToken = tokens[i];
 		if (currentToken.type == FUNCTION_NAME)
 		{
-			cout << "toto" << endl;
+			cout << "check function : " << currentToken.strvalue << endl;
 			if (strcmp(currentToken.strvalue, "max") == 0 && currentToken.dvalue == 2.0)
+			{
+				return true;
+			}
+			else if (strcmp(currentToken.strvalue, "cos") == 0 && currentToken.dvalue == 1.0)
 			{
 				return true;
 			}
