@@ -1,5 +1,6 @@
 #include <string.h>
 #include <stdlib.h>
+#include <math.h>
 #include <vector>
 #include <string>
 #include <iostream>
@@ -568,6 +569,27 @@ void UpdateVariables(vector<Token> & tokens, int first, int last)
 	}
 }
 
+// ------------------------------ FUNCTIONS ----------------------------------
+
+double CallFunction(const Token& function, vector<double> & args)
+{
+	assert(function.dvalue == args.size());
+
+	if (strcmp("max", function.strvalue) == 0)
+	{
+		return std::max(args[0], args[1]);
+	}
+
+	if (strcmp("cos", function.strvalue) == 0)
+	{
+		return cos(args[0]);
+	}
+
+	cout << "error : Call Function : function not found : " << function.strvalue <<endl;
+	assert(0);
+
+	return 0.0;
+}
 // ------------------------------ EVALUATOR ----------------------------------
 
 int EvaluateWithoutParenthesis(const vector<Token> & tokens, int first, int last)
@@ -643,7 +665,7 @@ double Evaluate(const vector<Token> & tokens, int first, int last)
 		vector<double> args;
 
 		// parse args list
-		int token_idx_in_args_list = (first += 2);
+		int token_idx_in_args_list = (first + 2);
 		assert(token_idx_in_args_list < last);
 		int end_idx_args_list = FindChar(tokens, token_idx_in_args_list, last, ']');
 		assert(end_idx_args_list > 0);
@@ -665,7 +687,7 @@ double Evaluate(const vector<Token> & tokens, int first, int last)
 			cout << "arg = " << currentArg;
 		}
 		cout << "args.size() = " << args.size();
-		result = 123.0;
+		result = CallFunction(tokens[first], args);
 		first = end_idx_args_list + 1;
 	}
 
