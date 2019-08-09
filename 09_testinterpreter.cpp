@@ -393,11 +393,11 @@ bool CheckFunctions(const vector<Token> & tokens, int first, int last)
 			cout << "toto" << endl;
 			if (strcmp(currentToken.strvalue, "max") == 0 && currentToken.dvalue == 2.0)
 			{
-				cout << "error : function not found : " << currentToken.strvalue << endl;
 				return true;
 			}
 			else
 			{
+				cout << "error : function not found : " << currentToken.strvalue << endl;
 				return false;
 			}
 		}
