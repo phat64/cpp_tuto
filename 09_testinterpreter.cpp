@@ -982,7 +982,8 @@ int main(int argc, char ** argv)
 		vector<Token> tokens;
 	
 		cout << "expr ?" << endl;
-		cin >> in; 
+		getline(cin, in);	// *fix: use "getline(cin, in)" instead of "cin >> in"
+					// cuz cin split the str with space
 
 		double result = Evaluate(in);
 		cout << "result = "<<  result <<endl;
