@@ -117,7 +117,7 @@ struct Token
 
 
 bool GetParenthesedExpression(const vector<Token> & tokens, int first, int last, int idx, int &firstIdx, int &lastIdx);
-
+bool GetFunctionExpression(const vector<Token> & tokens, int first, int last, int idx, int &firstIdx, int &lastIdx);
 
 // ------------------------------ TOKENIZER ----------------------------------
 void TokenizePostProcess(vector<Token> & tokens);
@@ -762,6 +762,74 @@ bool GetParenthesedExpression(const vector<Token> & tokens, int first, int last,
 
 					}
 					else if (tokens[idx].cvalue == ')')
+					{
+						depth--;
+					}
+				}
+			}
+		}
+	}
+
+	return false; // not found
+}
+
+bool GetFunctionExpression(const vector<Token> & tokens, int first, int last, int idx, int &firstIdx, int &lastIdx)
+{
+	if (idx < first)
+	{
+		return false;
+	}
+
+	if (idx >= last)
+	{
+		return false;
+	}
+
+	if (tokens[idx].type == FUNCTION_NAME || tokens[idx].type == FUNCTION_ARGS_END)
+	{
+		int depth = 0;
+		if (tokens[idx + 1].cvalue == '[')
+		{
+			firstIdx = idx;
+			idx++;
+			for(;idx < last;idx++)
+			{
+				if (tokens[idx].type == FUNCTION_ARGS_BEGIN || tokens[idx].type == FUNCTION_ARGS_END)
+				{
+					if (tokens[idx].cvalue == '[')
+					{
+						depth++;
+					}
+					else if (tokens[idx].cvalue == ']')
+					{
+						depth--;
+						if (depth == 0)
+						{
+							lastIdx = idx + 1;
+							return true; // found
+						}
+					}
+				}
+			}
+		}
+		else if (tokens[idx].cvalue == ']')
+		{
+			lastIdx = idx + 1;
+			for(;idx >= first;idx--)
+			{
+				if (tokens[idx].type == FUNCTION_ARGS_BEGIN || tokens[idx].type == FUNCTION_ARGS_END)
+				{
+					if (tokens[idx].cvalue == '[')
+					{
+						depth++;
+						if (depth == 0)
+						{
+							firstIdx = idx - 1;
+							return firstIdx >= first && tokens[firstIdx].type == FUNCTION_NAME; // found
+						}
+
+					}
+					else if (tokens[idx].cvalue == ']')
 					{
 						depth--;
 					}
