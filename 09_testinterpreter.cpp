@@ -773,8 +773,12 @@ bool GetParenthesedExpression(const vector<Token> & tokens, int first, int last,
 	return false; // not found
 }
 
+void PriorizeFunctions(vector<Token> & tokens, int & first, int & last);
+
 void Priorize(vector<Token> & tokens, int first, int last)
 {
+	//PriorizeFunctions(tokens, first, last);
+
 	int mulIdx = FindChar(tokens, first, last, '*');
 	int divIdx = FindChar(tokens, first, last, '/');
 	int mulDivIdx = (mulIdx != -1 && divIdx != -1 ? std::min(mulIdx, divIdx): std::max(mulIdx, divIdx));
@@ -831,6 +835,37 @@ void Priorize(vector<Token> & tokens, int first, int last)
 		}
 		cout <<endl;
 	}
+}
+
+void PriorizeFunctions(vector<Token> & tokens, int & first, int & last)
+{
+	int idx = FindChar(tokens, first, last, '[');
+	while (idx >= 0)
+	{
+		cout << "idxidx0 = " << idx << endl;
+		if (idx - 2 >= first && idx - 2 < last && tokens[idx - 2].cvalue != '(')
+		{
+			cout << "idxidx00 = " << idx << endl;
+			tokens.insert(tokens.begin() + idx - 2, Token('('));
+			first--;
+			last++;
+		}
+		idx = FindChar(tokens, idx + 1, last, '[');
+	}
+
+	idx = FindChar(tokens, first, last, ']');
+	while (idx >= 0)
+	{
+		cout << "idxidx1 = " << idx << endl;
+		if (idx + 1 >= first && idx + 1 < last && tokens[idx + 1].cvalue != ')')
+		{
+			cout << "idxidx11 = " << idx << endl;
+			tokens.insert(tokens.begin() + idx + 1, Token(')'));
+			last++;
+		}
+		idx = FindChar(tokens, idx + 2, last, ']');
+	}
+
 }
 
 double Evaluate(const string & str)
