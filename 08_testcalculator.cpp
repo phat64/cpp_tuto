@@ -594,7 +594,7 @@ int main(int argc, char ** argv)
 		vector<Token> tokens;
 	
 		cout << "expr ?" << endl;
-		cin >> in; 
+		getline(cin, in); 
 
 		double result = Evaluate(in);
 		cout << "result = "<<  result <<endl;
