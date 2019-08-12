@@ -512,14 +512,16 @@ void Priorize(vector<Token> & tokens, int first, int last)
 	int mulDivIdx = (mulIdx != -1 && divIdx != -1 ? std::min(mulIdx, divIdx): std::max(mulIdx, divIdx));
 	while (mulDivIdx != -1)
 	{
-		if (tokens[mulDivIdx - 1].type == NUMBER && tokens[mulDivIdx + 1].type == NUMBER)
+		const Token & tokenBeforeOperator = tokens[mulDivIdx - 1];
+		const Token & tokenAfterOperator = tokens[mulDivIdx + 1];
+		if (tokenBeforeOperator.type == NUMBER && tokenAfterOperator.type == NUMBER)
 		{
 			tokens.insert(tokens.begin() + mulDivIdx - 1, Token('('));
 			tokens.insert(tokens.begin() + mulDivIdx + 3, Token(')'));
 			last += 2;
 			mulDivIdx += 2;
 		}
-		else if (tokens[mulDivIdx - 1].type == NUMBER && tokens[mulDivIdx + 1].type == PARENTHESIS)
+		else if (tokenBeforeOperator.type == NUMBER && tokenAfterOperator.type == PARENTHESIS)
 		{
 			int expressionFirstIdx;
 			int expressionLastIdx;
@@ -532,7 +534,7 @@ void Priorize(vector<Token> & tokens, int first, int last)
 				mulDivIdx += 2;
 			}
 		}
-		else if (tokens[mulDivIdx - 1].type == PARENTHESIS && tokens[mulDivIdx + 1].type == NUMBER)
+		else if (tokenBeforeOperator.type == PARENTHESIS && tokenAfterOperator.type == NUMBER)
 		{
 			int expressionFirstIdx;
 			int expressionLastIdx;
