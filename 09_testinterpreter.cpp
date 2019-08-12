@@ -845,7 +845,7 @@ void PriorizeFunctions(vector<Token> & tokens, int & first, int & last);
 
 void Priorize(vector<Token> & tokens, int first, int last)
 {
-	//PriorizeFunctions(tokens, first, last);
+	PriorizeFunctions(tokens, first, last);
 
 	int mulIdx = FindChar(tokens, first, last, '*');
 	int divIdx = FindChar(tokens, first, last, '/');
@@ -909,33 +909,23 @@ void Priorize(vector<Token> & tokens, int first, int last)
 
 void PriorizeFunctions(vector<Token> & tokens, int & first, int & last)
 {
-	int idx = FindChar(tokens, first, last, '[');
-	while (idx >= 0)
+	int idx = FindChar(tokens, first, last, 'F');
+	while (idx > first)
 	{
-		cout << "idxidx0 = " << idx << endl;
-		if (idx - 2 >= first && idx - 2 < last && tokens[idx - 2].cvalue != '(')
-		{
-			cout << "idxidx00 = " << idx << endl;
-			tokens.insert(tokens.begin() + idx - 2, Token('('));
-			first--;
-			last++;
-		}
-		idx = FindChar(tokens, idx + 1, last, '[');
-	}
+		int expressionFirstIdx;
+		int expressionLastIdx;
 
-	idx = FindChar(tokens, first, last, ']');
-	while (idx >= 0)
-	{
-		cout << "idxidx1 = " << idx << endl;
-		if (idx + 1 >= first && idx + 1 < last && tokens[idx + 1].cvalue != ')')
+		if (GetFunctionExpression(tokens, first, last, idx - 1, expressionFirstIdx, expressionFirstIdx))
 		{
-			cout << "idxidx11 = " << idx << endl;
-			tokens.insert(tokens.begin() + idx + 1, Token(')'));
-			last++;
+			tokens.insert(tokens.begin() + expressionFirstIdx, Token('('));
+			tokens.insert(tokens.begin() + expressionLastIdx + 1, Token(')'));
+			idx = expressionLastIdx;
+			first --;
+			last += 2;
 		}
-		idx = FindChar(tokens, idx + 2, last, ']');
-	}
 
+		idx = FindChar(tokens, idx, last, 'F');
+	}
 }
 
 double Evaluate(const string & str)
