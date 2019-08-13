@@ -998,6 +998,7 @@ int main(int argc, char ** argv)
 	assert(cos(3.1415) == Evaluate("cos(pi)"));
 	assert(cos(2 * 3.1415) == Evaluate("cos(2 * pi)"));
 	assert(cos(cos(0.5 * 3.1415)) == Evaluate("cos(cos(0.5 * pi))"));
+	assert(cos(0) + cos(0) + cos(cos(0.5*3.1415)) == Evaluate("cos(0) + cos(0) + cos(cos(0.5*pi))"));
 
 	while (true)
 	{
