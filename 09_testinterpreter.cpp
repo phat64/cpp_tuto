@@ -909,22 +909,36 @@ void Priorize(vector<Token> & tokens, int first, int last)
 
 void PriorizeFunctions(vector<Token> & tokens, int & first, int & last)
 {
+int cpt = 0;
 	int idx = FindChar(tokens, first, last, 'F');
-	while (idx > first)
+	while (idx >= first)
 	{
 		int expressionFirstIdx;
 		int expressionLastIdx;
 
-		if (GetFunctionExpression(tokens, first, last, idx - 1, expressionFirstIdx, expressionFirstIdx))
+		if (GetFunctionExpression(tokens, first, last, idx, expressionFirstIdx, expressionLastIdx))
 		{
-			tokens.insert(tokens.begin() + expressionFirstIdx, Token('('));
-			tokens.insert(tokens.begin() + expressionLastIdx + 1, Token(')'));
-			idx = expressionLastIdx;
+	for (size_t i = 0; i < tokens.size(); i++)
+	{
+		cout << tokens[i].strvalue << " ";
+	}
+	cout << endl;
+		cout << "expressionFirstIdx = "<< expressionFirstIdx <<endl;
+		cout << "expressionLastIdx = "<< expressionLastIdx <<endl;
+		cout << "A";	tokens.insert(tokens.begin() + expressionFirstIdx, Token('('));
+		cout << "B";	tokens.insert(tokens.begin() + expressionLastIdx + 1, Token(')'));
+		cout << "C";	idx = expressionLastIdx;
 			first --;
 			last += 2;
 		}
+		else
+		{
+			break;
+		}
 
-		idx = FindChar(tokens, idx, last, 'F');
+		idx = FindChar(tokens, idx + 3, last, 'F');
+
+		//if (cpt++ >= 5) break;
 	}
 }
 
