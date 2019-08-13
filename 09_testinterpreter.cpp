@@ -666,11 +666,27 @@ double Evaluate(const vector<Token> & tokens, int first, int last)
 
 		// parse args list
 		int token_idx_in_args_list = (first + 2);
-		assert(token_idx_in_args_list < last);
+		//assert(token_idx_in_args_list < last);
 		int end_idx_args_list = FindChar(tokens, token_idx_in_args_list, last, ']');
-		assert(end_idx_args_list > 0);
-		assert(end_idx_args_list <= last);
+		//assert(end_idx_args_list > 0);
+		//assert(end_idx_args_list < last);
 
+		int functionExpressionFirst = -1;
+		int functionExpressionLast = -1;
+
+		if (GetFunctionExpression(tokens, first, last, first, functionExpressionFirst, functionExpressionLast))
+		{
+			token_idx_in_args_list = functionExpressionFirst + 2;
+			end_idx_args_list = functionExpressionLast - 1;
+		//assert(token_idx_in_args_list < last);
+		}
+		/*int token_idx_in_args_list = -1;
+		int end_idx_args_list = -1;
+		assert(GetFunctionExpression(tokens, first, last, first, token_idx_in_args_list, end_idx_args_list));
+		assert(end_idx_args_list > 0);
+		assert(++end_idx_args_list < last);
+*/
+		//token_idx_in_args_list+=2;
 		int next_token_idx_in_args_list = FindChar(tokens, token_idx_in_args_list + 1, last, ',');
 		while (next_token_idx_in_args_list > 0)
 		{
