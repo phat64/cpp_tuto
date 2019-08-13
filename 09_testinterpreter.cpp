@@ -666,28 +666,14 @@ double Evaluate(const vector<Token> & tokens, int first, int last)
 		vector<double> args;
 
 		// parse args list
-		int token_idx_in_args_list = (first + 2);
-		//assert(token_idx_in_args_list < last);
-		int end_idx_args_list = FindChar(tokens, token_idx_in_args_list, last, ']');
-		//assert(end_idx_args_list > 0);
-		//assert(end_idx_args_list < last);
-
 		int functionExpressionFirst = -1;
 		int functionExpressionLast = -1;
-
-		if (GetFunctionExpression(tokens, first, last, first, functionExpressionFirst, functionExpressionLast))
-		{
-			token_idx_in_args_list = functionExpressionFirst + 2;
-			end_idx_args_list = functionExpressionLast - 1;
-		//assert(token_idx_in_args_list < last);
-		}
-		/*int token_idx_in_args_list = -1;
-		int end_idx_args_list = -1;
-		assert(GetFunctionExpression(tokens, first, last, first, token_idx_in_args_list, end_idx_args_list));
+		assert(GetFunctionExpression(tokens, first, last, first, functionExpressionFirst, functionExpressionLast));
+		int token_idx_in_args_list = functionExpressionFirst + 2;
+		int end_idx_args_list = functionExpressionLast - 1;
 		assert(end_idx_args_list > 0);
-		assert(++end_idx_args_list < last);
-*/
-		//token_idx_in_args_list+=2;
+		assert(end_idx_args_list < last);
+
 		int next_token_idx_in_args_list = FindChar(tokens, token_idx_in_args_list + 1, last, ',');
 		while (next_token_idx_in_args_list > 0)
 		{
@@ -695,15 +681,15 @@ double Evaluate(const vector<Token> & tokens, int first, int last)
 			args.push_back(currentArg);
 			token_idx_in_args_list = next_token_idx_in_args_list + 1;
 			next_token_idx_in_args_list = FindChar(tokens, token_idx_in_args_list + 1, last, ',');
-			cout << "arg = " << currentArg;
+			cout << "arg = " << currentArg << endl;
 		}
 		if (token_idx_in_args_list != end_idx_args_list)
 		{
 			double currentArg = Evaluate(tokens, token_idx_in_args_list, end_idx_args_list);
 			args.push_back(currentArg);
-			cout << "arg = " << currentArg;
+			cout << "arg = " << currentArg << endl;
 		}
-		cout << "args.size() = " << args.size();
+		cout << "args.size() = " << args.size() << endl;
 		result = CallFunction(tokens[first], args);
 		first = end_idx_args_list + 1;
 	}
