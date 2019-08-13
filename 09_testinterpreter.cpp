@@ -20,6 +20,7 @@ using namespace std;
 
 // ---------------------------- CONSTANTES -----------------------------------
 
+static const double pi = 3.14159265358979323846;
 static const size_t NUMBER_DIGITS_MAX = 32;
 static const size_t NAME_NB_CHARS_MAX = 32;
 
@@ -563,7 +564,7 @@ void UpdateVariables(vector<Token> & tokens, int first, int last)
 		{
 			if (strcmp(currentToken.strvalue, "pi") == 0)
 			{
-				currentToken.dvalue = 3.1415;
+				currentToken.dvalue = pi;
 			}
 		}
 	}
@@ -988,17 +989,17 @@ int main(int argc, char ** argv)
 	assert(99.0 * 56.0 + 25.0 * 37.0 / 3.0 * 5.0 == Evaluate("99 * 56 + 25 * 37 / 3 * 5"));
 
 	// assertion for variables check
-	assert(3.1415 == Evaluate("pi"));
-	assert(2.0 * 3.1415 == Evaluate("2 * pi"));
+	assert(pi == Evaluate("pi"));
+	assert(2.0 * pi == Evaluate("2 * pi"));
 
 	// assertion for functions check
 	assert(55.0 == Evaluate("max(55,22)"));
 	assert(55.0 == Evaluate("max(22,55)"));
 	assert(1.0 == Evaluate("cos(0)"));
-	assert(cos(3.1415) == Evaluate("cos(pi)"));
-	assert(cos(2 * 3.1415) == Evaluate("cos(2 * pi)"));
-	assert(cos(cos(0.5 * 3.1415)) == Evaluate("cos(cos(0.5 * pi))"));
-	assert(cos(0) + cos(0) + cos(cos(0.5*3.1415)) == Evaluate("cos(0) + cos(0) + cos(cos(0.5*pi))"));
+	assert(cos(pi) == Evaluate("cos(pi)"));
+	assert(cos(2 * pi) == Evaluate("cos(2 * pi)"));
+	assert(cos(cos(0.5 * pi)) == Evaluate("cos(cos(0.5 * pi))"));
+	assert(cos(0) + cos(0) + cos(cos(0.5*pi)) == Evaluate("cos(0) + cos(0) + cos(cos(0.5*pi))"));
 
 	while (true)
 	{
