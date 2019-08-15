@@ -1026,6 +1026,8 @@ int main(int argc, char ** argv)
 	assert(cos(0) + cos(0) + cos(cos(0.5*pi)) == Evaluate("cos(0) + cos(0) + cos(cos(0.5*pi))"));
 	assert(99.0 == Evaluate("max(22,max(99,55))"));
 	assert(99.0 == Evaluate("max(max(99,55), 22)"));
+	assert(44.0 == Evaluate("max(max(11,22), max(33,44))"));
+	assert(44.0 == Evaluate("max(max(33,44), max(11,22))"));
 
 	while (true)
 	{
