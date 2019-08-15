@@ -343,6 +343,8 @@ bool CheckCombo(const vector<Token> & tokens, int idx0, int idx1)
 		}
 	}
 
+	cout << "[CheckCombo] wrong combo " << tokens[idx0].cvalue << tokens[idx1].cvalue << endl;
+
 	return false;
 }
 
