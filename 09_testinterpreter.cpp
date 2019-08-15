@@ -9,6 +9,9 @@
 /*
  * A simple calculator with 4 binary operations *, /, +, - and parenthesis ( and ).
  * It works fine.
+ *
+ * ps : I don't use yacc or lex but it can help you if you want to dev a compiler or a calculator
+ *
  * [TODO] => It's only for the tutorial. It's not for advanced developers and it's obviously not high optimized ^^
  *	- It's my old code. It needs more OOP.
  * 	- need the negative operator (unary operator)
