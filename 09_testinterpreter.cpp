@@ -531,22 +531,56 @@ bool Compute3(double & result, const vector<Token> & tokens, int first)
 
 // -------------------------------- MISC -------------------------------------
 
-int FindChar(const vector<Token> & tokens, int first, int last, char c, int dir = 1)
+int FindChar(const vector<Token> & tokens, int first, int last, char c, int dir = 1, bool checkDepth = false)
 {
+	int depth = 0;
+
 	if (dir > 0)
 	{
 		for (int idx = first; idx < last; idx++)
 		{
-			if (tokens[idx].strvalue[0] == c || tokens[idx].cvalue == c)
+			if (checkDepth)
+			{
+				if (tokens[idx].cvalue == '(' || tokens[idx].cvalue == '[')
+				{
+					depth++;
+				}
+
+				if (tokens[idx].cvalue == ')' || tokens[idx].cvalue == ']')
+				{
+					depth--;
+				}
+			}
+
+			if (depth == 0 && (tokens[idx].strvalue[0] == c || tokens[idx].cvalue == c))
+			{
+
 				return idx;
+			}
 		}
 	}
 	else if (dir < 0)
 	{
 		for (int idx = last-1; idx >= first; idx--)
 		{
-			if (tokens[idx].strvalue[0] == c || tokens[idx].cvalue == c)
+			if (checkDepth)
+			{
+				if (tokens[idx].cvalue == '(' || tokens[idx].cvalue == '[')
+				{
+					depth++;
+				}
+
+				if (tokens[idx].cvalue == ')' || tokens[idx].cvalue == ']')
+				{
+					depth--;
+				}
+			}
+
+			if (depth == 0 && (tokens[idx].strvalue[0] == c || tokens[idx].cvalue == c))
+			{
+
 				return idx;
+			}
 		}
 	}
 
@@ -674,13 +708,13 @@ double Evaluate(const vector<Token> & tokens, int first, int last)
 		assert(end_idx_args_list > 0);
 		assert(end_idx_args_list < last);
 
-		int next_token_idx_in_args_list = FindChar(tokens, token_idx_in_args_list + 1, last, ',');
+		int next_token_idx_in_args_list = FindChar(tokens, token_idx_in_args_list + 1, last, ',', 1, true);
 		while (next_token_idx_in_args_list > 0)
 		{
 			double currentArg = Evaluate(tokens, token_idx_in_args_list, next_token_idx_in_args_list);
 			args.push_back(currentArg);
 			token_idx_in_args_list = next_token_idx_in_args_list + 1;
-			next_token_idx_in_args_list = FindChar(tokens, token_idx_in_args_list + 1, last, ',');
+			next_token_idx_in_args_list = FindChar(tokens, token_idx_in_args_list + 1, last, ',', 1, true);
 			cout << "arg = " << currentArg << endl;
 		}
 		if (token_idx_in_args_list != end_idx_args_list)
