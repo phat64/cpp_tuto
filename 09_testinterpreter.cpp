@@ -686,7 +686,14 @@ double Evaluate(const vector<Token> & tokens, int first, int last)
 	}
 	else if (size == 2)
 	{
-		return 0;
+		if (tokens[first].type == RETURN)
+		{
+			return tokens[first + 1].dvalue;
+		}
+		else
+		{
+			return 0.0;
+		}
 	}
 	else if (size == 3)
 	{
