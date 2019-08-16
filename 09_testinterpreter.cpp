@@ -1068,6 +1068,8 @@ int main(int argc, char ** argv)
 	assert(pi == Evaluate("return pi"));
 	assert(cos(1.0) == Evaluate("return cos(1)"));
 	assert(33.0 == Evaluate("return max(22,33)"));
+	assert(cos(0.25 * pi) == Evaluate("return cos(0.25 * pi)"));
+	assert(11.0 + 22.0 * 2.0 + 5.0 == Evaluate("return 11 + 22 * 2 + 5"));
 
 	while (true)
 	{
