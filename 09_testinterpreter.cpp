@@ -34,7 +34,8 @@ enum TokenType
 {
 	NONE, NUMBER, OPERATOR, PARENTHESIS, COMMA,
 	NAME, VARIABLE_NAME, FUNCTION_NAME, /* NAME =  VARIABLE_NAME or FUNCTION_NAME*/
-	FUNCTION_ARGS_BEGIN, FUNCTION_ARGS_SEPARATOR, FUNCTION_ARGS_END /* ( , ) */
+	FUNCTION_ARGS_BEGIN, FUNCTION_ARGS_SEPARATOR, FUNCTION_ARGS_END, /* ( , ) */
+	IF
 };
 
 struct Token
@@ -103,9 +104,18 @@ struct Token
 		}
 		else if (isalpha(c))
 		{
-			type = NAME; // NAME =  VARIABLE_NAME or FUNCTION_NAME
-			cvalue = 'N';
-			dvalue = 0.0;
+			if (strcmp(str, "if") == 0)
+			{
+				type = IF;
+				cvalue = 'I';
+				dvalue = 0.0;
+			}
+			else
+			{
+				type = NAME; // NAME =  VARIABLE_NAME or FUNCTION_NAME
+				cvalue = 'N';
+				dvalue = 0.0;
+			}
 		}
 		else
 		{
