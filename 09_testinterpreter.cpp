@@ -1058,6 +1058,9 @@ int main(int argc, char ** argv)
 	assert(45.0 == Evaluate("max(max(11,22) + 1, max(33,44) + 1)"));
 	assert(45.0 == Evaluate("max(max(33,44) + 1, max(11,22) + 1)"));
 
+	// assertion for returns check
+	assert(123.0 == Evaluate("return 123"));
+
 	while (true)
 	{
 		string in;
