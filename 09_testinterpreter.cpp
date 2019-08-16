@@ -1066,6 +1066,8 @@ int main(int argc, char ** argv)
 	// assertion for returns check
 	assert(123.0 == Evaluate("return 123"));
 	assert(pi == Evaluate("return pi"));
+	assert(cos(1.0) == Evaluate("return cos(1)"));
+	assert(33.0 == Evaluate("return max(22,33)"));
 
 	while (true)
 	{
