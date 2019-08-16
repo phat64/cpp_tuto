@@ -1060,6 +1060,7 @@ int main(int argc, char ** argv)
 
 	// assertion for returns check
 	assert(123.0 == Evaluate("return 123"));
+	assert(pi == Evaluate("return pi"));
 
 	while (true)
 	{
