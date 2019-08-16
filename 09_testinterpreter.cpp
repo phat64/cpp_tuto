@@ -35,7 +35,7 @@ enum TokenType
 	NONE, NUMBER, OPERATOR, PARENTHESIS, COMMA,
 	NAME, VARIABLE_NAME, FUNCTION_NAME, /* NAME =  VARIABLE_NAME or FUNCTION_NAME*/
 	FUNCTION_ARGS_BEGIN, FUNCTION_ARGS_SEPARATOR, FUNCTION_ARGS_END, /* ( , ) */
-	IF
+	IF, RETURN
 };
 
 struct Token
@@ -108,6 +108,12 @@ struct Token
 			{
 				type = IF;
 				cvalue = 'I';
+				dvalue = 0.0;
+			}
+			else if (strcmp(str, "return") == 0)
+			{
+				type = RETURN;
+				cvalue = 'R';
 				dvalue = 0.0;
 			}
 			else
