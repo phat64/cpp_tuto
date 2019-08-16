@@ -326,7 +326,7 @@ bool Check1(const vector<Token> & tokens, int idx)
 
 bool Check2(const vector<Token> & tokens, int idx)
 {
-	return false;
+	return tokens[idx].type == RETURN && (tokens[idx + 1].type == NUMBER || tokens[idx + 1].type == VARIABLE_NAME);
 }
 
 bool Check3(const vector<Token> & tokens, int idx)
