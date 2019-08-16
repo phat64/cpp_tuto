@@ -756,6 +756,11 @@ double Evaluate(const vector<Token> & tokens, int first, int last)
 		result = CallFunction(tokens[first], args);
 		first = end_idx_args_list + 1;
 	}
+	else if (tokens[first].type == RETURN)
+	{
+		// TODO : search the end of the statement (;) or statements block {}
+		return Evaluate(tokens, first + 1, last);
+	}
 
 	if (first != last)
 	{
