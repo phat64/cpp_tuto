@@ -1122,6 +1122,11 @@ int main(int argc, char ** argv)
 	assert(11.0 + 22.0 * 2.0 + 5.0 == Evaluate("return 11 + 22 * 2 + 5"));
 	assert(11.0 + 22.0 * (2.0 + 5.0) == Evaluate("return (11 + 22 * (2 + 5))"));
 
+	// assertion for multiple statements check
+	assert(111.0 == Evaluate("return 111; return 222; return 333"));
+	assert(222.0 == Evaluate("111; return 222;333"));
+	assert(333.0 == Evaluate("111; 222; return 333"));
+
 	while (true)
 	{
 		string in;
