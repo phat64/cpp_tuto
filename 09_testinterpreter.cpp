@@ -784,19 +784,31 @@ double Evaluate1Statement(const vector<Token> & tokens, int first, int last)
 
 double Evaluate(const vector<Token> & tokens, int first, int last)
 {
-	int statementIdx;
+	int semicolonIdx;
 
 	// no semicolon => easy to evaluate
-	statementIdx = FindChar(tokens, first, last, ';');
-	if (statementIdx < 0)
+	semicolonIdx = FindChar(tokens, first, last, ';');
+	if (semicolonIdx < 0)
 	{
 		return Evaluate1Statement(tokens, first, last);
 	}
 
-	// insert your code here for evaluate a multiple statements expression
-	// ...
+	// evaluate a multiple statements expression
+	while (semicolonIdx >= 0)
+	{
+		int nextSemicolonIdx = FindChar(tokens, semicolonIdx + 1, last, ';');
+		if (nextSemicolonIdx >= 0)
+		{
+			Evaluate1Statement(tokens, semicolonIdx, nextSemicolonIdx);
+			semicolonIdx = nextSemicolonIdx;
+		}
+		else
+		{
+			return Evaluate1Statement(tokens, semicolonIdx, last);
+		}
+	}
 
-	return 0.0;
+	return 0.0; // => unreachable code
 }
 
 bool GetParenthesedExpression(const vector<Token> & tokens, int first, int last, int idx, int &firstIdx, int &lastIdx)
