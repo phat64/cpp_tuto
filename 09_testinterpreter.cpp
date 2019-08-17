@@ -800,12 +800,12 @@ double Evaluate(const vector<Token> & tokens, int first, int last)
 		int nextSemicolonIdx = FindChar(tokens, semicolonIdx + 1, last, ';');
 		if (nextSemicolonIdx >= 0)
 		{
-			Evaluate1Statement(tokens, semicolonIdx, nextSemicolonIdx);
+			Evaluate1Statement(tokens, semicolonIdx + 1, nextSemicolonIdx);
 			semicolonIdx = nextSemicolonIdx;
 		}
 		else
 		{
-			return Evaluate1Statement(tokens, semicolonIdx, last);
+			return Evaluate1Statement(tokens, semicolonIdx + 1, last);
 		}
 	}
 
