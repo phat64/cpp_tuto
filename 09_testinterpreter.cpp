@@ -357,7 +357,7 @@ bool CheckCombo(const vector<Token> & tokens, int idx0, int idx1)
 		"(N", "N)", "NO", "ON", "O(", ")O",
 		"F[", "[F", ",F", "],", ")]", "]], ""[(", "[]", ",(", "),",
 		"[N", "N]", "N,", ",N", "OF", "]O",
-		"I(", "RN", "R(", "RF",
+		"I(", "RN", "R(", "RF", ";R",
 		"N;", ";N", ");", ";(", ";I", ";F", "];", NULL};
 
 	for (int i = 0; validcombo[i]; i++)
