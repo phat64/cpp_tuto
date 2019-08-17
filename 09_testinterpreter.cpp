@@ -35,7 +35,7 @@ enum TokenType
 	NONE, NUMBER, OPERATOR, PARENTHESIS, COMMA,
 	NAME, VARIABLE_NAME, FUNCTION_NAME, /* NAME =  VARIABLE_NAME or FUNCTION_NAME*/
 	FUNCTION_ARGS_BEGIN, FUNCTION_ARGS_SEPARATOR, FUNCTION_ARGS_END, /* ( , ) */
-	IF, RETURN
+	IF, RETURN, SEMICOLON /* SEMICOLON = ';'*/
 };
 
 struct Token
@@ -67,6 +67,11 @@ struct Token
 			type = COMMA;
 			cvalue = ',';
 		}
+		else if (c == ';')
+		{
+			type = SEMICOLON;
+			cvalue = ';';
+		}
 		else
 		{
 			type = NONE;
@@ -92,7 +97,7 @@ struct Token
 		{
 			*this = Token(c);
 		}
-		else if (c == ',')
+		else if (c == ',' || c == ';')
 		{
 			*this = Token(c);
 		}
@@ -209,7 +214,7 @@ void Tokenize(vector<Token> & tokens, const string & str)
 		{
 			tokens.push_back(Token(c));
 		}
-		else if (c == ',')
+		else if (c == ',' || c == ';')
 		{
 			tokens.push_back(Token(c));
 		}
