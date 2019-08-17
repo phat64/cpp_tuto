@@ -674,7 +674,7 @@ int EvaluateWithoutParenthesis(const vector<Token> & tokens, int first, int last
 	return result;
 }
 
-double Evaluate(const vector<Token> & tokens, int first, int last)
+double Evaluate1Statement(const vector<Token> & tokens, int first, int last)
 {
 	for (int i = first; i < last; i++)
 	{
@@ -720,7 +720,7 @@ double Evaluate(const vector<Token> & tokens, int first, int last)
 		int expressionLastIdx;
 		if (GetParenthesedExpression(tokens, first, last, first, expressionFirstIdx, expressionLastIdx))
 		{
-			result = Evaluate(tokens, expressionFirstIdx + 1, expressionLastIdx - 1);
+			result = Evaluate1Statement(tokens, expressionFirstIdx + 1, expressionLastIdx - 1);
 			first = expressionLastIdx;
 		}
 	}
@@ -745,7 +745,7 @@ double Evaluate(const vector<Token> & tokens, int first, int last)
 		int next_token_idx_in_args_list = FindChar(tokens, token_idx_in_args_list + 1, last, ',', 1, true);
 		while (next_token_idx_in_args_list > 0)
 		{
-			double currentArg = Evaluate(tokens, token_idx_in_args_list, next_token_idx_in_args_list);
+			double currentArg = Evaluate1Statement(tokens, token_idx_in_args_list, next_token_idx_in_args_list);
 			args.push_back(currentArg);
 			token_idx_in_args_list = next_token_idx_in_args_list + 1;
 			next_token_idx_in_args_list = FindChar(tokens, token_idx_in_args_list + 1, last, ',', 1, true);
@@ -753,7 +753,7 @@ double Evaluate(const vector<Token> & tokens, int first, int last)
 		}
 		if (token_idx_in_args_list != end_idx_args_list)
 		{
-			double currentArg = Evaluate(tokens, token_idx_in_args_list, end_idx_args_list);
+			double currentArg = Evaluate1Statement(tokens, token_idx_in_args_list, end_idx_args_list);
 			args.push_back(currentArg);
 			cout << "arg = " << currentArg << endl;
 		}
@@ -764,12 +764,12 @@ double Evaluate(const vector<Token> & tokens, int first, int last)
 	else if (tokens[first].type == RETURN)
 	{
 		// TODO : search the end of the statement (;) or statements block {}
-		return Evaluate(tokens, first + 1, last);
+		return Evaluate1Statement(tokens, first + 1, last);
 	}
 
 	if (first != last)
 	{
-		double nextValue = Evaluate(tokens, first + 1, last);
+		double nextValue = Evaluate1Statement(tokens, first + 1, last);
 		result = Compute(result, tokens[first].strvalue[0], nextValue);
 		/*switch(tokens[first].strvalue[0])
 		{
@@ -780,6 +780,23 @@ double Evaluate(const vector<Token> & tokens, int first, int last)
 		}*/
 	}
 	return result;
+}
+
+double Evaluate(const vector<Token> & tokens, int first, int last)
+{
+	int statementIdx;
+
+	// no semicolon => easy to evaluate
+	statementIdx = FindChar(tokens, first, last, ';');
+	if (statementIdx < 0)
+	{
+		return Evaluate1Statement(tokens, first, last);
+	}
+
+	// insert your code here for evaluate a multiple statements expression
+	// ...
+
+	return 0.0;
 }
 
 bool GetParenthesedExpression(const vector<Token> & tokens, int first, int last, int idx, int &firstIdx, int &lastIdx)
