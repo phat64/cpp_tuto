@@ -57,7 +57,7 @@ struct Token
 			type = PARENTHESIS;
 			cvalue = c;
 		}
-		else if (c == '+' || c == '-' || c == '*' || c == '/')
+		else if (c == '+' || c == '-' || c == '*' || c == '/' || c == '&' || c=='|')
 		{
 			type = OPERATOR;
 			cvalue = 'O';
@@ -93,7 +93,7 @@ struct Token
 		{
 			*this = Token(c);
 		}
-		else if (c == '+' || c == '-' || c == '*' || c == '/')
+		else if (c == '+' || c == '-' || c == '*' || c == '/' || c == '&' || c=='|')
 		{
 			*this = Token(c);
 		}
@@ -206,7 +206,7 @@ void Tokenize(vector<Token> & tokens, const string & str)
 			strncpy(namestr, start, namestrlen);
 			tokens.push_back(Token(namestr));
 		}
-		else if (c == '+' || c == '-' || c == '*' || c == '/')
+		else if (c == '+' || c == '-' || c == '*' || c == '/' || c == '&' || c=='|')
 		{
 			tokens.push_back(Token(c));
 		}
