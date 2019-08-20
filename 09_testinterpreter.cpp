@@ -1143,6 +1143,7 @@ int main(int argc, char ** argv)
 	// assertion for boolean operations checks
 	assert(1 && 0 == Evaluate("1 & 0"));
 	assert(1 || 0 == Evaluate("1 | 0"));
+	assert(1 + 1 && 0 + 1 == Evaluate("1 + 1 & 0 + 1"));
 
 	while (true)
 	{
