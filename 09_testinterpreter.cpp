@@ -1146,6 +1146,7 @@ int main(int argc, char ** argv)
 	assert(1 || 0 == Evaluate("1 | 0"));
 	assert(1 + 1 && 0 + 1 == Evaluate("1 + 1 & 0 + 1"));
 	assert(0 + 1 || 0 + 1 == Evaluate("0 + 1 | 0 + 1"));
+	assert(1 || 1 && 0 == Evaluate("1 | 1 & 0"));
 
 	while (true)
 	{
