@@ -966,12 +966,11 @@ bool GetFunctionExpression(const vector<Token> & tokens, int first, int last, in
 
 void PriorizeFunctions(vector<Token> & tokens, int & first, int & last);
 
-void Priorize(vector<Token> & tokens, int first, int last)
+void Priorize(vector<Token> & tokens, int first, int last, char op1, char op2)
 {
-	PriorizeFunctions(tokens, first, last);
-
-	int mulIdx = FindChar(tokens, first, last, '*');
-	int divIdx = FindChar(tokens, first, last, '/');
+	//PriorizeFunctions(tokens, first, last);
+	int mulIdx = FindChar(tokens, first, last, op1);
+	int divIdx = FindChar(tokens, first, last, op2);
 	int mulDivIdx = (mulIdx != -1 && divIdx != -1 ? std::min(mulIdx, divIdx): std::max(mulIdx, divIdx));
 	while (mulDivIdx != -1)
 	{
@@ -1016,8 +1015,8 @@ void Priorize(vector<Token> & tokens, int first, int last)
 
 		
 
-		mulIdx = FindChar(tokens, mulDivIdx, last, '*');
-		divIdx = FindChar(tokens, mulDivIdx, last, '/');
+		mulIdx = FindChar(tokens, mulDivIdx, last, op1);
+		divIdx = FindChar(tokens, mulDivIdx, last, op2);
 		mulDivIdx = (mulIdx != -1 && divIdx != -1 ? std::min(mulIdx, divIdx): std::max(mulIdx, divIdx));
 
 		cout << "mulIdx = " << mulIdx << endl;
@@ -1028,6 +1027,12 @@ void Priorize(vector<Token> & tokens, int first, int last)
 		}
 		cout <<endl;
 	}
+}
+
+void Priorize(vector<Token> & tokens, int first, int last)
+{
+	PriorizeFunctions(tokens, first, last);
+	Priorize(tokens, first, last, '*', '/');
 }
 
 void PriorizeFunctions(vector<Token> & tokens, int & first, int & last)
