@@ -1040,6 +1040,7 @@ void Priorize(vector<Token> & tokens, int first, int last)
 	PriorizeFunctions(tokens, first, last);
 	Priorize(tokens, first, last, '*', '/');
 	Priorize(tokens, first, last, '+', '-');
+	Priorize(tokens, first, last, '=', '=');
 	Priorize(tokens, first, last, '&', '&');
 }
 
