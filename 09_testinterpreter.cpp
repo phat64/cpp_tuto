@@ -969,11 +969,13 @@ void PriorizeFunctions(vector<Token> & tokens, int & first, int & last);
 void Priorize(vector<Token> & tokens, int first, int last, char op1, char op2)
 {
 	//PriorizeFunctions(tokens, first, last);
+	bool changed = true;
 	int mulIdx = FindChar(tokens, first, last, op1);
 	int divIdx = FindChar(tokens, first, last, op2);
 	int mulDivIdx = (mulIdx != -1 && divIdx != -1 ? std::min(mulIdx, divIdx): std::max(mulIdx, divIdx));
-	while (mulDivIdx != -1)
+	while (mulDivIdx != -1 && changed)
 	{
+		changed = false;
 		const Token & tokenBeforeOperator = tokens[mulDivIdx - 1];
 		const Token & tokenAfterOperator = tokens[mulDivIdx + 1];
 		if ((tokenBeforeOperator.type == NUMBER || tokenBeforeOperator.type == VARIABLE_NAME)
@@ -983,6 +985,7 @@ void Priorize(vector<Token> & tokens, int first, int last, char op1, char op2)
 			tokens.insert(tokens.begin() + mulDivIdx + 3, Token(')'));
 			last += 2;
 			mulDivIdx += 2;
+			changed = true;
 		}
 		else if ((tokenBeforeOperator.type == NUMBER || tokenBeforeOperator.type == VARIABLE_NAME)
 			&& tokenAfterOperator.type == PARENTHESIS)
@@ -996,6 +999,7 @@ void Priorize(vector<Token> & tokens, int first, int last, char op1, char op2)
 				tokens.insert(tokens.begin() + expressionLastIdx + 1, Token(')'));
 				last += 2;
 				mulDivIdx += 2;
+				changed = true;
 			}
 		}
 		else if (tokenBeforeOperator.type == PARENTHESIS
@@ -1010,6 +1014,7 @@ void Priorize(vector<Token> & tokens, int first, int last, char op1, char op2)
 				tokens.insert(tokens.begin() + mulDivIdx + 3, Token(')'));
 				last += 2;
 				mulDivIdx += 2;
+				changed = true;
 			}
 		}
 
@@ -1033,6 +1038,7 @@ void Priorize(vector<Token> & tokens, int first, int last)
 {
 	PriorizeFunctions(tokens, first, last);
 	Priorize(tokens, first, last, '*', '/');
+	Priorize(tokens, first, last, '+', '-');
 }
 
 void PriorizeFunctions(vector<Token> & tokens, int & first, int & last)
