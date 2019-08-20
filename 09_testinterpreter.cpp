@@ -501,6 +501,7 @@ double Compute(double a, char op, double b)
 		case '/': result = a / b; break;
 		case '&': result = double(a != 0.0 && b != 0.0); break;
 		case '|': result = double(a != 0.0 || b != 0.0); break;
+		case '=': result = double(a == b); break; // TODO: need an epsilon
 		default : cout << "[Compute] unknown operator " << op << endl;
 	}
 
