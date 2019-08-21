@@ -746,7 +746,7 @@ double Evaluate1Statement(const vector<Token> & tokens, int first, int last)
 		assert(end_idx_args_list > 0);
 		assert(end_idx_args_list < last);
 
-		int next_token_idx_in_args_list = FindChar(tokens, token_idx_in_args_list + 1, last, ',', 1, true);
+		int next_token_idx_in_args_list = FindChar(tokens, token_idx_in_args_list, last, ',', 1, true);
 		while (next_token_idx_in_args_list > 0)
 		{
 			double currentArg = Evaluate1Statement(tokens, token_idx_in_args_list, next_token_idx_in_args_list);
