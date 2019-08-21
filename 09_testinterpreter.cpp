@@ -984,7 +984,7 @@ bool GetFunctionExpression(const vector<Token> & tokens, int first, int last, in
 
 void PriorizeFunctions(vector<Token> & tokens, int & first, int & last);
 
-void Priorize(vector<Token> & tokens, int first, int last, char op1, char op2)
+void Priorize(vector<Token> & tokens, int &first, int & last, char op1, char op2)
 {
 	//PriorizeFunctions(tokens, first, last);
 	bool changed = true;
