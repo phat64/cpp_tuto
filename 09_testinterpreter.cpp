@@ -94,10 +94,16 @@ struct Token
 		{
 			*this = Token(c);
 		}
-		else if (c == '+' || c == '-' || c == '*' || c == '/'
-			|| (c == '&' && c2 == '&') || (c == '|' && c2 == '|') || (c == '=' && c2 == '='))
+		else if (c == '+' || c == '-' || c == '*' || c == '/')
 		{
 			*this = Token(c);
+		}
+		else if	((c == '&' && c2 == '&') || (c == '|' && c2 == '|') || (c == '=' && c2 == '='))
+		{
+			*this = Token(c);
+			strvalue[0] = c;
+			strvalue[1] = c2;
+			strvalue[2] = '\0';
 		}
 		else if (c == ',' || c == ';')
 		{
