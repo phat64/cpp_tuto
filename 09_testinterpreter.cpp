@@ -89,11 +89,13 @@ struct Token
 		strvalue[sizeof(strvalue) - 1] = '\0';		// mandatory if str is bigger than strvalue
 
 		char c = *str;
+		char c2 = *(str + 1);
 		if (c == '(' || c == ')')
 		{
 			*this = Token(c);
 		}
-		else if (c == '+' || c == '-' || c == '*' || c == '/' || c == '&' || c == '|' || c == '=')
+		else if (c == '+' || c == '-' || c == '*' || c == '/'
+			|| (c == '&' && c2 == '&') || (c == '|' && c2 == '|') || (c == '=' && c2 == '='))
 		{
 			*this = Token(c);
 		}
@@ -151,6 +153,7 @@ void Tokenize(vector<Token> & tokens, const string & str)
 {
 	char * s = (char*)str.c_str();
 	char c;
+	char c2;
 
 	// Step 1 : simple tokenization
 	while (c = *s++)
@@ -164,7 +167,9 @@ void Tokenize(vector<Token> & tokens, const string & str)
 		{
 			break;
 		}
-		else if (isdigit(c))
+
+		c2 = *s;
+		if (isdigit(c))
 		{
 			char numberstr[NUMBER_DIGITS_MAX + 1] = {0};
 			size_t numberstrlen = 0;
@@ -206,9 +211,15 @@ void Tokenize(vector<Token> & tokens, const string & str)
 			strncpy(namestr, start, namestrlen);
 			tokens.push_back(Token(namestr));
 		}
-		else if (c == '+' || c == '-' || c == '*' || c == '/' || c == '&' || c == '|' || c == '=')
+		else if (c == '+' || c == '-' || c == '*' || c == '/')
 		{
 			tokens.push_back(Token(c));
+		}
+		else if ((c == '&' && c2 == '&') || (c == '|' && c2 == '|') || (c == '=' && c2 == '='))
+		{
+			char tmp[3] = {c, c2, '\0'};
+			tokens.push_back(Token(tmp));
+			s++;
 		}
 		else if (c == '(' || c ==')')
 		{
@@ -1144,12 +1155,12 @@ int main(int argc, char ** argv)
 	assert(333.0 == Evaluate("111; 222; return 333"));
 
 	// assertion for boolean operations checks
-	assert(1 && 0 == Evaluate("1 & 0"));
-	assert(1 || 0 == Evaluate("1 | 0"));
-	assert(1 + 1 && 0 + 1 == Evaluate("1 + 1 & 0 + 1"));
-	assert(0 + 1 || 0 + 1 == Evaluate("0 + 1 | 0 + 1"));
-	assert(1 || 1 && 0 == Evaluate("1 | 1 & 0"));
-	assert((1 == 2 && 2 == 1) == Evaluate("1 = 2 & 2 = 1"));
+	assert(1 && 0 == Evaluate("1 && 0"));
+	assert(1 || 0 == Evaluate("1 || 0"));
+	assert(1 + 1 && 0 + 1 == Evaluate("1 + 1 && 0 + 1"));
+	assert(0 + 1 || 0 + 1 == Evaluate("0 + 1 || 0 + 1"));
+	assert(1 || 1 && 0 == Evaluate("1 || 1 && 0"));
+	assert((1 == 2 && 2 == 1) == Evaluate("1 == 2 && 2 == 1"));
 
 	while (true)
 	{
