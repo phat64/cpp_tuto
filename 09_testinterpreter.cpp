@@ -988,21 +988,21 @@ void Priorize(vector<Token> & tokens, int &first, int & last, char op1, char op2
 {
 	//PriorizeFunctions(tokens, first, last);
 	bool changed = true;
-	int mulIdx = FindChar(tokens, first, last, op1);
-	int divIdx = FindChar(tokens, first, last, op2);
-	int mulDivIdx = (mulIdx != -1 && divIdx != -1 ? std::min(mulIdx, divIdx): std::max(mulIdx, divIdx));
-	while (mulDivIdx != -1 && changed)
+	int op1Idx = FindChar(tokens, first, last, op1);
+	int op2Idx = FindChar(tokens, first, last, op2);
+	int opIdx = (op1Idx != -1 && op2Idx != -1 ? std::min(op1Idx, op2Idx): std::max(op1Idx, op2Idx));
+	while (opIdx != -1 && changed)
 	{
 		changed = false;
-		const Token & tokenBeforeOperator = tokens[mulDivIdx - 1];
-		const Token & tokenAfterOperator = tokens[mulDivIdx + 1];
+		const Token & tokenBeforeOperator = tokens[opIdx - 1];
+		const Token & tokenAfterOperator = tokens[opIdx + 1];
 		if ((tokenBeforeOperator.type == NUMBER || tokenBeforeOperator.type == VARIABLE_NAME)
 		&& (tokenAfterOperator.type == NUMBER || tokenAfterOperator.type == VARIABLE_NAME))
 		{
-			tokens.insert(tokens.begin() + mulDivIdx - 1, Token('('));
-			tokens.insert(tokens.begin() + mulDivIdx + 3, Token(')'));
+			tokens.insert(tokens.begin() + opIdx - 1, Token('('));
+			tokens.insert(tokens.begin() + opIdx + 3, Token(')'));
 			last += 2;
-			mulDivIdx += 2;
+			opIdx += 2;
 			changed = true;
 		}
 		else if ((tokenBeforeOperator.type == NUMBER || tokenBeforeOperator.type == VARIABLE_NAME)
@@ -1011,12 +1011,12 @@ void Priorize(vector<Token> & tokens, int &first, int & last, char op1, char op2
 			int expressionFirstIdx;
 			int expressionLastIdx;
 
-			if (GetParenthesedExpression(tokens, first, last, mulDivIdx + 1, expressionFirstIdx, expressionLastIdx))
+			if (GetParenthesedExpression(tokens, first, last, opIdx + 1, expressionFirstIdx, expressionLastIdx))
 			{
-				tokens.insert(tokens.begin() + mulDivIdx - 1, Token('('));
+				tokens.insert(tokens.begin() + opIdx - 1, Token('('));
 				tokens.insert(tokens.begin() + expressionLastIdx + 1, Token(')'));
 				last += 2;
-				mulDivIdx += 2;
+				opIdx += 2;
 				changed = true;
 			}
 		}
@@ -1026,23 +1026,23 @@ void Priorize(vector<Token> & tokens, int &first, int & last, char op1, char op2
 			int expressionFirstIdx;
 			int expressionLastIdx;
 
-			if (GetParenthesedExpression(tokens, first, last, mulDivIdx - 1, expressionFirstIdx, expressionLastIdx))
+			if (GetParenthesedExpression(tokens, first, last, opIdx - 1, expressionFirstIdx, expressionLastIdx))
 			{
 				tokens.insert(tokens.begin() + expressionFirstIdx, Token('('));
-				tokens.insert(tokens.begin() + mulDivIdx + 3, Token(')'));
+				tokens.insert(tokens.begin() + opIdx + 3, Token(')'));
 				last += 2;
-				mulDivIdx += 2;
+				opIdx += 2;
 				changed = true;
 			}
 		}
 
 		
 
-		mulIdx = FindChar(tokens, mulDivIdx, last, op1);
-		divIdx = FindChar(tokens, mulDivIdx, last, op2);
-		mulDivIdx = (mulIdx != -1 && divIdx != -1 ? std::min(mulIdx, divIdx): std::max(mulIdx, divIdx));
+		op1Idx = FindChar(tokens, opIdx, last, op1);
+		op2Idx = FindChar(tokens, opIdx, last, op2);
+		opIdx = (op1Idx != -1 && op2Idx != -1 ? std::min(op1Idx, op2Idx): std::max(op1Idx, op2Idx));
 
-		cout << "mulIdx = " << mulIdx << endl;
+		cout << "op1Idx = " << op1Idx << endl;
 		cout <<endl;
 		for (size_t i = 0; i < tokens.size(); i++)
 		{
