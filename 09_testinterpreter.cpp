@@ -1212,13 +1212,23 @@ int main(int argc, char ** argv)
 	assert((1 == 2 && 2 == 1) == Evaluate("1 == 2 && 2 == 1"));
 	assert((1 + 1 && 2 == 2) == Evaluate("1 + 1 && 2 == 2"));
 
-	// assertion for if checks
+	// assertion for simple/direct if checks
 	assert(22 == Evaluate("if (1) return 22"));
 	assert(22 == Evaluate("if (1) return 22;"));
 	assert(22 == Evaluate("if (1) return 22; return 33"));
 	assert(22 == Evaluate("if (1) return 22; return 33;"));
 	assert(33 == Evaluate("if (0) return 22; return 33"));
 	assert(33 == Evaluate("if (0) return 22; return 33;"));
+
+	// assertion for if+booleans checks
+	assert(33 == Evaluate("if (0 && 0) return 22; return 33;"));
+	assert(33 == Evaluate("if (1 && 0) return 22; return 33;"));
+	assert(33 == Evaluate("if (0 && 1) return 22; return 33;"));
+	assert(22 == Evaluate("if (1 && 1) return 22; return 33;"));
+	assert(33 == Evaluate("if (0 || 0) return 22; return 33;"));
+	assert(22 == Evaluate("if (1 || 0) return 22; return 33;"));
+	assert(22 == Evaluate("if (0 || 1) return 22; return 33;"));
+	assert(22 == Evaluate("if (1 || 1) return 22; return 33;"));
 
 	while (true)
 	{
