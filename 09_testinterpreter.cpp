@@ -1217,6 +1217,8 @@ int main(int argc, char ** argv)
 	assert(22 == Evaluate("if (1) return 22;"));
 	assert(22 == Evaluate("if (1) return 22; return 33"));
 	assert(22 == Evaluate("if (1) return 22; return 33;"));
+	assert(33 == Evaluate("if (0) return 22; return 33"));
+	assert(33 == Evaluate("if (0) return 22; return 33;"));
 
 	while (true)
 	{
