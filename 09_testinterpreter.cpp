@@ -1220,7 +1220,7 @@ int main(int argc, char ** argv)
 	assert(33 == Evaluate("if (0) return 22; return 33"));
 	assert(33 == Evaluate("if (0) return 22; return 33;"));
 
-	// assertion for if+booleans checks
+	// assertion for if+simple booleans checks
 	assert(33 == Evaluate("if (0 && 0) return 22; return 33;"));
 	assert(33 == Evaluate("if (1 && 0) return 22; return 33;"));
 	assert(33 == Evaluate("if (0 && 1) return 22; return 33;"));
@@ -1229,6 +1229,11 @@ int main(int argc, char ** argv)
 	assert(22 == Evaluate("if (1 || 0) return 22; return 33;"));
 	assert(22 == Evaluate("if (0 || 1) return 22; return 33;"));
 	assert(22 == Evaluate("if (1 || 1) return 22; return 33;"));
+
+	// assertion for if+complex booleans checks
+	assert(99 == Evaluate("if (pi == 111) return 88; return 99;"));
+	assert(88 == Evaluate("if (pi == pi && 1 == 1) return 88; return 99;"));
+	assert(3 * pi == Evaluate("if (pi == 111 || 1 == 1) return 3 * pi; return 5 * pi;"));
 
 	while (true)
 	{
