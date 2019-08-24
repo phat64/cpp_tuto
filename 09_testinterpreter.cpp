@@ -1212,6 +1212,12 @@ int main(int argc, char ** argv)
 	assert((1 == 2 && 2 == 1) == Evaluate("1 == 2 && 2 == 1"));
 	assert((1 + 1 && 2 == 2) == Evaluate("1 + 1 && 2 == 2"));
 
+	// assertion for if checks
+	assert(22 == Evaluate("if (1) return 22"));
+	assert(22 == Evaluate("if (1) return 22;"));
+	assert(22 == Evaluate("if (1) return 22; return 33"));
+	assert(22 == Evaluate("if (1) return 22; return 33;"));
+
 	while (true)
 	{
 		string in;
