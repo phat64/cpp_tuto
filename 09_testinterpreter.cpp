@@ -354,7 +354,7 @@ bool Check1(const vector<Token> & tokens, int idx)
 
 bool Check2(const vector<Token> & tokens, int idx)
 {
-	return tokens[idx].type == RETURN && (tokens[idx + 1].type == NUMBER || tokens[idx + 1].type == VARIABLE_NAME);
+	return (tokens[idx].type == RETURN || tokens[idx].type == ELSE) && (tokens[idx + 1].type == NUMBER || tokens[idx + 1].type == VARIABLE_NAME);
 }
 
 bool Check3(const vector<Token> & tokens, int idx)
@@ -702,7 +702,7 @@ int EvaluateWithoutParenthesis(const vector<Token> & tokens, int first, int last
 	return result;
 }
 
-double Evaluate1Statement(const vector<Token> & tokens, int first, int last, bool * hasReturn = NULL)
+double Evaluate1Statement(const vector<Token> & tokens, int first, int last, bool * hasReturn = NULL, bool * hasIfConditionTrue = NULL)
 {
 	for (int i = first; i < last; i++)
 	{
@@ -712,7 +712,9 @@ double Evaluate1Statement(const vector<Token> & tokens, int first, int last, boo
 	int size = last - first;
 
 	double result = 0.0;
+	bool previousHasIfConditionTrue = false;
 	if (hasReturn) *hasReturn = false;
+	if (hasIfConditionTrue) {previousHasIfConditionTrue = *hasIfConditionTrue; *hasIfConditionTrue = false;}
 
 	if (size == 1)
 	{
@@ -730,14 +732,14 @@ double Evaluate1Statement(const vector<Token> & tokens, int first, int last, boo
 			return 0.0;
 		}
 	}
-	else if (size == 3)
+	else if (size == 3 && tokens[first].type != ELSE)
 	{
 		Compute3(result, tokens, first);
 		return result;
 	}
 
 	// no parenthesis => easy to evaluate
-	if (FindChar(tokens, first, last, '(') < 0)
+	if (FindChar(tokens, first, last, '(') < 0 && tokens[first].type != ELSE)
 	{
 		result = EvaluateWithoutParenthesis(tokens, first, last);
 		return result;
@@ -802,6 +804,7 @@ double Evaluate1Statement(const vector<Token> & tokens, int first, int last, boo
 				result = Evaluate1Statement(tokens, expressionFirstIdx + 1, expressionLastIdx - 1);
 				if (result != 0)
 				{
+					if (hasIfConditionTrue) *hasIfConditionTrue = true;
 					first = expressionLastIdx;
 					result = Evaluate1Statement(tokens, first, last, hasReturn);
 					return result;
@@ -822,6 +825,18 @@ double Evaluate1Statement(const vector<Token> & tokens, int first, int last, boo
 			return 0.0;
 		}
 
+	}
+	else if (tokens[first].type == ELSE)
+	{
+		cout << "E L S E " << endl;
+		if (previousHasIfConditionTrue)
+		{
+			return 0.0;
+		}
+		else
+		{
+			return Evaluate1Statement(tokens, first + 1, last, hasReturn);
+		}
 	}
 	else if (tokens[first].type == RETURN)
 	{
@@ -850,6 +865,7 @@ double Evaluate(const vector<Token> & tokens, int first, int last)
 	double result;
 	int semicolonIdx;
 	bool hasReturn = false;
+	bool hasIfConditionTrue = false;
 
 	// 1. no semicolon => easy to evaluate
 	semicolonIdx = FindChar(tokens, first, last, ';');
@@ -861,7 +877,7 @@ double Evaluate(const vector<Token> & tokens, int first, int last)
 	// 2. evaluate a multiple statements expression
 
 	// 2.1 special case : 1rst token is return
-	result = Evaluate1Statement(tokens, first, semicolonIdx, &hasReturn);
+	result = Evaluate1Statement(tokens, first, semicolonIdx, &hasReturn, &hasIfConditionTrue);
 	if (hasReturn)
 	{
 		return result;
@@ -873,7 +889,7 @@ double Evaluate(const vector<Token> & tokens, int first, int last)
 		int nextSemicolonIdx = FindChar(tokens, semicolonIdx + 1, last, ';');
 		if (nextSemicolonIdx >= 0)
 		{
-			result = Evaluate1Statement(tokens, semicolonIdx + 1, nextSemicolonIdx, &hasReturn);
+			result = Evaluate1Statement(tokens, semicolonIdx + 1, nextSemicolonIdx, &hasReturn, &hasIfConditionTrue);
 			// manage the RETURN token
 			if (hasReturn)
 			{
