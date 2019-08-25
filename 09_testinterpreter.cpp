@@ -7,15 +7,24 @@
 #include <assert.h>
 
 /*
- * A simple calculator with 4 binary operations *, /, +, - and parenthesis ( and ).
+ * A simple C-like interpreter with :
+ *	- 4 binary operations *, /, +, - and parenthesis ( and ).
+ *	- 2 binary boolean operations && and ||.
+ *	- 1 comparaison operation ==.
+ *	- 1 variable/constante : pi.
+ *	- 2 functions : max(double, double) and cos(double).
+ *	- 'return' keyword management.
+ *	- 'if (<condition>) <statement>;' management.
+ *	- 'if (<condition>) <statementA>; else <statementB>;' management.
  * It works fine.
  *
  * ps : I don't use yacc or lex but it can help you if you want to dev a compiler or a calculator
  *
- * [TODO] => It's only for the tutorial. It's not for advanced developers and it's obviously not high optimized ^^
- *	- It's my old code. It needs more OOP.
- * 	- need the negative operator (unary operator)
- *	- need math functions like sine or cosine
+ * [TODO] => It's only for the tutorial. It's not for advanced developers and it's obviously not yet high optimized ^^
+ *	- It uses my old code. It needs more OOP.
+ * 	- need the negative operator (unary operator).
+ *	- need more math functions like sine or cosine.
+ *	- need a bytecode translator/compiler and a Virtual Machine.
  */
 
 
