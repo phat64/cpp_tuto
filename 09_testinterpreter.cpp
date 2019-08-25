@@ -354,6 +354,15 @@ void TokenizePostProcess(vector<Token> & tokens)
 	}
 }
 
+void PrintTokensList(const vector<Token> & tokens, int first, int last)
+{
+	for (int i = first; i < last; i++)
+	{
+		cout << tokens[i].strvalue << " ";
+	}
+	cout << endl;
+}
+
 // ------------------------------ CHECKER ------------------------------------
 
 bool Check1(const vector<Token> & tokens, int idx)
@@ -716,11 +725,7 @@ int EvaluateWithoutParenthesis(const vector<Token> & tokens, int first, int last
 double Evaluate1Statement(const vector<Token> & tokens, int first, int last, bool * hasReturn = NULL, bool * hasIfConditionTrue = NULL)
 {
 #if defined(DEBUG)
-	for (int i = first; i < last; i++)
-	{
-		cout << tokens[i].strvalue;
-	}
-	cout << endl;
+	PrintTokensList(tokens, first, last);
 #endif
 
 	int size = last - first;
@@ -1127,11 +1132,7 @@ void Priorize(vector<Token> & tokens, int &first, int & last, char op1, char op2
 #if defined(DEBUG)
 		cout << "op1Idx = " << op1Idx << endl;
 		cout <<endl;
-		for (size_t i = 0; i < tokens.size(); i++)
-		{
-			cout << tokens[i].strvalue;
-		}
-		cout <<endl;
+		PrintTokensList(tokens, 0, (int)tokens.size());
 #endif
 	}
 }
@@ -1156,11 +1157,7 @@ void PriorizeFunctions(vector<Token> & tokens, int & first, int & last)
 		if (GetFunctionExpression(tokens, first, last, idx, expressionFirstIdx, expressionLastIdx))
 		{
 #if defined(DEBUG)
-			for (size_t i = 0; i < tokens.size(); i++)
-			{
-				cout << tokens[i].strvalue << " ";
-			}
-			cout << endl;
+			PrintTokensList(tokens, 0, (int)tokens.size());
 #endif
 
 #if defined(DEBUG)
