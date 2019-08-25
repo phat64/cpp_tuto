@@ -359,7 +359,7 @@ bool Check2(const vector<Token> & tokens, int idx)
 
 bool Check3(const vector<Token> & tokens, int idx)
 {
-	const char * validcombo[] = {"(N)", "NON", "F[]", NULL};
+	const char * validcombo[] = {"(N)", "NON", "F[]", "ERN", NULL};
 
 	for (int i = 0; validcombo[i]; i++)
 	{
