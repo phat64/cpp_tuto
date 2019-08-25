@@ -1252,6 +1252,10 @@ int main(int argc, char ** argv)
 	assert(88 == Evaluate("if (pi == pi && 1 == 1) return 88; return 99;"));
 	assert(3 * pi == Evaluate("if (pi == 111 || 1 == 1) return 3 * pi; return 5 * pi;"));
 
+	// assertion for if/else checks
+	assert(111 == Evaluate("if (1) return 111; else return 222; return 333;"));
+	assert(222 == Evaluate("if (0) return 111; else return 222; return 333;"));
+
 	while (true)
 	{
 		string in;
