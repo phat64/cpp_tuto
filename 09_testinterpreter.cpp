@@ -453,7 +453,9 @@ bool CheckFunctions(const vector<Token> & tokens, int first, int last)
 		const Token & currentToken = tokens[i];
 		if (currentToken.type == FUNCTION_NAME)
 		{
+#if defined(DEBUG)
 			cout << "check function : " << currentToken.strvalue << endl;
+#endif
 			if (strcmp(currentToken.strvalue, "max") == 0 && currentToken.dvalue == 2.0)
 			{
 				return true;
@@ -713,11 +715,14 @@ int EvaluateWithoutParenthesis(const vector<Token> & tokens, int first, int last
 
 double Evaluate1Statement(const vector<Token> & tokens, int first, int last, bool * hasReturn = NULL, bool * hasIfConditionTrue = NULL)
 {
+#if defined(DEBUG)
 	for (int i = first; i < last; i++)
 	{
 		cout << tokens[i].strvalue;
 	}
 	cout << endl;
+#endif
+
 	int size = last - first;
 
 	double result = 0.0;
@@ -790,15 +795,22 @@ double Evaluate1Statement(const vector<Token> & tokens, int first, int last, boo
 			args.push_back(currentArg);
 			token_idx_in_args_list = next_token_idx_in_args_list + 1;
 			next_token_idx_in_args_list = FindChar(tokens, token_idx_in_args_list + 1, last, ',', 1, true);
+#if defined(DEBUG)
 			cout << "arg = " << currentArg << endl;
+#endif
 		}
 		if (token_idx_in_args_list != end_idx_args_list)
 		{
 			double currentArg = Evaluate1Statement(tokens, token_idx_in_args_list, end_idx_args_list);
 			args.push_back(currentArg);
+#if defined(DEBUG)
 			cout << "arg = " << currentArg << endl;
+#endif
 		}
+
+#if defined(DEBUG)
 		cout << "args.size() = " << args.size() << endl;
+#endif
 		result = CallFunction(tokens[first], args);
 		first = end_idx_args_list + 1;
 	}
@@ -837,7 +849,9 @@ double Evaluate1Statement(const vector<Token> & tokens, int first, int last, boo
 	}
 	else if (tokens[first].type == ELSE)
 	{
+#if defined(DEBUG)
 		cout << "E L S E " << endl;
+#endif
 		if (previousHasIfConditionTrue)
 		{
 			return 0.0;
@@ -1110,7 +1124,7 @@ void Priorize(vector<Token> & tokens, int &first, int & last, char op1, char op2
 		op1Idx = FindChar(tokens, opIdx, last, op1);
 		op2Idx = FindChar(tokens, opIdx, last, op2);
 		opIdx = (op1Idx != -1 && op2Idx != -1 ? std::min(op1Idx, op2Idx): std::max(op1Idx, op2Idx));
-
+#if defined(DEBUG)
 		cout << "op1Idx = " << op1Idx << endl;
 		cout <<endl;
 		for (size_t i = 0; i < tokens.size(); i++)
@@ -1118,6 +1132,7 @@ void Priorize(vector<Token> & tokens, int &first, int & last, char op1, char op2
 			cout << tokens[i].strvalue;
 		}
 		cout <<endl;
+#endif
 	}
 }
 
@@ -1132,7 +1147,6 @@ void Priorize(vector<Token> & tokens, int first, int last)
 
 void PriorizeFunctions(vector<Token> & tokens, int & first, int & last)
 {
-int cpt = 0;
 	int idx = FindChar(tokens, first, last, 'F');
 	while (idx >= first)
 	{
@@ -1141,16 +1155,21 @@ int cpt = 0;
 
 		if (GetFunctionExpression(tokens, first, last, idx, expressionFirstIdx, expressionLastIdx))
 		{
-	for (size_t i = 0; i < tokens.size(); i++)
-	{
-		cout << tokens[i].strvalue << " ";
-	}
-	cout << endl;
-		cout << "expressionFirstIdx = "<< expressionFirstIdx <<endl;
-		cout << "expressionLastIdx = "<< expressionLastIdx <<endl;
-		cout << "A";	tokens.insert(tokens.begin() + expressionFirstIdx, Token('('));
-		cout << "B";	tokens.insert(tokens.begin() + expressionLastIdx + 1, Token(')'));
-		cout << "C";	idx = expressionLastIdx;
+#if defined(DEBUG)
+			for (size_t i = 0; i < tokens.size(); i++)
+			{
+				cout << tokens[i].strvalue << " ";
+			}
+			cout << endl;
+#endif
+
+#if defined(DEBUG)
+			cout << "[PriorizeFunctions] expressionFirstIdx = "<< expressionFirstIdx <<endl;
+			cout << "[PriorizeFunctions] expressionLastIdx = "<< expressionLastIdx <<endl;
+			cout << "A";	tokens.insert(tokens.begin() + expressionFirstIdx, Token('('));
+			cout << "B";	tokens.insert(tokens.begin() + expressionLastIdx + 1, Token(')'));
+			cout << "C";	idx = expressionLastIdx;
+#endif
 			first --;
 			last += 2;
 		}
