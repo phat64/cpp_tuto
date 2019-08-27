@@ -398,7 +398,7 @@ bool CheckCombo(const vector<Token> & tokens, int idx0, int idx1)
 		"(N", "N)", "NO", "ON", "O(", ")O",
 		"F[", "[F", ",F", "],", ")]", "]], ""[(", "[]", ",(", "),",
 		"[N", "N]", "N,", ",N", "OF", "]O",
-		"I(", ")I","RN", "R(", ")R", "RF", ";R",
+		"I(", ")I", "RN", "R(", ")R", "RF", ";R",
 		";E", "EN", "ER", "E(", "EF", "E;",
 		"N;", ";N", ");", ";(", ";I", ";F", "];", NULL};
 
@@ -821,36 +821,43 @@ double Evaluate1Statement(const vector<Token> & tokens, int first, int last, boo
 	}
 	else if (tokens[first].type == IF)
 	{
-		if (tokens[first + 1].type == PARENTHESIS && tokens[first + 1].cvalue == '(')
+		while (tokens[first].type == IF)
 		{
-			int expressionFirstIdx;
-			int expressionLastIdx;
-			if (GetParenthesedExpression(tokens, first + 1, last, first + 1, expressionFirstIdx, expressionLastIdx))
+			if (tokens[first + 1].type == PARENTHESIS && tokens[first + 1].cvalue == '(')
 			{
-				result = Evaluate1Statement(tokens, expressionFirstIdx + 1, expressionLastIdx - 1);
-				if (result != 0)
+				int expressionFirstIdx;
+				int expressionLastIdx;
+				if (GetParenthesedExpression(tokens, first + 1, last, first + 1, expressionFirstIdx, expressionLastIdx))
 				{
-					if (hasIfConditionTrue) *hasIfConditionTrue = true;
-					first = expressionLastIdx;
-					result = Evaluate1Statement(tokens, first, last, hasReturn);
-					return result;
+					result = Evaluate1Statement(tokens, expressionFirstIdx + 1, expressionLastIdx - 1);
+					if (result != 0)
+					{
+						if (hasIfConditionTrue) *hasIfConditionTrue = true;
+						first = expressionLastIdx;
+						result = Evaluate1Statement(tokens, first, last, hasReturn, hasIfConditionTrue);
+						//return result;
+					}
+					else
+					{
+						return 0.0;
+					}
 				}
 				else
 				{
+					cout << "[Evaluate1Statement] : if error : missing '(' in if condition" << endl;
+					assert(0);
 					return 0.0;
 				}
 			}
-			cout << "[Evaluate1Statement] : if error : missing '(' in if condition" << endl;
-			assert(0);
-			return 0.0;
-		}
-		else
-		{
-			cout << "[Evaluate1Statement] : if error : no '('" << endl;
-			assert(0);
-			return 0.0;
+			else
+			{
+				cout << "[Evaluate1Statement] : if error : no '('" << endl;
+				assert(0);
+				return 0.0;
+			}
 		}
 
+		return result;
 	}
 	else if (tokens[first].type == ELSE)
 	{
