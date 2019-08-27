@@ -1304,6 +1304,23 @@ int main(int argc, char ** argv)
 	assert(555 == Evaluate("if (1) if (1) if (0) return 111; return 555;"));
 	assert(111 == Evaluate("if (1) if (1) if (1) return 111; return 555;"));
 
+	// assertion for double-if-else checks
+	assert(111 == Evaluate("if (1) if (1) return 111; else return 555; return 777;"));
+	assert(555 == Evaluate("if (1) if (0) return 111; else return 555; return 777;"));
+	assert(555 == Evaluate("if (0) if (1) return 111; else return 555; return 777;"));
+	assert(555 == Evaluate("if (0) if (0) return 111; else return 555; return 777;"));
+
+	// assertion for triple-if-else checks
+	assert(555 == Evaluate("if (0) if (0) if (0) return 111; else return 555; return 777;"));
+	assert(555 == Evaluate("if (0) if (0) if (1) return 111; else return 555; return 777;"));
+	assert(555 == Evaluate("if (0) if (1) if (0) return 111; else return 555; return 777;"));
+	assert(555 == Evaluate("if (0) if (1) if (1) return 111; else return 555; return 777;"));
+	assert(555 == Evaluate("if (1) if (0) if (0) return 111; else return 555; return 777;"));
+	assert(555 == Evaluate("if (1) if (0) if (1) return 111; else return 555; return 777;"));
+	assert(555 == Evaluate("if (1) if (1) if (0) return 111; else return 555; return 777;"));
+	assert(111 == Evaluate("if (1) if (1) if (1) return 111; else return 555; return 777;"));
+
+
 	while (true)
 	{
 		string in;
