@@ -917,18 +917,18 @@ double Evaluate1Statement(const vector<Token> & tokens, int first, int last, boo
 	return result;
 }
 
-double EvaluateNStatements(const vector<Token> & tokens, int first, int last)
+double EvaluateNStatements(const vector<Token> & tokens, int first, int last,
+	bool & hasReturn, bool & hasIfConditionTrue)
 {
 	double result;
 	int semicolonIdx;
-	bool hasReturn = false;
-	bool hasIfConditionTrue = false;
+
 
 	// 1. no semicolon => easy to evaluate
 	semicolonIdx = FindChar(tokens, first, last, ';');
 	if (semicolonIdx < 0)
 	{
-		return Evaluate1Statement(tokens, first, last);
+		return Evaluate1Statement(tokens, first, last, &hasReturn, &hasIfConditionTrue);
 	}
 
 	// 2. evaluate a multiple statements expression
@@ -957,20 +957,19 @@ double EvaluateNStatements(const vector<Token> & tokens, int first, int last)
 		else
 		{
 			//  evaluate the last statement : no need to check the return
-			return Evaluate1Statement(tokens, semicolonIdx + 1, last);
+			return Evaluate1Statement(tokens, semicolonIdx + 1, last, &hasReturn, &hasIfConditionTrue);
 		}
 	}
 
 	return result; // => unreachable code
 }
 
-double Evaluate1Scope(const vector<Token> & tokens, int first, int last)
+double Evaluate1Scope(const vector<Token> & tokens, int first, int last,
+	bool & hasReturn, bool & hasIfConditionTrue)
 {
 	double result;
 	int scopeBeginIdx;
 	int scopeEndIdx;
-	bool hasReturn = false;
-	bool hasIfConditionTrue = false;
 
 	int size = last - first;
 	/*assert(size >= 2);
@@ -993,24 +992,29 @@ double Evaluate1Scope(const vector<Token> & tokens, int first, int last)
 	while (scopeBeginIdx >= 0)
 	{
 		// 1. evaluate before the scope
-		result = EvaluateNStatements(tokens, first, scopeBeginIdx);
+		result = EvaluateNStatements(tokens, first, scopeBeginIdx, hasReturn, hasIfConditionTrue);
+		if (hasReturn) return result;
 
 		// 2. evaluate the scope
 		assert(GetScopedExpression(tokens, first, last, scopeBeginIdx, scopeBeginIdx, scopeEndIdx));
-		result = Evaluate1Scope(tokens, scopeBeginIdx, scopeEndIdx);
+		result = Evaluate1Scope(tokens, scopeBeginIdx, scopeEndIdx, hasReturn, hasIfConditionTrue);
+		if (hasReturn) return result;
 
 		// 3. evaluate after the scope
 		first = scopeEndIdx;
 		scopeBeginIdx = FindChar(tokens, first, last, '{');
 	}
 
-	result = EvaluateNStatements(tokens, first, last);
+	result = EvaluateNStatements(tokens, first, last, hasReturn, hasIfConditionTrue);
 	return result;
 }
 
 double Evaluate(const vector<Token> & tokens, int first, int last)
 {
-	return Evaluate1Scope(tokens, first, last);
+	bool hasReturn = false;
+	bool hasIfConditionTrue = false;
+
+	return Evaluate1Scope(tokens, first, last, hasReturn, hasIfConditionTrue);
 }
 
 bool GetGenericExpression(const vector<Token> & tokens, int first, int last, int idx, int &firstIdx, int &lastIdx,
