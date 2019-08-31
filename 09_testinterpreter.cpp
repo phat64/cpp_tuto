@@ -916,7 +916,7 @@ double Evaluate1Statement(const vector<Token> & tokens, int first, int last, boo
 	return result;
 }
 
-double Evaluate(const vector<Token> & tokens, int first, int last)
+double EvaluateNStatements(const vector<Token> & tokens, int first, int last)
 {
 	double result;
 	int semicolonIdx;
@@ -961,6 +961,11 @@ double Evaluate(const vector<Token> & tokens, int first, int last)
 	}
 
 	return result; // => unreachable code
+}
+
+double Evaluate(const vector<Token> & tokens, int first, int last)
+{
+	return EvaluateNStatements(tokens, first, last);
 }
 
 bool GetParenthesedExpression(const vector<Token> & tokens, int first, int last, int idx, int &firstIdx, int &lastIdx)
