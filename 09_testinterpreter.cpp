@@ -385,12 +385,18 @@ bool Check1(const vector<Token> & tokens, int idx)
 
 bool Check2(const vector<Token> & tokens, int idx)
 {
-	return (tokens[idx].type == RETURN || tokens[idx].type == ELSE) && (tokens[idx + 1].type == NUMBER || tokens[idx + 1].type == VARIABLE_NAME);
+	return	(
+			(tokens[idx].type == RETURN || tokens[idx].type == ELSE)
+			&& (tokens[idx + 1].type == NUMBER || tokens[idx + 1].type == VARIABLE_NAME)
+		)
+		||
+			(tokens[idx].type == SCOPE && tokens[idx].cvalue == '{'
+			&& tokens[idx + 1].type == SCOPE && tokens[idx + 1].cvalue == '}');
 }
 
 bool Check3(const vector<Token> & tokens, int idx)
 {
-	const char * validcombo[] = {"(N)", "NON", "F[]", "ERN", NULL};
+	const char * validcombo[] = {"(N)", "NON", "F[]", "ERN", "{N}", "{;}", NULL};
 
 	for (int i = 0; validcombo[i]; i++)
 	{
@@ -413,7 +419,9 @@ bool CheckCombo(const vector<Token> & tokens, int idx0, int idx1)
 		"[N", "N]", "N,", ",N", "OF", "]O",
 		"I(", ")I", "RN", "R(", ")R", "RF", ";R",
 		";E", "EN", "ER", "E(", "EF", "E;",
-		"N;", ";N", ");", ";(", ";I", ";F", "];", NULL};
+		"N;", ";N", ");", ";(", ";I", ";F", "];",
+		"{N", "{F", "{(", "{{", "{R", "{I", "){", "{;",
+		"{}", ";}", "}}", NULL};
 
 	for (int i = 0; validcombo[i]; i++)
 	{
