@@ -44,7 +44,7 @@ enum TokenType
 	NONE, NUMBER, OPERATOR, PARENTHESIS, COMMA,
 	NAME, VARIABLE_NAME, FUNCTION_NAME, /* NAME =  VARIABLE_NAME or FUNCTION_NAME*/
 	FUNCTION_ARGS_BEGIN, FUNCTION_ARGS_SEPARATOR, FUNCTION_ARGS_END, /* ( , ) */
-	IF, ELSE, RETURN, SEMICOLON /* SEMICOLON = ';'*/
+	IF, ELSE, RETURN, SEMICOLON, SCOPE /* SEMICOLON = ';'*/
 };
 
 struct Token
@@ -81,6 +81,11 @@ struct Token
 			type = SEMICOLON;
 			cvalue = ';';
 		}
+		else if (c == '{' || c == '}')
+		{
+			type = SCOPE;
+			cvalue = c;
+		}
 		else
 		{
 			type = NONE;
@@ -115,6 +120,10 @@ struct Token
 			strvalue[2] = '\0';
 		}
 		else if (c == ',' || c == ';')
+		{
+			*this = Token(c);
+		}
+		else if (c == '{' || c == '}')
 		{
 			*this = Token(c);
 		}
@@ -247,6 +256,10 @@ void Tokenize(vector<Token> & tokens, const string & str)
 			tokens.push_back(Token(c));
 		}
 		else if (c == ',' || c == ';')
+		{
+			tokens.push_back(Token(c));
+		}
+		else if (c == '{' || c == '}')
 		{
 			tokens.push_back(Token(c));
 		}
