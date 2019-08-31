@@ -968,7 +968,8 @@ double Evaluate(const vector<Token> & tokens, int first, int last)
 	return EvaluateNStatements(tokens, first, last);
 }
 
-bool GetParenthesedExpression(const vector<Token> & tokens, int first, int last, int idx, int &firstIdx, int &lastIdx)
+bool GetGenericExpression(const vector<Token> & tokens, int first, int last, int idx, int &firstIdx, int &lastIdx,
+	enum TokenType token_type, char token_cvalue_begin, char token_cvalue_end)
 {
 	if (idx < first)
 	{
@@ -980,21 +981,21 @@ bool GetParenthesedExpression(const vector<Token> & tokens, int first, int last,
 		return false;
 	}
 
-	if (tokens[idx].type == PARENTHESIS)
+	if (tokens[idx].type == token_type)
 	{
 		int depth = 0;
-		if (tokens[idx].cvalue == '(')
+		if (tokens[idx].cvalue == token_cvalue_begin)
 		{
 			firstIdx = idx;
 			for(;idx < last;idx++)
 			{
-				if (tokens[idx].type == PARENTHESIS)
+				if (tokens[idx].type == token_type)
 				{
-					if (tokens[idx].cvalue == '(')
+					if (tokens[idx].cvalue == token_cvalue_begin)
 					{
 						depth++;
 					}
-					else if (tokens[idx].cvalue == ')')
+					else if (tokens[idx].cvalue == token_cvalue_end)
 					{
 						depth--;
 						if (depth == 0)
@@ -1006,14 +1007,14 @@ bool GetParenthesedExpression(const vector<Token> & tokens, int first, int last,
 				}
 			}
 		}
-		else if (tokens[idx].cvalue == ')')
+		else if (tokens[idx].cvalue == token_cvalue_end)
 		{
 			lastIdx = idx + 1;
 			for(;idx >= first;idx--)
 			{
-				if (tokens[idx].type == PARENTHESIS)
+				if (tokens[idx].type == token_type)
 				{
-					if (tokens[idx].cvalue == '(')
+					if (tokens[idx].cvalue == token_cvalue_begin)
 					{
 						depth++;
 						if (depth == 0)
@@ -1023,7 +1024,7 @@ bool GetParenthesedExpression(const vector<Token> & tokens, int first, int last,
 						}
 
 					}
-					else if (tokens[idx].cvalue == ')')
+					else if (tokens[idx].cvalue == token_cvalue_end)
 					{
 						depth--;
 					}
@@ -1035,8 +1036,21 @@ bool GetParenthesedExpression(const vector<Token> & tokens, int first, int last,
 	return false; // not found
 }
 
+bool GetParenthesedExpression(const vector<Token> & tokens, int first, int last, int idx, int &firstIdx, int &lastIdx)
+{
+	return GetGenericExpression(tokens, first, last, idx, firstIdx,
+		lastIdx, PARENTHESIS, '(', ')');
+}
+
+bool GetScopedExpression(const vector<Token> & tokens, int first, int last, int idx, int &firstIdx, int &lastIdx)
+{
+	return GetGenericExpression(tokens, first, last, idx, firstIdx,
+		lastIdx, SCOPE, '{', '}');
+}
+
 bool GetFunctionExpression(const vector<Token> & tokens, int first, int last, int idx, int &firstIdx, int &lastIdx)
 {
+	// [TODO] need to refactor with GetGenericExpression(...)
 	if (idx < first)
 	{
 		return false;
