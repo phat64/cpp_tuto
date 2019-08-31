@@ -174,6 +174,7 @@ struct Token
 
 
 bool GetParenthesedExpression(const vector<Token> & tokens, int first, int last, int idx, int &firstIdx, int &lastIdx);
+bool GetScopedExpression(const vector<Token> & tokens, int first, int last, int idx, int &firstIdx, int &lastIdx);
 bool GetFunctionExpression(const vector<Token> & tokens, int first, int last, int idx, int &firstIdx, int &lastIdx);
 
 // ------------------------------ TOKENIZER ----------------------------------
@@ -963,9 +964,53 @@ double EvaluateNStatements(const vector<Token> & tokens, int first, int last)
 	return result; // => unreachable code
 }
 
+double Evaluate1Scope(const vector<Token> & tokens, int first, int last)
+{
+	double result;
+	int scopeBeginIdx;
+	int scopeEndIdx;
+	bool hasReturn = false;
+	bool hasIfConditionTrue = false;
+
+	int size = last - first;
+	/*assert(size >= 2);
+	assert(tokens[first].type == SCOPE);
+	assert(tokens[first].cvalue == '{');
+	assert(tokens[last - 1].type == SCOPE);
+	assert(tokens[last - 1].cvalue == '}');
+*/
+	if (size >= 2 &&
+		tokens[first].type == SCOPE &&
+		tokens[first].cvalue == '{' &&
+		tokens[last - 1].type == SCOPE &&
+		tokens[last - 1].cvalue == '}')
+	{
+		first++;
+		last--;
+	}
+
+	scopeBeginIdx = FindChar(tokens, first, last, '{');
+	while (scopeBeginIdx >= 0)
+	{
+		// 1. evaluate before the scope
+		result = EvaluateNStatements(tokens, first, scopeBeginIdx);
+
+		// 2. evaluate the scope
+		assert(GetScopedExpression(tokens, first, last, scopeBeginIdx, scopeBeginIdx, scopeEndIdx));
+		result = Evaluate1Scope(tokens, scopeBeginIdx, scopeEndIdx);
+
+		// 3. evaluate after the scope
+		first = scopeEndIdx;
+		scopeBeginIdx = FindChar(tokens, first, last, '{');
+	}
+
+	result = EvaluateNStatements(tokens, first, last);
+	return result;
+}
+
 double Evaluate(const vector<Token> & tokens, int first, int last)
 {
-	return EvaluateNStatements(tokens, first, last);
+	return Evaluate1Scope(tokens, first, last);
 }
 
 bool GetGenericExpression(const vector<Token> & tokens, int first, int last, int idx, int &firstIdx, int &lastIdx,
