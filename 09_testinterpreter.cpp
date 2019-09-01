@@ -995,12 +995,19 @@ double Evaluate1Scope(const vector<Token> & tokens, int first, int last,
 	scopeBeginIdx = FindChar(tokens, first, last, '{');
 	while (scopeBeginIdx >= 0)
 	{
+		assert(GetScopedExpression(tokens, first, last, scopeBeginIdx, scopeBeginIdx, scopeEndIdx, ifScopedIdx, elseScopedIdx));
+
+		// include the IF or the ELSE with the scope (if it's neccessary)
+		if (ifScopedIdx >= first || elseScopedIdx >= first)
+		{
+			scopeBeginIdx = std::max(ifScopedIdx, elseScopedIdx);
+		}
+
 		// 1. evaluate before the scope
 		result = EvaluateNStatements(tokens, first, scopeBeginIdx, hasReturn, hasIfConditionTrue);
 		if (hasReturn) return result;
 
 		// 2. evaluate the scope
-		assert(GetScopedExpression(tokens, first, last, scopeBeginIdx, scopeBeginIdx, scopeEndIdx, ifScopedIdx, elseScopedIdx));
 		result = Evaluate1Scope(tokens, scopeBeginIdx, scopeEndIdx, hasReturn, hasIfConditionTrue);
 		if (hasReturn) return result;
 
