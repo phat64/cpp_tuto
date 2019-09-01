@@ -175,6 +175,7 @@ struct Token
 
 bool GetParenthesedExpression(const vector<Token> & tokens, int first, int last, int idx, int &firstIdx, int &lastIdx);
 bool GetScopedExpression(const vector<Token> & tokens, int first, int last, int idx, int &firstIdx, int &lastIdx);
+bool GetScopedExpression(const vector<Token> & tokens, int first, int last, int idx, int &firstIdx, int &lastIdx, bool & isIfScoped, bool isElseScoped);
 bool GetFunctionExpression(const vector<Token> & tokens, int first, int last, int idx, int &firstIdx, int &lastIdx);
 
 // ------------------------------ TOKENIZER ----------------------------------
@@ -1095,6 +1096,38 @@ bool GetScopedExpression(const vector<Token> & tokens, int first, int last, int 
 {
 	return GetGenericExpression(tokens, first, last, idx, firstIdx,
 		lastIdx, SCOPE, '{', '}');
+}
+
+bool GetScopedExpression(const vector<Token> & tokens, int first, int last, int idx, int &firstIdx, int &lastIdx, bool & isIfScoped, bool isElseScoped)
+{
+	if (GetScopedExpression(tokens, first, last, idx, firstIdx, lastIdx))
+	{
+		if (firstIdx > first)
+		{
+			// IF () {scope}
+			if (tokens[firstIdx -1].type == PARENTHESIS && tokens[firstIdx -1].cvalue == ')')
+			{
+				int ifConditionBeginIdx;
+				int ifConditionEndIdx;
+				if (GetParenthesedExpression(tokens, first, last, firstIdx - 1, ifConditionBeginIdx, ifConditionEndIdx))
+				{
+					isIfScoped = ifConditionBeginIdx -1 >= first && tokens[ifConditionBeginIdx -1].type == IF;
+					isElseScoped = false;
+					return true;
+				}
+			}
+			// ELSE {scope}
+			else if (tokens[firstIdx -1].type == ELSE)
+			{
+				isIfScoped = false;
+				isElseScoped = true;
+				return true;
+			}
+		}
+	}
+	isIfScoped = false;
+	isElseScoped = false;
+	return false;
 }
 
 bool GetFunctionExpression(const vector<Token> & tokens, int first, int last, int idx, int &firstIdx, int &lastIdx)
