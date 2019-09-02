@@ -976,12 +976,6 @@ double Evaluate1Scope(const vector<Token> & tokens, int first, int last,
 	int elseScopedIdx;
 
 	int size = last - first;
-	/*assert(size >= 2);
-	assert(tokens[first].type == SCOPE);
-	assert(tokens[first].cvalue == '{');
-	assert(tokens[last - 1].type == SCOPE);
-	assert(tokens[last - 1].cvalue == '}');
-*/
 	if (size >= 2 &&
 		tokens[first].type == SCOPE &&
 		tokens[first].cvalue == '{' &&
@@ -999,18 +993,14 @@ double Evaluate1Scope(const vector<Token> & tokens, int first, int last,
 	while (scopeBeginIdx >= 0)
 	{
 		assert(GetScopedExpression(tokens, first, last, scopeBeginIdx, scopeBeginIdx, scopeEndIdx, ifScopedIdx, elseScopedIdx));
-
+#if defined(DEBUG)
 		cout << "ifScopedIdx = " << ifScopedIdx << endl;
 		cout << "elseScopedIdx = " << elseScopedIdx << endl;
-
-		// include the IF or the ELSE with the scope (if it's neccessary)
-		if (ifScopedIdx >= 0 || elseScopedIdx >= 0)
-		{
-			//scopeBeginIdx = std::max(ifScopedIdx, elseScopedIdx);
-		}
-
+#endif
 		// 1. evaluate before the scope
-		result = EvaluateNStatements(tokens, first, ifScopedIdx >= 0 || elseScopedIdx >= 0? std::max(ifScopedIdx, elseScopedIdx) : scopeBeginIdx, hasReturn, hasIfConditionTrue);
+		result = EvaluateNStatements(tokens, first,
+			ifScopedIdx >= 0 || elseScopedIdx >= 0? std::max(ifScopedIdx, elseScopedIdx) : scopeBeginIdx,
+			hasReturn, hasIfConditionTrue);
 		if (hasReturn) return result;
 
 		if (ifScopedIdx >= 0)
@@ -1060,10 +1050,12 @@ double Evaluate(const vector<Token> & tokens, int first, int last)
 bool GetGenericExpression(const vector<Token> & tokens, int first, int last, int idx, int &firstIdx, int &lastIdx,
 	enum TokenType token_type, char token_cvalue_begin, char token_cvalue_end)
 {
+#if defined(DEBUG)
+	cout << "GetGenericExpression : " << endl;
 	cout << "idx = " << idx << endl;
 	cout << "first = " << first << endl;
 	cout << "last = " << last << endl;
-
+#endif
 	if (idx < first)
 	{
 		return false;
@@ -1145,12 +1137,15 @@ bool GetScopedExpression(const vector<Token> & tokens, int first, int last, int 
 	int & ifScopedIdx, int &elseScopedIdx)
 {
 	bool ret = GetScopedExpression(tokens, first, last, idx, firstIdx, lastIdx);
+#if defined(DEBUG)
+	cout << "GetScopedExpression :" << endl;
 	cout << "ret = " << ret << endl;
 	cout << "idx = " << idx << endl;
 	cout << "first = " << first << endl;
 	cout << "last = " << last << endl;
 	cout << "firstIdx = " << firstIdx << endl;
 	cout << "lastIdx = " << lastIdx << endl;
+#endif
 	if (ret)
 	{
 		if (firstIdx -1 >= first)
