@@ -1501,6 +1501,10 @@ int main(int argc, char ** argv)
 	// assertion for if/else+scope checks
 	assert(789 == Evaluate("if (1) {return 789;}"));
 	assert(999 == Evaluate("if (0) {return 789;} else {return 999;}"));
+	assert(123 == Evaluate("if (1) return 123; else {return 555;}"));
+	assert(123 == Evaluate("if (1) {return 123;} else return 555;"));
+	assert(555 == Evaluate("if (0) return 123; else {return 555;}"));
+	assert(555 == Evaluate("if (0) {return 123;} else return 555;"));
 
 	while (true)
 	{
