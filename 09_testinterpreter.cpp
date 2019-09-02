@@ -176,7 +176,7 @@ struct Token
 bool GetParenthesedExpression(const vector<Token> & tokens, int first, int last, int idx, int &firstIdx, int &lastIdx);
 bool GetScopedExpression(const vector<Token> & tokens, int first, int last, int idx, int &firstIdx, int &lastIdx);
 bool GetScopedExpression(const vector<Token> & tokens, int first, int last, int idx, int &firstIdx, int &lastIdx,
-	int & ifScopedIdx, int elseScopedIdx);
+	int & ifScopedIdx, int & elseScopedIdx);
 bool GetFunctionExpression(const vector<Token> & tokens, int first, int last, int idx, int &firstIdx, int &lastIdx);
 
 // ------------------------------ TOKENIZER ----------------------------------
@@ -424,7 +424,7 @@ bool CheckCombo(const vector<Token> & tokens, int idx0, int idx1)
 		";E", "EN", "ER", "E(", "EF", "E;",
 		"N;", ";N", ");", ";(", ";I", ";F", "];",
 		"{N", "{F", "{(", "{{", "{R", "{I", "){", "{;",
-		"{}", ";}", "}}", "}N", "}F", "}R", "}I", "}E", NULL};
+		"{}", ";}", "}}", "}N", "}F", "}R", "}I", "}E", "E{", NULL};
 
 	for (int i = 0; validcombo[i]; i++)
 	{
@@ -990,26 +990,55 @@ double Evaluate1Scope(const vector<Token> & tokens, int first, int last,
 	{
 		first++;
 		last--;
+		size -= 2;
 	}
+
+	if (size <= 0) return 0.0;
 
 	scopeBeginIdx = FindChar(tokens, first, last, '{');
 	while (scopeBeginIdx >= 0)
 	{
 		assert(GetScopedExpression(tokens, first, last, scopeBeginIdx, scopeBeginIdx, scopeEndIdx, ifScopedIdx, elseScopedIdx));
 
+		cout << "ifScopedIdx = " << ifScopedIdx << endl;
+		cout << "elseScopedIdx = " << elseScopedIdx << endl;
+
 		// include the IF or the ELSE with the scope (if it's neccessary)
-		if (ifScopedIdx >= first || elseScopedIdx >= first)
+		if (ifScopedIdx >= 0 || elseScopedIdx >= 0)
 		{
-			scopeBeginIdx = std::max(ifScopedIdx, elseScopedIdx);
+			//scopeBeginIdx = std::max(ifScopedIdx, elseScopedIdx);
 		}
 
 		// 1. evaluate before the scope
-		result = EvaluateNStatements(tokens, first, scopeBeginIdx, hasReturn, hasIfConditionTrue);
+		result = EvaluateNStatements(tokens, first, ifScopedIdx >= 0 || elseScopedIdx >= 0? std::max(ifScopedIdx, elseScopedIdx) : scopeBeginIdx, hasReturn, hasIfConditionTrue);
 		if (hasReturn) return result;
 
-		// 2. evaluate the scope
-		result = Evaluate1Scope(tokens, scopeBeginIdx, scopeEndIdx, hasReturn, hasIfConditionTrue);
-		if (hasReturn) return result;
+		if (ifScopedIdx >= 0)
+		{
+			int ifConditionBegin;
+			int ifConditionEnd;
+
+			assert(GetParenthesedExpression(tokens, first, last, ifScopedIdx + 1, ifConditionBegin,ifConditionEnd));
+
+			result = Evaluate1Statement(tokens, ifConditionBegin, ifConditionEnd);
+			hasIfConditionTrue = result != 0.0;
+			if (hasIfConditionTrue)
+			{
+				result = Evaluate1Scope(tokens, scopeBeginIdx, scopeEndIdx, hasReturn, hasIfConditionTrue);
+				if (hasReturn) return result;
+			}
+		}
+		else if (elseScopedIdx >= 0 && !hasIfConditionTrue)
+		{
+			result = Evaluate1Scope(tokens, scopeBeginIdx, scopeEndIdx, hasReturn, hasIfConditionTrue);
+			if (hasReturn) return result;
+		}
+		else
+		{
+			// 2. evaluate the scope
+			result = Evaluate1Scope(tokens, scopeBeginIdx, scopeEndIdx, hasReturn, hasIfConditionTrue);
+			if (hasReturn) return result;
+		}
 
 		// 3. evaluate after the scope
 		first = scopeEndIdx;
@@ -1031,6 +1060,10 @@ double Evaluate(const vector<Token> & tokens, int first, int last)
 bool GetGenericExpression(const vector<Token> & tokens, int first, int last, int idx, int &firstIdx, int &lastIdx,
 	enum TokenType token_type, char token_cvalue_begin, char token_cvalue_end)
 {
+	cout << "idx = " << idx << endl;
+	cout << "first = " << first << endl;
+	cout << "last = " << last << endl;
+
 	if (idx < first)
 	{
 		return false;
@@ -1109,15 +1142,21 @@ bool GetScopedExpression(const vector<Token> & tokens, int first, int last, int 
 }
 
 bool GetScopedExpression(const vector<Token> & tokens, int first, int last, int idx, int &firstIdx, int &lastIdx,
-	int & ifScopedIdx, int elseScopedIdx)
+	int & ifScopedIdx, int &elseScopedIdx)
 {
 	bool ret = GetScopedExpression(tokens, first, last, idx, firstIdx, lastIdx);
+	cout << "ret = " << ret << endl;
+	cout << "idx = " << idx << endl;
+	cout << "first = " << first << endl;
+	cout << "last = " << last << endl;
+	cout << "firstIdx = " << firstIdx << endl;
+	cout << "lastIdx = " << lastIdx << endl;
 	if (ret)
 	{
-		if (firstIdx > first)
+		if (firstIdx -1 >= first)
 		{
 			// IF () {scope}
-			if (tokens[firstIdx -1].type == PARENTHESIS && tokens[firstIdx -1].cvalue == ')')
+			if (tokens[firstIdx - 1].type == PARENTHESIS && tokens[firstIdx - 1].cvalue == ')')
 			{
 				int ifConditionBeginIdx;
 				int ifConditionEndIdx;
@@ -1126,6 +1165,10 @@ bool GetScopedExpression(const vector<Token> & tokens, int first, int last, int 
 					if (ifConditionBeginIdx - 1 >= first && tokens[ifConditionBeginIdx -1].type == IF)
 					{
 						ifScopedIdx = ifConditionBeginIdx - 1;
+					}
+					else
+					{
+						ifScopedIdx = -1;
 					}
 					elseScopedIdx = -1;
 					return true;
