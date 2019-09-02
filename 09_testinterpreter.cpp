@@ -1498,6 +1498,10 @@ int main(int argc, char ** argv)
 	// assertion for scope checks
 	assert(99 == Evaluate("{{5+5;} return 99; 9+9;} return 123;"));
 
+	// assertion for if/else+scope checks
+	assert(789 == Evaluate("if (1) {return 789;}"));
+	assert(999 == Evaluate("if (0) {return 789;} else {return 999;}"));
+
 	while (true)
 	{
 		string in;
