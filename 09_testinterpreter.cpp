@@ -975,6 +975,10 @@ double Evaluate1Scope(const vector<Token> & tokens, int first, int last,
 	int ifScopedIdx;
 	int elseScopedIdx;
 
+#if defined(DEBUG)
+	PrintTokensList(tokens, first, last);
+#endif
+
 	int size = last - first;
 	if (size >= 2 &&
 		tokens[first].type == SCOPE &&
