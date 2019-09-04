@@ -1510,6 +1510,10 @@ int main(int argc, char ** argv)
 	assert(555 == Evaluate("if (0) return 123; else {return 555;}"));
 	assert(555 == Evaluate("if (0) {return 123;} else return 555;"));
 
+	// assertion for multiple-"if/else+scope"
+	assert(pi == Evaluate("if (1) { if (1) {return pi;} }"));
+	assert(222 == Evaluate("if (1){ if (0) return 111;else {return 222;}}"));
+
 	while (true)
 	{
 		string in;
