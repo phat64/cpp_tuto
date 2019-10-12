@@ -1,9 +1,6 @@
 #include <string.h>
 #include <stdlib.h>
 #include <math.h>
-#include <vector>
-#include <string>
-#include <iostream>
 #include <assert.h>
 
 /*
@@ -28,8 +25,96 @@
  */
 
 
+#include <string>
+#include <iostream>
 using namespace std;
 
+#if USE_STL
+#include <vector>
+
+#else
+#include <stdio.h>
+
+// minimalist implementation of the stl vector
+template <typename T>
+class vector
+{
+public:
+	vector()
+	{
+		m_data = NULL;
+		m_size = 0;
+		m_capacity = 0;
+	}
+
+	virtual ~vector()
+	{
+		if (m_data)
+		{
+			delete [] m_data;
+		}
+	}
+
+	size_t size() const { return m_size;}
+	T* begin(){ return m_data;}
+	T* end() { return m_data + m_size;}
+
+	T& operator[](size_t i) { return m_data[i];}
+	T& operator[](int i) { return m_data[i]; }
+	const T& operator[](size_t i) const { return m_data[i]; }
+	const T& operator[](int i) const { return m_data[i]; }
+
+	void push_back(const T& item)
+	{
+		if (m_size == m_capacity)
+		{
+			if (m_capacity == 0)
+			{
+				m_capacity = 1; // must be optimized with a bigger value like 32
+				m_data = new T[m_capacity];
+			}
+			else
+			{
+				T* newData = new T[m_capacity * 2]; // need to optimize the ctr calls
+				memcpy(newData, m_data, m_capacity * sizeof(T));
+				delete [] m_data;
+				m_data = newData;
+				m_capacity *= 2;
+			}
+		}
+
+		m_data[m_size++] = item;
+	}
+
+	void insert(T* pos, const T& item)
+	{
+		if (pos == end())
+		{
+			push_back(item);
+		}
+		else
+		{
+			size_t idx = pos - begin();
+			size_t n = m_size - idx;
+			if (m_size == m_capacity)
+			{
+				push_back(T());
+				m_size--;
+			}
+			memmove(m_data + idx + 1, m_data + idx, n * sizeof(T));
+			m_data[idx] = item;
+			m_size++;
+		}
+	}
+
+
+private:
+	T * m_data;
+	size_t m_size;
+	size_t m_capacity;
+};
+
+#endif
 // ---------------------------- CONSTANTES -----------------------------------
 
 static const double pi = 3.14159265358979323846;
@@ -434,9 +519,11 @@ bool CheckCombo(const vector<Token> & tokens, int idx0, int idx1)
 			return true;
 		}
 	}
-
+#if USE_STL
 	cout << "[CheckCombo] wrong combo " << tokens[idx0].cvalue << tokens[idx1].cvalue << endl;
-
+#else
+	printf("[CheckCombo] wrong combo %c%c\n", tokens[idx0].cvalue, tokens[idx1].cvalue);
+#endif
 	return false;
 }
 
@@ -471,7 +558,11 @@ bool CheckVariables(const vector<Token> & tokens, int first, int last)
 		{
 			if (strcmp(currentToken.strvalue, "pi") != 0)
 			{
+#if USE_STL
 				cout << "error : variable not found : " << currentToken.strvalue << endl;
+#else
+				printf("error : variable not found : %s\n", currentToken.strvalue);
+#endif
 				return false;
 			}
 		}
@@ -499,7 +590,11 @@ bool CheckFunctions(const vector<Token> & tokens, int first, int last)
 			}
 			else
 			{
+#if USE_STL
 				cout << "error : function not found : " << currentToken.strvalue << endl;
+#else
+				printf("error : function not found : %s\n", currentToken.strvalue);
+#endif
 				return false;
 			}
 		}
@@ -570,7 +665,12 @@ double Compute(double a, char op, double b)
 		case '&': result = double(a != 0.0 && b != 0.0); break;
 		case '|': result = double(a != 0.0 || b != 0.0); break;
 		case '=': result = double(a == b); break; // TODO: need an epsilon
-		default : cout << "[Compute] unknown operator " << op << endl;
+		default :
+#if USE_STL
+			cout << "[Compute] unknown operator " << op << endl;
+#else
+			printf("[Compute] unknown operator %c\n", op);
+#endif
 	}
 
 	return result;
@@ -718,8 +818,11 @@ double CallFunction(const Token& function, vector<double> & args)
 	{
 		return cos(args[0]);
 	}
-
+#if USE_STL
 	cout << "error : Call Function : function not found : " << function.strvalue <<endl;
+#else
+	printf("error : Call Function : function not found : %s\n", function.strvalue);
+#endif
 	assert(0);
 
 	return 0.0;
@@ -832,6 +935,7 @@ double Evaluate1Statement(const vector<Token> & tokens, int first, int last, boo
 		{
 			double currentArg = Evaluate1Statement(tokens, token_idx_in_args_list, end_idx_args_list);
 			args.push_back(currentArg);
+
 #if defined(DEBUG)
 			cout << "arg = " << currentArg << endl;
 #endif
@@ -868,14 +972,23 @@ double Evaluate1Statement(const vector<Token> & tokens, int first, int last, boo
 				}
 				else
 				{
+#if USE_STL
 					cout << "[Evaluate1Statement] : if error : missing '(' in if condition" << endl;
+#else
+					printf("[Evaluate1Statement] : if error : missing '(' in if condition\n");
+#endif
 					assert(0);
 					return 0.0;
 				}
 			}
 			else
 			{
+#if USE_STL
 				cout << "[Evaluate1Statement] : if error : no '('" << endl;
+#else
+				printf("[Evaluate1Statement] : if error : no '('\n");
+#endif
+
 				assert(0);
 				return 0.0;
 			}
@@ -1377,7 +1490,11 @@ double Evaluate(const string & str)
 		Priorize(tokens, 0, tokens.size());
 		return Evaluate(tokens, 0, tokens.size());
 	}
+#if USE_STL
 	cout << "error : " << str << endl;
+#else
+	printf("error %s\n", str.c_str());
+#endif
 	return 0;
 }
 
