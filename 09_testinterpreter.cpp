@@ -1,6 +1,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <math.h>
+#include <ctype.h>
 #include <assert.h>
 
 /*
@@ -25,15 +26,69 @@
  */
 
 
-#include <string>
-#include <iostream>
-using namespace std;
+
+
 
 #if USE_STL
 #include <vector>
-
+#include <string>
+#include <iostream>
+using namespace std;
 #else
 #include <stdio.h>
+using namespace std;
+namespace std {
+	template <typename T>
+	T min(const T& a, const T & b)
+	{
+		return a < b? a : b;
+	}
+
+	template <typename T>
+	T max(const T& a, const T & b)
+	{
+		return a > b? a : b;
+	}
+};
+
+// minimalist implementation of the stl vector
+class string
+{
+public:
+	string(const char * str = "")
+	{
+		s = strdup(str);
+		len = strlen(s);
+	}
+
+	string(const string & other)
+	{
+		s = strdup(other.s);
+		len = other.len;
+	}
+
+	string& operator=(const string & other)
+	{
+		free((void*)s);
+		s = strdup(other.s);
+		len = other.len;
+		return *this;
+	}
+
+	virtual ~string()
+	{
+		free((void*)s);
+	}
+
+	const char* c_str() const { return s; }
+	size_t length() const { return len; }
+	const char& operator[](size_t i) const { return s[i];}
+
+private:
+	const char * s;
+	size_t len;
+
+};
 
 // minimalist implementation of the stl vector
 template <typename T>
@@ -114,6 +169,31 @@ private:
 	size_t m_capacity;
 };
 
+static FILE * cin = stdin;
+
+bool getline(FILE * stream, string & in, char delim = '\n')
+{
+	vector<char> s;
+	char c;
+
+	while(true)
+	{
+		c = getc(stream);
+
+		if (c == EOF) {
+		    break;
+		}
+
+		if (c == delim) {
+		    break;
+		}
+
+		s.push_back(c);
+	}
+	s.push_back('\0');
+	in = string(&s[0]);
+	return true;
+}
 #endif
 // ---------------------------- CONSTANTES -----------------------------------
 
@@ -247,7 +327,11 @@ struct Token
 		}
 		else
 		{
+#if USE_STL
 			cerr << "unknown token : " << str << endl;
+#else
+			printf("unknown token : %s\n", str); //  [TODO] plz use the stderr(2)
+#endif
 			assert(0);
 		}
 	}
@@ -353,7 +437,11 @@ void Tokenize(vector<Token> & tokens, const string & str)
 		}
 		else
 		{
-			cout << "UNKNOW CHARACTER" << c << endl;
+#if USE_STL
+			cout << "UNKNOW CHARACTER " << c << endl;
+#else
+			printf("UNKNOW CHARACTER %c\n", c);
+#endif
 			exit(-1);
 		}
 	}
@@ -459,9 +547,18 @@ void PrintTokensList(const vector<Token> & tokens, int first, int last)
 {
 	for (int i = first; i < last; i++)
 	{
+#if USE_STL
 		cout << tokens[i].strvalue << " ";
+#else
+		printf("%s ", tokens[i].strvalue);
+#endif
 	}
+#if USE_STL
 	cout << endl;
+#else
+	putchar('\n');
+#endif
+
 }
 
 // ------------------------------ CHECKER ------------------------------------
@@ -1635,13 +1732,21 @@ int main(int argc, char ** argv)
 	{
 		string in;
 		vector<Token> tokens;
-	
+#if USE_STL
 		cout << "expr ?" << endl;
+#else
+		printf("expr ?\n");
+#endif
+
 		getline(cin, in);	// *fix: use "getline(cin, in)" instead of "cin >> in"
 					// cuz cin split the str with space
 
 		double result = Evaluate(in);
+#if USE_STL
 		cout << "result = "<<  result <<endl;
+#else
+		printf("result = %f\n", result);
+#endif
 	}
 
 	return 0;
