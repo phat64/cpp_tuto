@@ -209,7 +209,8 @@ enum TokenType
 	NONE, NUMBER, OPERATOR, PARENTHESIS, COMMA,
 	NAME, VARIABLE_NAME, FUNCTION_NAME, /* NAME =  VARIABLE_NAME or FUNCTION_NAME*/
 	FUNCTION_ARGS_BEGIN, FUNCTION_ARGS_SEPARATOR, FUNCTION_ARGS_END, /* ( , ) */
-	IF, ELSE, RETURN, SEMICOLON, SCOPE /* SEMICOLON = ';'*/
+	IF, ELSE, RETURN, SEMICOLON, SCOPE, /* SEMICOLON = ';'*/
+	STORE /* STORE = '=' */
 };
 
 struct Token
@@ -224,17 +225,25 @@ struct Token
 		dvalue = 0.0;
 	}
 
-	Token(char c)
+	Token(char c, char c2 = '\0')
 	{
 		if (c == '(' || c == ')')
 		{
 			type = PARENTHESIS;
 			cvalue = c;
 		}
-		else if (c == '+' || c == '-' || c == '*' || c == '/' || c == '&' || c == '|' || c == '=')
+		else if (c == '+' || c == '-' || c == '*' || c == '/'
+			|| (c == '&' && c2 == '&')
+			|| (c == '|' && c2 == '|')
+			|| (c == '=' && c2 == '='))
 		{
 			type = OPERATOR;
 			cvalue = 'O';
+		}
+		else if (c == '=')
+		{
+			type = STORE;
+			cvalue = '=';
 		}
 		else if (c == ',')
 		{
@@ -257,7 +266,8 @@ struct Token
 			cvalue = '?';
 		}
 		strvalue[0] = c;
-		strvalue[1] = '\0';
+		strvalue[1] = c2;
+		strvalue[2] = '\0';
 		dvalue = 0.0;
 	}
 
@@ -279,10 +289,14 @@ struct Token
 		}
 		else if	((c == '&' && c2 == '&') || (c == '|' && c2 == '|') || (c == '=' && c2 == '='))
 		{
-			*this = Token(c);
+			*this = Token(c, c2);
 			strvalue[0] = c;
 			strvalue[1] = c2;
 			strvalue[2] = '\0';
+		}
+		else if (c == '=')
+		{
+			*this = Token(c);
 		}
 		else if (c == ',' || c == ';')
 		{
@@ -422,6 +436,10 @@ void Tokenize(vector<Token> & tokens, const string & str)
 			char tmp[3] = {c, c2, '\0'};
 			tokens.push_back(Token(tmp));
 			s++;
+		}
+		else if (c == '=' && c2!='=')
+		{
+			tokens.push_back(Token(c));
 		}
 		else if (c == '(' || c ==')')
 		{
