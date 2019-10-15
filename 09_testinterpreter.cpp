@@ -201,6 +201,11 @@ static const double pi = 3.14159265358979323846;
 static const size_t NUMBER_DIGITS_MAX = 32;
 static const size_t NAME_NB_CHARS_MAX = 32;
 
+// ---------------------- VARIABLES (TEMP CODE) ------------------------------
+
+double* GetVariablePtr(void *handle, const char * variableName);
+const double* GetConstantePtr(void *handle, const char * constanteName);
+
 // ------------------------------- TOKEN -------------------------------------
 
 
@@ -671,7 +676,8 @@ bool CheckVariables(const vector<Token> & tokens, int first, int last)
 		const Token & currentToken = tokens[i];
 		if (currentToken.type == VARIABLE_NAME)
 		{
-			if (strcmp(currentToken.strvalue, "pi") != 0)
+			if (!GetVariablePtr(NULL, currentToken.strvalue)
+				&& !GetConstantePtr(NULL, currentToken.strvalue))
 			{
 #if USE_STL
 				cout << "error : variable not found : " << currentToken.strvalue << endl;
@@ -903,16 +909,65 @@ int FindChar(const vector<Token> & tokens, int first, int last, char c, int dir 
 
 // ------------------------------ VARIABLES ----------------------------------
 
-void UpdateVariables(vector<Token> & tokens, int first, int last)
+double* GetVariablePtr(void *handle, const char * variableName)
+{
+	static double abc = 0.0;
+	static double counter = 0.0;
+
+	if (strcmp(variableName, "abc") == 0)
+	{
+		return &abc;
+	}
+	else if (strcmp(variableName, "counter") == 0)
+	{
+		return &counter;
+	}
+	return NULL;
+}
+
+const double* GetConstantePtr(void *handle, const char * constanteName)
+{
+	if (strcmp(constanteName, "pi") == 0)
+	{
+		return &pi;
+	}
+	return NULL;
+}
+
+
+bool SetVariable(void * handle, Token & token, double value)
+{
+	assert(token.type == VARIABLE_NAME);
+	token.dvalue = value;
+
+	double* variablePtr = GetVariablePtr(handle, token.strvalue);
+	if (variablePtr)
+	{
+		*variablePtr = value;
+	}
+	return variablePtr != NULL;
+}
+
+void UpdateVariables(void* handle, vector<Token> & tokens, int first, int last)
 {
 	for (int i = first; i < last; i++)
 	{
 		Token & currentToken = tokens[i];
 		if (currentToken.type == VARIABLE_NAME)
 		{
-			if (strcmp(currentToken.strvalue, "pi") == 0)
+			const double* valuePtr;
+			if ((valuePtr = GetVariablePtr(handle, currentToken.strvalue))
+				|| (valuePtr = GetConstantePtr(handle, currentToken.strvalue)))
 			{
-				currentToken.dvalue = pi;
+				currentToken.dvalue = *valuePtr;
+			}
+			else
+			{
+#if USE_STL
+				cout << "variable not found " << currentToken.strvalue << endl;
+#else
+				printf("variable not found %s\n", currentToken.strvalue);
+#endif
 			}
 		}
 	}
@@ -1595,13 +1650,13 @@ void PriorizeFunctions(vector<Token> & tokens, int & first, int & last)
 	}
 }
 
-double Evaluate(const string & str)
+double Evaluate(const string & str, void * handle = NULL)
 {
 	vector<Token> tokens;
 	Tokenize(tokens, str);
 	if (Check(tokens, 0, tokens.size()))
 	{
-		UpdateVariables(tokens, 0, tokens.size());
+		UpdateVariables(handle, tokens, 0, tokens.size());
 		Priorize(tokens, 0, tokens.size());
 		return Evaluate(tokens, 0, tokens.size());
 	}
