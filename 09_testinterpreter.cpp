@@ -823,7 +823,7 @@ bool Compute2(double & result, double val, const vector<Token> & tokens, int fir
 		if (tokens[first].type == OPERATOR)
 		{
 			double a = val;
-			double b = tokens[first+1].dvalue;
+			double b = tokens[first+1].GetDoubleValue();
 			result = Compute(a, tokens[first].strvalue[0], b);
 			/*switch(tokens[first].strvalue[0])
 			{
@@ -846,8 +846,8 @@ bool Compute3(double & result, const vector<Token> & tokens, int first)
 		// NON
 		if (tokens[first + 1].type == OPERATOR)
 		{
-			double a = tokens[first].dvalue;
-			double b = tokens[first+2].dvalue;
+			double a = tokens[first].GetDoubleValue();
+			double b = tokens[first+2].GetDoubleValue();
 			result = Compute(a, tokens[first + 1].strvalue[0], b);
 			/*switch(tokens[first + 1].strvalue[0])
 			{
@@ -861,7 +861,7 @@ bool Compute3(double & result, const vector<Token> & tokens, int first)
 		// (N)
 		if (tokens[first + 1].type == NUMBER || tokens[first + 1].type == VARIABLE_NAME)
 		{
-			result = tokens[first+1].dvalue;
+			result = tokens[first+1].GetDoubleValue();
 			return true;
 		}
 	}
@@ -1028,11 +1028,11 @@ double CallFunction(const Token& function, vector<double> & args)
 
 int EvaluateWithoutParenthesis(const vector<Token> & tokens, int first, int last)
 {
-	double result = tokens[first].dvalue;
+	double result = tokens[first].GetDoubleValue();
 
 	for (int i = first + 1; i < last; i+= 2)
 	{
-		double nextValue = tokens[i+1].dvalue;
+		double nextValue = tokens[i+1].GetDoubleValue();
 		result = Compute(result, tokens[i].strvalue[0], nextValue);
 		/*switch(tokens[i].strvalue[0])
 		{
@@ -1061,14 +1061,14 @@ double Evaluate1Statement(const vector<Token> & tokens, int first, int last, boo
 
 	if (size == 1)
 	{
-		return tokens[first].dvalue;
+		return tokens[first].GetDoubleValue();
 	}
 	else if (size == 2)
 	{
 		if (tokens[first].type == RETURN)
 		{
 			if (hasReturn) *hasReturn = true;
-			return tokens[first + 1].dvalue;
+			return tokens[first + 1].GetDoubleValue();
 		}
 		else
 		{
@@ -1101,7 +1101,7 @@ double Evaluate1Statement(const vector<Token> & tokens, int first, int last, boo
 	}
 	else if (tokens[first].type == NUMBER || tokens[first].type == VARIABLE_NAME)
 	{
-		result = tokens[first].dvalue;
+		result = tokens[first].GetDoubleValue();
 		first++;
 	}
 	else if (tokens[first].type == FUNCTION_NAME)
