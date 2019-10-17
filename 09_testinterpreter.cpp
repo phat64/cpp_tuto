@@ -635,6 +635,14 @@ bool Check3(const vector<Token> & tokens, int idx)
 		}
 	}
 
+	// special case : 'Variable = Number' or 'Variable = Variable' or 'Variable = ('
+	if (tokens[idx + 0].type == VARIABLE_NAME
+		&& tokens[idx + 1].cvalue == '='
+		&& tokens[idx + 2].cvalue == 'N')
+	{
+		return true;
+	}
+
 	return false;
 }
 
@@ -648,7 +656,8 @@ bool CheckCombo(const vector<Token> & tokens, int idx0, int idx1)
 		";E", "EN", "ER", "E(", "EF", "E;",
 		"N;", ";N", ");", ";(", ";I", ";F", "];",
 		"{N", "{F", "{(", "{{", "{R", "{I", "){", "{;", "};", ";;",
-		"{}", ";}", "}}", "}N", "}F", "}R", "}I", "}E", "E{", NULL};
+		"{}", ";}", "}}", "}N", "}F", "}R", "}I", "}E", "E{",
+		"=N", "=(", "=F", NULL};
 
 	for (int i = 0; validcombo[i]; i++)
 	{
@@ -658,6 +667,14 @@ bool CheckCombo(const vector<Token> & tokens, int idx0, int idx1)
 			return true;
 		}
 	}
+
+	// special case : only 'Variable ='  is accepted
+	if (tokens[idx0].type == VARIABLE_NAME
+		&& tokens[idx1].cvalue == '=')
+	{
+		return true;
+	}
+
 #if USE_STL
 	cout << "[CheckCombo] wrong combo " << tokens[idx0].cvalue << tokens[idx1].cvalue << endl;
 #else
