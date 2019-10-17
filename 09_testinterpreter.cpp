@@ -358,6 +358,18 @@ struct Token
 		}
 	}
 
+	double GetDoubleValue() const
+	{
+		if (type == VARIABLE_NAME && dvaluePtr != NULL && !dvaluePtrIsConstante)
+		{
+			return *dvaluePtr;
+		}
+		else
+		{
+			return dvalue;
+		}
+	}
+
 	char strvalue[NAME_NB_CHARS_MAX + 1];
 	char cvalue;
 	double dvalue;
