@@ -228,6 +228,7 @@ struct Token
 		strvalue[0] = '\0';
 		cvalue = '?';
 		dvalue = 0.0;
+		dvaluePtr = NULL;
 	}
 
 	Token(char c, char c2 = '\0')
@@ -274,6 +275,8 @@ struct Token
 		strvalue[1] = c2;
 		strvalue[2] = '\0';
 		dvalue = 0.0;
+		dvaluePtr = NULL;
+		dvaluePtrIsConstante = true;
 	}
 
 	Token(const char * str)
@@ -358,6 +361,8 @@ struct Token
 	char strvalue[NAME_NB_CHARS_MAX + 1];
 	char cvalue;
 	double dvalue;
+	double* dvaluePtr;
+	bool dvaluePtrIsConstante;
 };
 
 
@@ -552,6 +557,7 @@ void TokenizePostProcess(vector<Token> & tokens)
 				{
 					currentToken.type = VARIABLE_NAME;
 					currentToken.cvalue = 'N';
+
 				}
 			}
 		}
@@ -562,6 +568,7 @@ void TokenizePostProcess(vector<Token> & tokens)
 		if (lastToken.type == NAME)
 		{
 			lastToken.type = VARIABLE_NAME;
+			lastToken.cvalue = 'N';
 		}
 	}
 }
@@ -948,18 +955,26 @@ bool SetVariable(void * handle, Token & token, double value)
 	return variablePtr != NULL;
 }
 
-void UpdateVariables(void* handle, vector<Token> & tokens, int first, int last)
+void UpdateVariablesAddr(void* handle, vector<Token> & tokens, int first, int last)
 {
 	for (int i = first; i < last; i++)
 	{
 		Token & currentToken = tokens[i];
 		if (currentToken.type == VARIABLE_NAME)
 		{
-			const double* valuePtr;
-			if ((valuePtr = GetVariablePtr(handle, currentToken.strvalue))
-				|| (valuePtr = GetConstantePtr(handle, currentToken.strvalue)))
+			// apply relocation : symbole -> addr
+			currentToken.dvaluePtr = (double*)GetConstantePtr(handle, currentToken.strvalue);
+			currentToken.dvaluePtrIsConstante = true;
+			if (currentToken.dvaluePtr == NULL)
 			{
-				currentToken.dvalue = *valuePtr;
+				currentToken.dvaluePtr = GetVariablePtr(handle, currentToken.strvalue);
+				currentToken.dvaluePtrIsConstante = false;
+			}
+
+			// update value
+			if (currentToken.dvaluePtr)
+			{
+				currentToken.dvalue = *currentToken.dvaluePtr;
 			}
 			else
 			{
@@ -1656,7 +1671,7 @@ double Evaluate(const string & str, void * handle = NULL)
 	Tokenize(tokens, str);
 	if (Check(tokens, 0, tokens.size()))
 	{
-		UpdateVariables(handle, tokens, 0, tokens.size());
+		UpdateVariablesAddr(handle, tokens, 0, tokens.size());
 		Priorize(tokens, 0, tokens.size());
 		return Evaluate(tokens, 0, tokens.size());
 	}
