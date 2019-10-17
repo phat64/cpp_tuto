@@ -1076,6 +1076,7 @@ double Evaluate1Statement(const vector<Token> & tokens, int first, int last, boo
 	if (hasReturn) *hasReturn = false;
 	if (hasIfConditionTrue) {previousHasIfConditionTrue = *hasIfConditionTrue; *hasIfConditionTrue = false;}
 
+
 	if (size == 1)
 	{
 		return tokens[first].GetDoubleValue();
@@ -1092,9 +1093,18 @@ double Evaluate1Statement(const vector<Token> & tokens, int first, int last, boo
 			return 0.0;
 		}
 	}
-	else if (size == 3 && tokens[first].type != ELSE)
+	else if (size == 3 && tokens[first].type != ELSE && tokens[first + 1].type != STORE)
 	{
 		Compute3(result, tokens, first);
+		return result;
+	}
+
+	// good enough with 1 variable but doesnt work with a chain like 'var1 = var2 = 123'
+	if (size >= 3 && tokens[first].type == VARIABLE_NAME && tokens[first + 1].type == STORE)
+	{
+		Token variable = tokens[first];
+		double result = Evaluate1Statement(tokens, first + 2, last, hasReturn, hasIfConditionTrue);
+		SetVariable(NULL, variable, result);
 		return result;
 	}
 
