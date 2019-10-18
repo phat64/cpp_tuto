@@ -943,6 +943,65 @@ int FindChar(const vector<Token> & tokens, int first, int last, char c, int dir 
 	return -1;
 }
 
+
+// [TODO] need to be refactored with FindChar
+int FindToken(const vector<Token> & tokens, int first, int last, TokenType type, int dir = 1, bool checkDepth = false)
+{
+	int depth = 0;
+
+	if (dir > 0)
+	{
+		for (int idx = first; idx < last; idx++)
+		{
+			if (checkDepth)
+			{
+				if (tokens[idx].cvalue == '(' || tokens[idx].cvalue == '[')
+				{
+					depth++;
+				}
+
+				if (tokens[idx].cvalue == ')' || tokens[idx].cvalue == ']')
+				{
+					depth--;
+				}
+			}
+
+			if (depth == 0 && tokens[idx].type == type)
+			{
+
+				return idx;
+			}
+		}
+	}
+	else if (dir < 0)
+	{
+		for (int idx = last-1; idx >= first; idx--)
+		{
+			if (checkDepth)
+			{
+				if (tokens[idx].cvalue == '(' || tokens[idx].cvalue == '[')
+				{
+					depth++;
+				}
+
+				if (tokens[idx].cvalue == ')' || tokens[idx].cvalue == ']')
+				{
+					depth--;
+				}
+			}
+
+			if (depth == 0 && tokens[idx].type == type)
+			{
+
+				return idx;
+			}
+		}
+	}
+
+	return -1;
+}
+
+
 // ------------------------------ VARIABLES ----------------------------------
 
 double* GetVariablePtr(void *handle, const char * variableName)
