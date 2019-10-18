@@ -1660,8 +1660,54 @@ void Priorize(vector<Token> & tokens, int &first, int & last, char op1, char op2
 	}
 }
 
+void PriorizeStoreFor1Statement(vector<Token> & tokens, int & first, int & last)
+{
+
+}
+
+void PriorizeStore(vector<Token> & tokens, int & first, int & last)
+{
+	int scopeIdx = FindChar(tokens, first, last, '{');
+	if (scopeIdx >= 0) return;
+
+	int semicolonIdx;
+
+
+	// 1. no semicolon => easy to evaluate
+	semicolonIdx = FindChar(tokens, first, last, ';');
+	if (semicolonIdx < 0)
+	{
+		PriorizeStoreFor1Statement(tokens, first, last);
+		return;
+	}
+
+	// 2. evaluate a multiple statements expression
+
+	// 2.1 special case : 1rst token is return
+	PriorizeStoreFor1Statement(tokens, first, semicolonIdx);
+
+	// 2.2 : evaluate each statement
+	while (semicolonIdx >= 0)
+	{
+		semicolonIdx++;
+
+		int nextSemicolonIdx = FindChar(tokens, semicolonIdx, last, ';');
+		if (nextSemicolonIdx >= 0)
+		{
+			PriorizeStoreFor1Statement(tokens, semicolonIdx, nextSemicolonIdx);
+			semicolonIdx = nextSemicolonIdx;
+		}
+		else
+		{
+			PriorizeStoreFor1Statement(tokens, semicolonIdx, last);
+			break;
+		}
+	}
+}
+
 void Priorize(vector<Token> & tokens, int first, int last)
 {
+	PriorizeStore(tokens, first, last);
 	PriorizeFunctions(tokens, first, last);
 	Priorize(tokens, first, last, '*', '/');
 	Priorize(tokens, first, last, '+', '-');
