@@ -1721,7 +1721,15 @@ void Priorize(vector<Token> & tokens, int &first, int & last, char op1, char op2
 
 void PriorizeStoreFor1Statement(vector<Token> & tokens, int & first, int & last)
 {
+	int storeIdx = FindToken(tokens, first, last, STORE, -1);
+	while(storeIdx >= 0)
+	{
+		tokens.insert(tokens.begin() + storeIdx - 1, Token('('));
+		tokens.insert(tokens.begin() + last + 1, Token(')'));
 
+		last += 2;
+		storeIdx = FindToken(tokens, first, storeIdx - 1, STORE, -1);
+	}
 }
 
 void PriorizeStore(vector<Token> & tokens, int & first, int & last)
