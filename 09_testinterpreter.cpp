@@ -943,6 +943,62 @@ int FindChar(const vector<Token> & tokens, int first, int last, char c, int dir 
 	return -1;
 }
 
+// [TODO] need to be refactored with FindChar
+int FindOperator(const vector<Token> & tokens, int first, int last, char c, int dir = 1, bool checkDepth = false)
+{
+	int depth = 0;
+
+	if (dir > 0)
+	{
+		for (int idx = first; idx < last; idx++)
+		{
+			if (checkDepth)
+			{
+				if (tokens[idx].cvalue == '(' || tokens[idx].cvalue == '[')
+				{
+					depth++;
+				}
+
+				if (tokens[idx].cvalue == ')' || tokens[idx].cvalue == ']')
+				{
+					depth--;
+				}
+			}
+
+			if (depth == 0 && tokens[idx].type == OPERATOR && (tokens[idx].strvalue[0] == c || tokens[idx].cvalue == c))
+			{
+
+				return idx;
+			}
+		}
+	}
+	else if (dir < 0)
+	{
+		for (int idx = last-1; idx >= first; idx--)
+		{
+			if (checkDepth)
+			{
+				if (tokens[idx].cvalue == '(' || tokens[idx].cvalue == '[')
+				{
+					depth++;
+				}
+
+				if (tokens[idx].cvalue == ')' || tokens[idx].cvalue == ']')
+				{
+					depth--;
+				}
+			}
+
+			if (depth == 0 && tokens[idx].type == OPERATOR && (tokens[idx].strvalue[0] == c || tokens[idx].cvalue == c))
+			{
+
+				return idx;
+			}
+		}
+	}
+
+	return -1;
+}
 
 // [TODO] need to be refactored with FindChar
 int FindToken(const vector<Token> & tokens, int first, int last, TokenType type, int dir = 1, bool checkDepth = false)
@@ -1109,7 +1165,9 @@ int EvaluateWithoutParenthesis(const vector<Token> & tokens, int first, int last
 	for (int i = first + 1; i < last; i+= 2)
 	{
 		double nextValue = tokens[i+1].GetDoubleValue();
-		result = Compute(result, tokens[i].strvalue[0], nextValue);
+		if (tokens[i].type == OPERATOR)
+			result = Compute(result, tokens[i].strvalue[0], nextValue);
+		else assert(0);
 		/*switch(tokens[i].strvalue[0])
 		{
 			case '+': result += nextValue; break;
@@ -1124,7 +1182,10 @@ int EvaluateWithoutParenthesis(const vector<Token> & tokens, int first, int last
 
 double Evaluate1Statement(const vector<Token> & tokens, int first, int last, bool * hasReturn = NULL, bool * hasIfConditionTrue = NULL)
 {
+	Token firstToken = tokens[first];
+
 #if defined(DEBUG)
+	printf("Evaluate1Statement : ");
 	PrintTokensList(tokens, first, last);
 #endif
 
@@ -1164,6 +1225,9 @@ double Evaluate1Statement(const vector<Token> & tokens, int first, int last, boo
 		Token variable = tokens[first];
 		double result = Evaluate1Statement(tokens, first + 2, last, hasReturn, hasIfConditionTrue);
 		SetVariable(NULL, variable, result);
+#ifdef DEBUG
+		printf("_STORE %f\n", result);
+#endif
 		return result;
 	}
 
@@ -1303,7 +1367,27 @@ double Evaluate1Statement(const vector<Token> & tokens, int first, int last, boo
 	if (first != last)
 	{
 		double nextValue = Evaluate1Statement(tokens, first + 1, last);
-		result = Compute(result, tokens[first].strvalue[0], nextValue);
+
+		if (tokens[first].type == OPERATOR)
+		{
+			result = Compute(result, tokens[first].strvalue[0], nextValue);
+#ifdef DEBUG
+			printf("Compute %f\n", result);
+#endif
+		}
+		else if (tokens[first].type == STORE)
+		{
+			result = *firstToken.dvaluePtr = nextValue;
+#ifdef DEBUG
+			printf("Store %f\n", result);
+#endif
+		}
+		else
+		{
+#ifdef DEBUG
+			printf("unknown %f\n", result);
+#endif
+		}
 		/*switch(tokens[first].strvalue[0])
 		{
 			case '+': result += nextValue; break;
@@ -1658,8 +1742,8 @@ void Priorize(vector<Token> & tokens, int &first, int & last, char op1, char op2
 {
 	//PriorizeFunctions(tokens, first, last);
 	bool changed = true;
-	int op1Idx = FindChar(tokens, first, last, op1);
-	int op2Idx = FindChar(tokens, first, last, op2);
+	int op1Idx = FindOperator(tokens, first, last, op1);
+	int op2Idx = FindOperator(tokens, first, last, op2);
 	int opIdx = (op1Idx != -1 && op2Idx != -1 ? std::min(op1Idx, op2Idx): std::max(op1Idx, op2Idx));
 	while (opIdx != -1 && changed)
 	{
@@ -1708,8 +1792,8 @@ void Priorize(vector<Token> & tokens, int &first, int & last, char op1, char op2
 
 		
 
-		op1Idx = FindChar(tokens, opIdx, last, op1);
-		op2Idx = FindChar(tokens, opIdx, last, op2);
+		op1Idx = FindOperator(tokens, opIdx, last, op1);
+		op2Idx = FindOperator(tokens, opIdx, last, op2);
 		opIdx = (op1Idx != -1 && op2Idx != -1 ? std::min(op1Idx, op2Idx): std::max(op1Idx, op2Idx));
 #if defined(DEBUG)
 		cout << "op1Idx = " << op1Idx << endl;
@@ -1719,62 +1803,8 @@ void Priorize(vector<Token> & tokens, int &first, int & last, char op1, char op2
 	}
 }
 
-void PriorizeStoreFor1Statement(vector<Token> & tokens, int & first, int & last)
-{
-	int storeIdx = FindToken(tokens, first, last, STORE, -1);
-	while(storeIdx >= 0)
-	{
-		tokens.insert(tokens.begin() + storeIdx - 1, Token('('));
-		tokens.insert(tokens.begin() + last + 1, Token(')'));
-
-		last += 2;
-		storeIdx = FindToken(tokens, first, storeIdx - 1, STORE, -1);
-	}
-}
-
-void PriorizeStore(vector<Token> & tokens, int & first, int & last)
-{
-	int scopeIdx = FindChar(tokens, first, last, '{');
-	if (scopeIdx >= 0) return;
-
-	int semicolonIdx;
-
-
-	// 1. no semicolon => easy to evaluate
-	semicolonIdx = FindChar(tokens, first, last, ';');
-	if (semicolonIdx < 0)
-	{
-		PriorizeStoreFor1Statement(tokens, first, last);
-		return;
-	}
-
-	// 2. evaluate a multiple statements expression
-
-	// 2.1 special case : 1rst token is return
-	PriorizeStoreFor1Statement(tokens, first, semicolonIdx);
-
-	// 2.2 : evaluate each statement
-	while (semicolonIdx >= 0)
-	{
-		semicolonIdx++;
-
-		int nextSemicolonIdx = FindChar(tokens, semicolonIdx, last, ';');
-		if (nextSemicolonIdx >= 0)
-		{
-			PriorizeStoreFor1Statement(tokens, semicolonIdx, nextSemicolonIdx);
-			semicolonIdx = nextSemicolonIdx;
-		}
-		else
-		{
-			PriorizeStoreFor1Statement(tokens, semicolonIdx, last);
-			break;
-		}
-	}
-}
-
 void Priorize(vector<Token> & tokens, int first, int last)
 {
-	PriorizeStore(tokens, first, last);
 	PriorizeFunctions(tokens, first, last);
 	Priorize(tokens, first, last, '*', '/');
 	Priorize(tokens, first, last, '+', '-');
