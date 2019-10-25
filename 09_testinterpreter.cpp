@@ -476,7 +476,6 @@ void Tokenize(vector<Token> & tokens, const string & str)
 			_strlen = min(size_t(end - start) + 1, NAME_NB_CHARS_MAX + 2);
 			strncpy(_str, start, _strlen);
 			if (_strlen == NAME_NB_CHARS_MAX + 2) _str[_strlen - 1] = '\"';
-			printf("_str = %s\n", _str);
 			tokens.push_back(Token(_str));
 		}
 		else if (c == '+' || c == '-' || c == '*' || c == '/')
