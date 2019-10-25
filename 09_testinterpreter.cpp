@@ -1358,6 +1358,7 @@ double Evaluate1Statement(const vector<Token> & tokens, int first, int last, boo
 
 		printf("\n");
 		first = end_idx_args_list + 1;
+		result = 1; 
 	}
 	else if (tokens[first].type == FUNCTION_NAME)
 	{
