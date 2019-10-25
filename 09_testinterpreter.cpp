@@ -635,7 +635,7 @@ void PrintTokensList(const vector<Token> & tokens, int first, int last)
 
 bool Check1(const vector<Token> & tokens, int idx)
 {
-	return tokens[idx].type == NUMBER || tokens[idx].type == VARIABLE_NAME;
+	return tokens[idx].type == NUMBER || tokens[idx].type == VARIABLE_NAME || tokens[idx].type == STRING;
 }
 
 bool Check2(const vector<Token> & tokens, int idx)
@@ -651,7 +651,7 @@ bool Check2(const vector<Token> & tokens, int idx)
 
 bool Check3(const vector<Token> & tokens, int idx)
 {
-	const char * validcombo[] = {"(N)", "NON", "F[]", "ERN", "{N}", "{;}", NULL};
+	const char * validcombo[] = {"(N)", "(S)", "NON", "F[]", "ERN", "{N}", "{S}", "{;}", NULL};
 
 	for (int i = 0; validcombo[i]; i++)
 	{
@@ -685,7 +685,8 @@ bool CheckCombo(const vector<Token> & tokens, int idx0, int idx1)
 		"N;", ";N", ");", ";(", ";I", ";F", "];",
 		"{N", "{F", "{(", "{{", "{R", "{I", "){", "{;", "};", ";;",
 		"{}", ";}", "}}", "}N", "}F", "}R", "}I", "}E", "E{",
-		"=N", "=(", "=F", NULL};
+		"=N", "=(", "=F",
+		"S,", ",S", "(S", "S)","[S", "S]", "S;", ";S", NULL};
 
 	for (int i = 0; validcombo[i]; i++)
 	{
