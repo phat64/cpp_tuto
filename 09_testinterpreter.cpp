@@ -352,9 +352,9 @@ struct Token
 			type = STRING;
 			cvalue = 'S';
 			dvalue = 0.0;
-			strncpy(strvalue, str + 1, sizeof(strvalue) - 1); 	// strncpy is safer than strcpy
+			strncpy(strvalue, str + 1, sizeof(strvalue) - 1); // remove the first '"'
 			strvalue[sizeof(strvalue) - 1] = '\0';		// mandatory if str is bigger than strvalue
-			strvalue[strlen(strvalue) - 1] = '\0';
+			strvalue[strlen(strvalue) - 1] = '\0';		// remove the last '"'
 		}
 		else
 		{
