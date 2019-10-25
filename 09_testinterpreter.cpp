@@ -766,7 +766,11 @@ bool CheckFunctions(const vector<Token> & tokens, int first, int last)
 #if defined(DEBUG)
 			cout << "check function : " << currentToken.strvalue << endl;
 #endif
-			if (strcmp(currentToken.strvalue, "max") == 0 && currentToken.dvalue == 2.0)
+			if (strcmp(currentToken.strvalue, "print") == 0)
+			{
+				return true;
+			}
+			else if (strcmp(currentToken.strvalue, "max") == 0 && currentToken.dvalue == 2.0)
 			{
 				return true;
 			}
@@ -1228,7 +1232,15 @@ double Evaluate1Statement(const vector<Token> & tokens, int first, int last, boo
 
 	if (size == 1)
 	{
-		return tokens[first].GetDoubleValue();
+		if (tokens[first].type == STRING)
+		{
+			printf("%s\n", tokens[first].strvalue);
+			return 1.0;
+		}
+		else
+		{
+			return tokens[first].GetDoubleValue();
+		}
 	}
 	else if (size == 2)
 	{
@@ -1282,6 +1294,24 @@ double Evaluate1Statement(const vector<Token> & tokens, int first, int last, boo
 	{
 		result = tokens[first].GetDoubleValue();
 		first++;
+	}
+	else if (tokens[first].type == FUNCTION_NAME && strcmp(tokens[first].strvalue, "print") == 0)
+	{
+		int functionExpressionFirst = -1;
+		int functionExpressionLast = -1;
+		assert(GetFunctionExpression(tokens, first, last, first, functionExpressionFirst, functionExpressionLast));
+
+		for (int i = functionExpressionFirst; i < functionExpressionLast; i++)
+		{
+			if (tokens[i].type == STRING)
+				printf("%s", tokens[i].strvalue);
+			if (tokens[i].type == NUMBER || tokens[i].type == VARIABLE_NAME)
+			{
+				printf("%f", tokens[i].GetDoubleValue());
+			}
+		}
+		printf("\n");
+		first = functionExpressionLast;
 	}
 	else if (tokens[first].type == FUNCTION_NAME)
 	{
