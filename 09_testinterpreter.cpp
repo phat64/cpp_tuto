@@ -211,7 +211,7 @@ const double* GetConstantePtr(void *handle, const char * constanteName);
 
 enum TokenType
 {
-	NONE, NUMBER, OPERATOR, PARENTHESIS, COMMA,
+	NONE, NUMBER, STRING, OPERATOR, PARENTHESIS, COMMA,
 	NAME, VARIABLE_NAME, FUNCTION_NAME, /* NAME =  VARIABLE_NAME or FUNCTION_NAME*/
 	FUNCTION_ARGS_BEGIN, FUNCTION_ARGS_SEPARATOR, FUNCTION_ARGS_END, /* ( , ) */
 	IF, ELSE, RETURN, SEMICOLON, SCOPE, /* SEMICOLON = ';'*/
@@ -347,6 +347,13 @@ struct Token
 				dvalue = 0.0;
 			}
 		}
+		else if (c == '\"')
+		{
+			type = STRING;
+			cvalue = 'S';
+			dvalue = 0.0;
+			printf("string = [%s]\n", str);
+		}
 		else
 		{
 #if USE_STL
@@ -448,6 +455,27 @@ void Tokenize(vector<Token> & tokens, const string & str)
 			namestrlen = min(size_t(end - start), NAME_NB_CHARS_MAX);
 			strncpy(namestr, start, namestrlen);
 			tokens.push_back(Token(namestr));
+		}
+		else if (c == '\"')
+		{
+			char _str[NAME_NB_CHARS_MAX + 1] = {0};
+			size_t _strlen = 0;
+			char * start;
+			char * end;
+			start = end = s-1;
+			int n = 0;
+
+			c = *++end;
+			while(c && c != '\"')
+			{
+				c = *++end;
+			}
+			s = end + 1;
+			_strlen = min(size_t(end - start) + 1, NAME_NB_CHARS_MAX);
+			strncpy(_str, start, _strlen);
+			if (_strlen == NAME_NB_CHARS_MAX) _str[_strlen - 1] = '\"';
+			printf("_str = %s\n", _str);
+			tokens.push_back(Token(_str));
 		}
 		else if (c == '+' || c == '-' || c == '*' || c == '/')
 		{
