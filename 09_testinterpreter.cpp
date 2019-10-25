@@ -1307,7 +1307,16 @@ double Evaluate1Statement(const vector<Token> & tokens, int first, int last, boo
 				printf("%s", tokens[i].strvalue);
 			if (tokens[i].type == NUMBER || tokens[i].type == VARIABLE_NAME)
 			{
-				printf("%f", tokens[i].GetDoubleValue());
+				double dvalue = tokens[i].GetDoubleValue();
+				int ivalue = int(dvalue);
+				if (double(ivalue) == dvalue)
+				{
+					printf("%d", ivalue);
+				}
+				else
+				{
+					printf("%f", dvalue);
+				}
 			}
 		}
 		printf("\n");
