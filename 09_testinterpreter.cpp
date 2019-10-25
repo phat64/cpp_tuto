@@ -352,7 +352,9 @@ struct Token
 			type = STRING;
 			cvalue = 'S';
 			dvalue = 0.0;
-			printf("string = [%s]\n", str);
+			strncpy(strvalue, str + 1, sizeof(strvalue) - 1); 	// strncpy is safer than strcpy
+			strvalue[sizeof(strvalue) - 1] = '\0';		// mandatory if str is bigger than strvalue
+			strvalue[strlen(strvalue) - 1] = '\0';
 		}
 		else
 		{
@@ -458,7 +460,7 @@ void Tokenize(vector<Token> & tokens, const string & str)
 		}
 		else if (c == '\"')
 		{
-			char _str[NAME_NB_CHARS_MAX + 1] = {0};
+			char _str[NAME_NB_CHARS_MAX + 2 + 1] = {0};
 			size_t _strlen = 0;
 			char * start;
 			char * end;
@@ -471,9 +473,9 @@ void Tokenize(vector<Token> & tokens, const string & str)
 				c = *++end;
 			}
 			s = end + 1;
-			_strlen = min(size_t(end - start) + 1, NAME_NB_CHARS_MAX);
+			_strlen = min(size_t(end - start) + 1, NAME_NB_CHARS_MAX + 2);
 			strncpy(_str, start, _strlen);
-			if (_strlen == NAME_NB_CHARS_MAX) _str[_strlen - 1] = '\"';
+			if (_strlen == NAME_NB_CHARS_MAX + 2) _str[_strlen - 1] = '\"';
 			printf("_str = %s\n", _str);
 			tokens.push_back(Token(_str));
 		}
