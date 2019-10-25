@@ -1297,17 +1297,52 @@ double Evaluate1Statement(const vector<Token> & tokens, int first, int last, boo
 	}
 	else if (tokens[first].type == FUNCTION_NAME && strcmp(tokens[first].strvalue, "print") == 0)
 	{
+		// parse args list
 		int functionExpressionFirst = -1;
 		int functionExpressionLast = -1;
 		assert(GetFunctionExpression(tokens, first, last, first, functionExpressionFirst, functionExpressionLast));
+		int token_idx_in_args_list = functionExpressionFirst + 2;
+		int end_idx_args_list = functionExpressionLast - 1;
+		assert(end_idx_args_list > 0);
+		assert(end_idx_args_list < last);
 
-		for (int i = functionExpressionFirst; i < functionExpressionLast; i++)
+		int next_token_idx_in_args_list = FindChar(tokens, token_idx_in_args_list, last, ',', 1, true);
+		while (next_token_idx_in_args_list > 0)
 		{
-			if (tokens[i].type == STRING)
-				printf("%s", tokens[i].strvalue);
-			if (tokens[i].type == NUMBER || tokens[i].type == VARIABLE_NAME)
+			int size = next_token_idx_in_args_list - token_idx_in_args_list;
+			if (tokens[token_idx_in_args_list].type == STRING)
 			{
-				double dvalue = tokens[i].GetDoubleValue();
+				printf("%s", tokens[token_idx_in_args_list].strvalue);
+				assert(size == 1);
+			}
+			else
+			{
+				double dvalue = Evaluate1Statement(tokens, token_idx_in_args_list, next_token_idx_in_args_list);
+				int ivalue = int(dvalue);
+				if (double(ivalue) == dvalue)
+				{
+					printf("%d", ivalue);
+				}
+				else
+				{
+					printf("%f", dvalue);
+				}
+			}
+
+			token_idx_in_args_list = next_token_idx_in_args_list + 1;
+			next_token_idx_in_args_list = FindChar(tokens, token_idx_in_args_list + 1, last, ',', 1, true);
+		}
+		if (token_idx_in_args_list != end_idx_args_list)
+		{
+			int size = token_idx_in_args_list - end_idx_args_list;
+			if (tokens[token_idx_in_args_list].type == STRING)
+			{
+				printf("%s", tokens[token_idx_in_args_list].strvalue);
+				//assert(size == 1);
+			}
+			else
+			{
+				double dvalue = Evaluate1Statement(tokens, token_idx_in_args_list, end_idx_args_list);
 				int ivalue = int(dvalue);
 				if (double(ivalue) == dvalue)
 				{
@@ -1319,8 +1354,9 @@ double Evaluate1Statement(const vector<Token> & tokens, int first, int last, boo
 				}
 			}
 		}
+
 		printf("\n");
-		first = functionExpressionLast;
+		first = end_idx_args_list + 1;
 	}
 	else if (tokens[first].type == FUNCTION_NAME)
 	{
