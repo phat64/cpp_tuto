@@ -2143,7 +2143,9 @@ int main(int argc, char ** argv)
 	assert(pi == Evaluate("if (1) { if (1) {return pi;} }"));
 	assert(222 == Evaluate("if (1){ if (0) return 111;else {return 222;}}"));
 
-	// assertion for the crc32
+	// assertions for the crc32
+	assert(0 == ComputeCRC32("", 0));
+	assert(0 == ComputeCRC32(NULL, 0));
 	assert(0xcbf43926 == ComputeCRC32("123456789", 9));
 
 	while (true)
