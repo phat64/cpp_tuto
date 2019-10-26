@@ -1273,15 +1273,7 @@ double Evaluate1Statement(const vector<Token> & tokens, int first, int last, boo
 
 	if (size == 1)
 	{
-		if (tokens[first].type == STRING)
-		{
-			printf("%s\n", tokens[first].strvalue);
-			return 1.0;
-		}
-		else
-		{
-			return tokens[first].GetDoubleValue();
-		}
+		return tokens[first].GetDoubleValue();
 	}
 	else if (size == 2)
 	{
