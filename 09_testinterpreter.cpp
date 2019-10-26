@@ -1160,12 +1160,11 @@ const double* GetConstantePtr(void *handle, const char * constanteName)
 }
 
 
-bool SetVariable(void * handle, Token & token, double value)
+bool SetVariable(void * address, const char * name, double value)
 {
-	assert(token.type == VARIABLE_NAME);
-	token.dvalue = value;
+	assert(name != NULL);
 
-	double* variablePtr = GetVariablePtr(handle, token.strvalue);
+	double* variablePtr = (double*)address;
 	if (variablePtr)
 	{
 		*variablePtr = value;
@@ -1298,7 +1297,9 @@ double Evaluate1Statement(const vector<Token> & tokens, int first, int last, boo
 	{
 		Token variable = tokens[first];
 		double result = Evaluate1Statement(tokens, first + 2, last, hasReturn, hasIfConditionTrue);
-		SetVariable(NULL, variable, result);
+		variable.dvalue = result;
+		SetVariable(variable.dvaluePtr, variable.strvalue, result);
+
 #ifdef DEBUG
 		printf("_STORE %f\n", result);
 #endif
@@ -1515,7 +1516,8 @@ double Evaluate1Statement(const vector<Token> & tokens, int first, int last, boo
 		}
 		else if (tokens[first].type == STORE)
 		{
-			result = *firstToken.dvaluePtr = nextValue;
+			result = nextValue;
+			SetVariable(firstToken.dvaluePtr, firstToken.strvalue, result);
 #ifdef DEBUG
 			printf("Store %f\n", result);
 #endif
