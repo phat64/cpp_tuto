@@ -2144,6 +2144,8 @@ int main(int argc, char ** argv)
 	// assertions for the strings
 	assert(0.0 == Evaluate("\"\"")); // test empty string ""
 	assert(0xcbf43926 == Evaluate("\"123456789\"")); // test "123456789"
+	assert(0.0 == Evaluate("return \"\"")); // test return empty string ""
+	assert(0xcbf43926 == Evaluate("return \"123456789\"")); // test return "123456789"
 
 	while (true)
 	{
