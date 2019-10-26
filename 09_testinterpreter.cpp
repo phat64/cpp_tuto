@@ -205,6 +205,7 @@ static const size_t NAME_NB_CHARS_MAX = 32;
 
 double* GetVariablePtr(void *handle, const char * variableName);
 const double* GetConstantePtr(void *handle, const char * constanteName);
+unsigned int ComputeCRC32(const void * buffer, size_t len, unsigned int crc = 0xffffffff);
 
 // ------------------------------- TOKEN -------------------------------------
 
@@ -349,12 +350,12 @@ struct Token
 		}
 		else if (c == '\"')
 		{
+			size_t len = std::min(strlen(str) - 2, sizeof(strvalue) - 1);
 			type = STRING;
 			cvalue = 'S';
-			dvalue = 0.0;
-			strncpy(strvalue, str + 1, sizeof(strvalue) - 1); // remove the first '"'
-			strvalue[sizeof(strvalue) - 1] = '\0';		// mandatory if str is bigger than strvalue
-			strvalue[strlen(strvalue) - 1] = '\0';		// remove the last '"'
+			strncpy(strvalue, str + 1, sizeof(strvalue) - 1);// remove the first '"'
+			strvalue[len] = '\0';				// remove the last '"'
+			dvalue = ComputeCRC32(strvalue, len);		// compute the crc32 only for the string
 		}
 		else
 		{
@@ -919,7 +920,7 @@ bool Compute3(double & result, const vector<Token> & tokens, int first)
 	return false;
 }
 
-unsigned int ComputeCRC32(const void * buffer, size_t len, unsigned int crc = 0xffffffff)
+unsigned int ComputeCRC32(const void * buffer, size_t len, unsigned int crc /*= 0xffffffff*/)
 {
 	static unsigned int crc32_table[256];
 	static bool initialized = false;
