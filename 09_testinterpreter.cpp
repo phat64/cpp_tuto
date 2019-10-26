@@ -2141,6 +2141,10 @@ int main(int argc, char ** argv)
 	assert(0 == ComputeCRC32(NULL, 0));
 	assert(0xcbf43926 == ComputeCRC32("123456789", 9));
 
+	// assertions for the strings
+	assert(0.0 == Evaluate("\"\"")); // test empty string ""
+	assert(0xcbf43926 == Evaluate("\"123456789\"")); // test "123456789"
+
 	while (true)
 	{
 		string in;
