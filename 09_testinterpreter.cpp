@@ -644,7 +644,7 @@ bool Check2(const vector<Token> & tokens, int idx)
 {
 	return	(
 			(tokens[idx].type == RETURN || tokens[idx].type == ELSE)
-			&& (tokens[idx + 1].type == NUMBER || tokens[idx + 1].type == VARIABLE_NAME)
+			&& (tokens[idx + 1].type == NUMBER || tokens[idx + 1].type == VARIABLE_NAME || tokens[idx + 1].type == STRING)
 		)
 		||
 			(tokens[idx].type == SCOPE && tokens[idx].cvalue == '{'
@@ -688,7 +688,7 @@ bool CheckCombo(const vector<Token> & tokens, int idx0, int idx1)
 		"{N", "{F", "{(", "{{", "{R", "{I", "){", "{;", "};", ";;",
 		"{}", ";}", "}}", "}N", "}F", "}R", "}I", "}E", "E{",
 		"=N", "=(", "=F",
-		"S,", ",S", "(S", "S)","[S", "S]", "S;", ";S", NULL};
+		"S,", ",S", "(S", "S)","[S", "S]", "S;", ";S", "RS", NULL};
 
 	for (int i = 0; validcombo[i]; i++)
 	{
