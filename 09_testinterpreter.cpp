@@ -919,6 +919,45 @@ bool Compute3(double & result, const vector<Token> & tokens, int first)
 	return false;
 }
 
+unsigned int ComputeCRC32(const void * buffer, size_t len, unsigned int crc = 0xffffffff)
+{
+	static unsigned int crc32_table[256];
+	static bool initialized = false;
+
+	unsigned char *ptr = (unsigned char *)buffer;
+
+	if (!initialized)
+	{
+		initialized = true;
+
+		// Compute the CRC table
+		for (unsigned int i = 0; i < 256; i++)
+		{
+			unsigned int tmp = i;
+			for (unsigned int j = 0; j < 8; j++)
+			{
+				if (tmp & 1)
+				{
+					tmp >>= 1;
+					tmp ^= 0xEDB88320;
+				}
+				else
+				{
+					tmp >>= 1;
+				}
+			}
+			crc32_table[i] = tmp;
+		}
+	}
+
+	while(len--)
+	{
+		crc = (crc >> 8) ^ crc32_table[(crc & 0xff) ^ *ptr++];
+	}
+
+	return ~crc;
+}
+
 // -------------------------------- MISC -------------------------------------
 
 int FindChar(const vector<Token> & tokens, int first, int last, char c, int dir = 1, bool checkDepth = false)
