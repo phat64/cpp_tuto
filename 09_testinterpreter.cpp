@@ -1207,6 +1207,54 @@ void UpdateVariablesAddr(void* handle, vector<Token> & tokens, int first, int la
 
 // ------------------------------ FUNCTIONS ----------------------------------
 
+double myEmptyFunction()
+{
+	return 1.0;
+}
+
+double myMin(double a, double b)
+{
+	return a < b? a : b;
+}
+
+
+double myMax(double a, double b)
+{
+	return a > b? a : b;
+}
+
+double myCos(double rad)
+{
+	return cos(rad);
+}
+
+void* GetFunctionAddr(const char* functionName, size_t & nbParams)
+{
+	assert(functionName != NULL);
+	static struct FunctionInfo {const char*name; size_t nbParams; void * addr;} functionTable[] =
+	{
+		{"print", 0, (void*)&myEmptyFunction},
+		{"min", 2, (void*)&myMin},
+		{"max", 2, (void*)&myMax},
+		{"cos", 1, (void*)&myCos},
+		{NULL, 0, NULL}
+	};
+
+	for (size_t i = 0; functionTable[i].name; i++)
+	{
+		struct FunctionInfo & info = functionTable[i];
+
+		if (strcmp(functionName, info.name) == 0)
+		{
+			nbParams = info.nbParams;
+			return info.addr;
+		}
+	}
+
+	return NULL;
+}
+
+
 double CallFunction(const Token& function, vector<double> & args)
 {
 	assert(function.dvalue == args.size());
