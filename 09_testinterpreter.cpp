@@ -1258,24 +1258,50 @@ void* GetFunctionAddr(const char* functionName, size_t & nbParams)
 double CallFunction(const Token& function, vector<double> & args)
 {
 	assert(function.dvalue == args.size());
+	size_t nbParams;
+	void* functionAddr;
+	double result = 0.0;
 
-	if (strcmp("max", function.strvalue) == 0)
+	functionAddr = GetFunctionAddr(function.strvalue, nbParams);
+	if (functionAddr)
 	{
-		return std::max(args[0], args[1]);
-	}
+typedef double (*function0_t) ();
+typedef double (*function1_t) (double);
+typedef double (*function2_t) (double, double);
+typedef double (*function3_t) (double, double, double);
+typedef double (*function4_t) (double, double, double, double);
+typedef double (*function5_t) (double, double, double, double, double);
+typedef double (*function6_t) (double, double, double, double, double, double);
 
-	if (strcmp("cos", function.strvalue) == 0)
-	{
-		return cos(args[0]);
-	}
+		switch(nbParams)
+		{
+			case 0:	result = ((function0_t)functionAddr)();break;
+			case 1:	result = ((function1_t)functionAddr)(args[0]);break;
+			case 2:	result = ((function2_t)functionAddr)(args[0], args[1]);break;
+			case 3:	result = ((function3_t)functionAddr)(args[0], args[1], args[2]);break;
+			case 4:	result = ((function4_t)functionAddr)(args[0], args[1], args[2], args[3]);break;
+			case 5:	result = ((function5_t)functionAddr)(args[0], args[1], args[2], args[3], args[4]);break;
+			case 6:	result = ((function6_t)functionAddr)(args[0], args[1], args[2], args[3], args[4], args[5]);break;
+			default:
 #if USE_STL
-	cout << "error : Call Function : function not found : " << function.strvalue <<endl;
+				cout << "error : Call Function : too much params : " << function.strvalue <<endl;
 #else
-	printf("error : Call Function : function not found : %s\n", function.strvalue);
+				printf("error : Call Function : too much params : %s\n", function.strvalue);
 #endif
-	assert(0);
+				assert(0);
+		}
+	}
+	else
+	{
+#if USE_STL
+		cout << "error : Call Function : function not found : " << function.strvalue <<endl;
+#else
+		printf("error : Call Function : function not found : %s\n", function.strvalue);
+#endif
+		assert(0);
+	}
 
-	return 0.0;
+	return result;
 }
 // ------------------------------ EVALUATOR ----------------------------------
 
