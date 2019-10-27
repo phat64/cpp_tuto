@@ -234,6 +234,7 @@ struct Token
 		cvalue = '?';
 		dvalue = 0.0;
 		dvaluePtr = NULL;
+		functionAddr = NULL;
 	}
 
 	Token(char c, char c2 = '\0')
@@ -282,6 +283,7 @@ struct Token
 		dvalue = 0.0;
 		dvaluePtr = NULL;
 		dvaluePtrIsConstante = true;
+		functionAddr = NULL;
 	}
 
 	Token(const char * str)
@@ -350,6 +352,8 @@ struct Token
 				type = NAME; // NAME =  VARIABLE_NAME or FUNCTION_NAME
 				cvalue = 'N';
 				dvalue = 0.0;
+				functionAddr = NULL;
+				nbParams = 0;
 			}
 		}
 		else if (c == '\"')
@@ -360,6 +364,8 @@ struct Token
 			strncpy(strvalue, str + 1, sizeof(strvalue) - 1);// remove the first '"'
 			strvalue[len] = '\0';				// remove the last '"'
 			dvalue = ComputeCRC32(strvalue, len);		// compute the crc32 only for the string
+			functionAddr = NULL;
+			nbParams = 0;
 		}
 		else
 		{
@@ -389,6 +395,8 @@ struct Token
 	double dvalue;
 	double* dvaluePtr;
 	bool dvaluePtrIsConstante;
+	void* functionAddr;
+	size_t nbParams;
 };
 
 
@@ -592,6 +600,7 @@ void TokenizePostProcess(vector<Token> & tokens)
 						size_t nbArgs = nbSeparators + 1;
 						currentToken.dvalue = double(nbArgs);
 					}
+					currentToken.functionAddr = GetFunctionAddr(currentToken.strvalue, currentToken.nbParams);
 #if 0
 					// debug function
 					cout << "fname = " << currentToken.strvalue;
@@ -1258,13 +1267,10 @@ void* GetFunctionAddr(const char* functionName, size_t & nbParams)
 
 double CallFunction(const Token& function, vector<double> & args)
 {
-	assert(function.dvalue == args.size());
-	size_t nbParams;
-	void* functionAddr;
+	assert(function.nbParams == args.size());
 	double result = 0.0;
 
-	functionAddr = GetFunctionAddr(function.strvalue, nbParams);
-	if (functionAddr)
+	if (function.functionAddr)
 	{
 typedef double (*function0_t) ();
 typedef double (*function1_t) (double);
@@ -1274,15 +1280,15 @@ typedef double (*function4_t) (double, double, double, double);
 typedef double (*function5_t) (double, double, double, double, double);
 typedef double (*function6_t) (double, double, double, double, double, double);
 
-		switch(nbParams)
+		switch(function.nbParams)
 		{
-			case 0:	result = ((function0_t)functionAddr)();break;
-			case 1:	result = ((function1_t)functionAddr)(args[0]);break;
-			case 2:	result = ((function2_t)functionAddr)(args[0], args[1]);break;
-			case 3:	result = ((function3_t)functionAddr)(args[0], args[1], args[2]);break;
-			case 4:	result = ((function4_t)functionAddr)(args[0], args[1], args[2], args[3]);break;
-			case 5:	result = ((function5_t)functionAddr)(args[0], args[1], args[2], args[3], args[4]);break;
-			case 6:	result = ((function6_t)functionAddr)(args[0], args[1], args[2], args[3], args[4], args[5]);break;
+			case 0:	result = ((function0_t)function.functionAddr)();break;
+			case 1:	result = ((function1_t)function.functionAddr)(args[0]);break;
+			case 2:	result = ((function2_t)function.functionAddr)(args[0], args[1]);break;
+			case 3:	result = ((function3_t)function.functionAddr)(args[0], args[1], args[2]);break;
+			case 4:	result = ((function4_t)function.functionAddr)(args[0], args[1], args[2], args[3]);break;
+			case 5:	result = ((function5_t)function.functionAddr)(args[0], args[1], args[2], args[3], args[4]);break;
+			case 6:	result = ((function6_t)function.functionAddr)(args[0], args[1], args[2], args[3], args[4], args[5]);break;
 			default:
 #if USE_STL
 				cout << "error : Call Function : too much params : " << function.strvalue <<endl;
