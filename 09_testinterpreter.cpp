@@ -207,6 +207,10 @@ double* GetVariablePtr(void *handle, const char * variableName);
 const double* GetConstantePtr(void *handle, const char * constanteName);
 unsigned int ComputeCRC32(const void * buffer, size_t len, unsigned int crc = 0xffffffff);
 
+// ---------------------- FUNCTIONS PROTOTYPES -------------------------------
+
+void* GetFunctionAddr(const char* functionName, size_t & nbParams);
+
 // ------------------------------- TOKEN -------------------------------------
 
 
@@ -765,18 +769,15 @@ bool CheckFunctions(const vector<Token> & tokens, int first, int last)
 		const Token & currentToken = tokens[i];
 		if (currentToken.type == FUNCTION_NAME)
 		{
+			bool valid;
+			size_t nbParams;
+			void* functionAddr;
 #if defined(DEBUG)
 			cout << "check function : " << currentToken.strvalue << endl;
 #endif
-			if (strcmp(currentToken.strvalue, "print") == 0)
-			{
-				return true;
-			}
-			else if (strcmp(currentToken.strvalue, "max") == 0 && currentToken.dvalue == 2.0)
-			{
-				return true;
-			}
-			else if (strcmp(currentToken.strvalue, "cos") == 0 && currentToken.dvalue == 1.0)
+			functionAddr = GetFunctionAddr(currentToken.strvalue, nbParams);
+			valid = functionAddr != NULL && (nbParams == currentToken.dvalue || nbParams == (size_t)-1);
+			if (valid)
 			{
 				return true;
 			}
@@ -1233,7 +1234,7 @@ void* GetFunctionAddr(const char* functionName, size_t & nbParams)
 	assert(functionName != NULL);
 	static struct FunctionInfo {const char*name; size_t nbParams; void * addr;} functionTable[] =
 	{
-		{"print", 0, (void*)&myEmptyFunction},
+		{"print", -1, (void*)&myEmptyFunction},
 		{"min", 2, (void*)&myMin},
 		{"max", 2, (void*)&myMax},
 		{"cos", 1, (void*)&myCos},
