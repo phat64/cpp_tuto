@@ -778,19 +778,11 @@ bool CheckFunctions(const vector<Token> & tokens, int first, int last)
 		const Token & currentToken = tokens[i];
 		if (currentToken.type == FUNCTION_NAME)
 		{
-			bool valid;
-			size_t nbParams;
-			void* functionAddr;
 #if defined(DEBUG)
 			cout << "check function : " << currentToken.strvalue << endl;
 #endif
-			functionAddr = GetFunctionAddr(currentToken.strvalue, nbParams);
-			valid = functionAddr != NULL && (nbParams == currentToken.dvalue || nbParams == (size_t)-1);
-			if (valid)
-			{
-				return true;
-			}
-			else
+			// check function addr
+			if (currentToken.functionAddr == NULL)
 			{
 #if USE_STL
 				cout << "error : function not found : " << currentToken.strvalue << endl;
@@ -799,6 +791,19 @@ bool CheckFunctions(const vector<Token> & tokens, int first, int last)
 #endif
 				return false;
 			}
+
+			// check function params (count)
+			if (currentToken.nbParams != currentToken.dvalue && currentToken.nbParams != (size_t)-1)
+			{
+#if USE_STL
+				cout << "error : invalid params in function : " << currentToken.strvalue << endl;
+#else
+				printf("error : invalid params in function : %s\n", currentToken.strvalue);
+#endif
+				return false;
+			}
+
+			return true;
 		}
 	}
 	return true;
@@ -1291,9 +1296,9 @@ typedef double (*function6_t) (double, double, double, double, double, double);
 			case 6:	result = ((function6_t)function.functionAddr)(args[0], args[1], args[2], args[3], args[4], args[5]);break;
 			default:
 #if USE_STL
-				cout << "error : Call Function : too much params : " << function.strvalue <<endl;
+				cout << "error : Call Function : too much params ("<< function.nbParams <<") : " << function.strvalue <<endl;
 #else
-				printf("error : Call Function : too much params : %s\n", function.strvalue);
+				printf("error : Call Function : too much params (%d): %s\n", int(function.nbParams), function.strvalue);
 #endif
 				assert(0);
 		}
