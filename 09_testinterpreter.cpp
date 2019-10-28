@@ -369,9 +369,9 @@ struct Token
 
 	double GetDoubleValue() const
 	{
-		if (type == VARIABLE_NAME && dvaluePtr != NULL)
+		if (type == VARIABLE_NAME && ptrvalue != NULL)
 		{
-			return *((double*)dvaluePtr);
+			return *((double*)ptrvalue);
 		}
 		else
 		{
@@ -382,7 +382,7 @@ struct Token
 	char strvalue[NAME_NB_CHARS_MAX + 1];
 	char cvalue;
 	double dvalue;
-	void* dvaluePtr;
+	void* ptrvalue;
 	VariableType variableType;
 	void* functionAddr;
 	size_t nbParams;
@@ -394,7 +394,7 @@ private:
 		strvalue[0] ='\0';
 		cvalue = '?';
 		dvalue = 0.0;
-		dvaluePtr = NULL;
+		ptrvalue = NULL;
 		variableType = VOID;
 		functionAddr = NULL;
 		nbParams = 0;
@@ -1223,16 +1223,16 @@ void UpdateVariablesAddr(void* handle, vector<Token> & tokens, int first, int la
 			currentToken.dvalue = GetConstanteValue(handle, currentToken.strvalue, isConstante);
 			if (isConstante)
 			{
-				currentToken.dvaluePtr = NULL;
+				currentToken.ptrvalue = NULL;
 			}
 			else
 			{
-				currentToken.dvaluePtr = GetVariablePtr(handle, currentToken.strvalue, currentToken.variableType);
+				currentToken.ptrvalue = GetVariablePtr(handle, currentToken.strvalue, currentToken.variableType);
 			}
 
 
 			// check if the variable or the constante is found
-			if (!isConstante && !currentToken.dvaluePtr)
+			if (!isConstante && !currentToken.ptrvalue)
 			{
 #if USE_STL
 				cout << "variable not found " << currentToken.strvalue << endl;
@@ -1408,7 +1408,7 @@ double Evaluate1Statement(const vector<Token> & tokens, int first, int last, boo
 		Token variable = tokens[first];
 		double result = Evaluate1Statement(tokens, first + 2, last, hasReturn, hasIfConditionTrue);
 		variable.dvalue = result;
-		SetVariable(variable.dvaluePtr, variable.strvalue, result);
+		SetVariable(variable.ptrvalue, variable.strvalue, result);
 
 #ifdef DEBUG
 		printf("_STORE %f\n", result);
@@ -1627,7 +1627,7 @@ double Evaluate1Statement(const vector<Token> & tokens, int first, int last, boo
 		else if (tokens[first].type == STORE)
 		{
 			result = nextValue;
-			SetVariable(firstToken.dvaluePtr, firstToken.strvalue, result);
+			SetVariable(firstToken.ptrvalue, firstToken.strvalue, result);
 #ifdef DEBUG
 			printf("Store %f\n", result);
 #endif
