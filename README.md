@@ -8,3 +8,5 @@ C++ tutorials
 6. Image To ASCII : How to display an image in text ?
 7. Object Oriented Programming in C : How to dev with the OOP paradigm in C ?
 8. Calculator : How to write a calculator (with 4 operators and parenthesis) in C++ ?
+
+(c) phat64
