@@ -1198,16 +1198,23 @@ double GetConstanteValue(void *handle, const char * constanteName, bool & found)
 }
 
 
-bool SetVariable(void * address, const char * name, double value)
+bool SetVariable(void * address, const char * name, double value, VariableType type)
 {
+	assert(address != NULL);
 	assert(name != NULL);
+	assert(type != VOID);
 
-	double* variablePtr = (double*)address;
-	if (variablePtr)
+	if (address)
 	{
-		*variablePtr = value;
+		switch(type)
+		{
+			case DOUBLE: *((double*)address) = value; return true;
+			case FLOAT: *((float*)address) = value; return true;
+			case INT: *((int*)address) = value; return true;
+			default : assert(0);
+		}
 	}
-	return variablePtr != NULL;
+	return false;
 }
 
 void UpdateVariablesAddr(void* handle, vector<Token> & tokens, int first, int last)
@@ -1408,7 +1415,7 @@ double Evaluate1Statement(const vector<Token> & tokens, int first, int last, boo
 		Token variable = tokens[first];
 		double result = Evaluate1Statement(tokens, first + 2, last, hasReturn, hasIfConditionTrue);
 		variable.dvalue = result;
-		SetVariable(variable.ptrvalue, variable.strvalue, result);
+		SetVariable(variable.ptrvalue, variable.strvalue, result, variable.variableType);
 
 #ifdef DEBUG
 		printf("_STORE %f\n", result);
@@ -1627,7 +1634,7 @@ double Evaluate1Statement(const vector<Token> & tokens, int first, int last, boo
 		else if (tokens[first].type == STORE)
 		{
 			result = nextValue;
-			SetVariable(firstToken.ptrvalue, firstToken.strvalue, result);
+			SetVariable(firstToken.ptrvalue, firstToken.strvalue, result, firstToken.variableType);
 #ifdef DEBUG
 			printf("Store %f\n", result);
 #endif
