@@ -231,16 +231,13 @@ struct Token
 
 	Token()
 	{
-		type = NONE;
-		strvalue[0] = '\0';
-		cvalue = '?';
-		dvalue = 0.0;
-		dvaluePtr = NULL;
-		functionAddr = NULL;
+		Clear();
 	}
 
 	Token(char c, char c2 = '\0')
 	{
+		Clear();
+
 		if (c == '(' || c == ')')
 		{
 			type = PARENTHESIS;
@@ -282,15 +279,13 @@ struct Token
 		strvalue[0] = c;
 		strvalue[1] = c2;
 		strvalue[2] = '\0';
-		dvalue = 0.0;
-		dvaluePtr = NULL;
-		dvaluePtrIsConstante = true;
-		functionAddr = NULL;
 	}
 
 	Token(const char * str)
 	{
 		assert(str != NULL);
+
+		Clear();
 		strncpy(strvalue, str, sizeof(strvalue) - 1); 	// strncpy is safer than strcpy
 		strvalue[sizeof(strvalue) - 1] = '\0';		// mandatory if str is bigger than strvalue
 
@@ -335,27 +330,21 @@ struct Token
 			{
 				type = IF;
 				cvalue = 'I';
-				dvalue = 0.0;
 			}
 			else if (strcmp(str, "return") == 0)
 			{
 				type = RETURN;
 				cvalue = 'R';
-				dvalue = 0.0;
 			}
 			else if (strcmp(str, "else") == 0)
 			{
 				type = ELSE;
 				cvalue = 'E';
-				dvalue = 0.0;
 			}
 			else
 			{
 				type = NAME; // NAME =  VARIABLE_NAME or FUNCTION_NAME
 				cvalue = 'N';
-				dvalue = 0.0;
-				functionAddr = NULL;
-				nbParams = 0;
 			}
 		}
 		else if (c == '\"')
@@ -366,8 +355,6 @@ struct Token
 			strncpy(strvalue, str + 1, sizeof(strvalue) - 1);// remove the first '"'
 			strvalue[len] = '\0';				// remove the last '"'
 			dvalue = ComputeCRC32(strvalue, len);		// compute the crc32 only for the string
-			functionAddr = NULL;
-			nbParams = 0;
 		}
 		else
 		{
@@ -400,6 +387,20 @@ struct Token
 	VariableType variableType;
 	void* functionAddr;
 	size_t nbParams;
+
+private:
+	void Clear()
+	{
+		type = NONE;
+		strvalue[0] ='\0';
+		cvalue = '?';
+		dvalue = 0.0;
+		dvaluePtr = NULL;
+		dvaluePtrIsConstante = true;
+		variableType = DOUBLE;
+		functionAddr = NULL;
+		nbParams = 0;
+	}
 };
 
 
