@@ -195,6 +195,7 @@ bool getline(FILE * stream, string & in, char delim = '\n')
 	return true;
 }
 #endif
+
 // ---------------------------- CONSTANTES -----------------------------------
 
 static const double pi = 3.14159265358979323846;
@@ -204,7 +205,7 @@ static const size_t NAME_NB_CHARS_MAX = 32;
 // ---------------------- VARIABLES (TEMP CODE) ------------------------------
 
 double* GetVariablePtr(void *handle, const char * variableName);
-const double* GetConstantePtr(void *handle, const char * constanteName);
+double GetConstanteValue(void *handle, const char * constanteName, bool & found);
 unsigned int ComputeCRC32(const void * buffer, size_t len, unsigned int crc = 0xffffffff);
 
 // ---------------------- FUNCTIONS PROTOTYPES -------------------------------
@@ -756,8 +757,10 @@ bool CheckVariables(const vector<Token> & tokens, int first, int last)
 		const Token & currentToken = tokens[i];
 		if (currentToken.type == VARIABLE_NAME)
 		{
+			bool found = false;
+
 			if (!GetVariablePtr(NULL, currentToken.strvalue)
-				&& !GetConstantePtr(NULL, currentToken.strvalue))
+				&& !(GetConstanteValue(NULL, currentToken.strvalue, found) && found))
 			{
 #if USE_STL
 				cout << "error : variable not found : " << currentToken.strvalue << endl;
@@ -1165,13 +1168,16 @@ double* GetVariablePtr(void *handle, const char * variableName)
 	return NULL;
 }
 
-const double* GetConstantePtr(void *handle, const char * constanteName)
+double GetConstanteValue(void *handle, const char * constanteName, bool & found)
 {
 	if (strcmp(constanteName, "pi") == 0)
 	{
-		return &pi;
+		found = true;
+		return pi;
 	}
-	return NULL;
+
+	found = false;
+	return 0.0;
 }
 
 
@@ -1195,20 +1201,19 @@ void UpdateVariablesAddr(void* handle, vector<Token> & tokens, int first, int la
 		if (currentToken.type == VARIABLE_NAME)
 		{
 			// apply relocation : symbole -> addr
-			currentToken.dvaluePtr = (double*)GetConstantePtr(handle, currentToken.strvalue);
-			currentToken.dvaluePtrIsConstante = true;
-			if (currentToken.dvaluePtr == NULL)
+			currentToken.dvalue = GetConstanteValue(handle, currentToken.strvalue, currentToken.dvaluePtrIsConstante);
+			if (currentToken.dvaluePtrIsConstante)
 			{
-				currentToken.dvaluePtr = GetVariablePtr(handle, currentToken.strvalue);
-				currentToken.dvaluePtrIsConstante = false;
-			}
-
-			// update value
-			if (currentToken.dvaluePtr)
-			{
-				currentToken.dvalue = *currentToken.dvaluePtr;
+				currentToken.dvaluePtr = NULL;
 			}
 			else
+			{
+				currentToken.dvaluePtr = GetVariablePtr(handle, currentToken.strvalue);
+			}
+
+
+			// check if the variable or the constante is found
+			if (!currentToken.dvaluePtrIsConstante && !currentToken.dvaluePtr)
 			{
 #if USE_STL
 				cout << "variable not found " << currentToken.strvalue << endl;
