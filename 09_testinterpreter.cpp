@@ -369,7 +369,7 @@ struct Token
 
 	double GetDoubleValue() const
 	{
-		if (type == VARIABLE_NAME && dvaluePtr != NULL && !dvaluePtrIsConstante)
+		if (type == VARIABLE_NAME && dvaluePtr != NULL)
 		{
 			return *dvaluePtr;
 		}
@@ -383,7 +383,6 @@ struct Token
 	char cvalue;
 	double dvalue;
 	double* dvaluePtr;
-	bool dvaluePtrIsConstante;
 	VariableType variableType;
 	void* functionAddr;
 	size_t nbParams;
@@ -396,7 +395,6 @@ private:
 		cvalue = '?';
 		dvalue = 0.0;
 		dvaluePtr = NULL;
-		dvaluePtrIsConstante = true;
 		variableType = DOUBLE;
 		functionAddr = NULL;
 		nbParams = 0;
@@ -1215,9 +1213,11 @@ void UpdateVariablesAddr(void* handle, vector<Token> & tokens, int first, int la
 		Token & currentToken = tokens[i];
 		if (currentToken.type == VARIABLE_NAME)
 		{
+			bool isConstante = false;
+
 			// apply relocation : symbole -> addr
-			currentToken.dvalue = GetConstanteValue(handle, currentToken.strvalue, currentToken.dvaluePtrIsConstante);
-			if (currentToken.dvaluePtrIsConstante)
+			currentToken.dvalue = GetConstanteValue(handle, currentToken.strvalue, isConstante);
+			if (isConstante)
 			{
 				currentToken.dvaluePtr = NULL;
 			}
@@ -1228,7 +1228,7 @@ void UpdateVariablesAddr(void* handle, vector<Token> & tokens, int first, int la
 
 
 			// check if the variable or the constante is found
-			if (!currentToken.dvaluePtrIsConstante && !currentToken.dvaluePtr)
+			if (!isConstante && !currentToken.dvaluePtr)
 			{
 #if USE_STL
 				cout << "variable not found " << currentToken.strvalue << endl;
