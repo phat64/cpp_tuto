@@ -1170,10 +1170,22 @@ double* GetVariablePtr(void *handle, const char * variableName)
 
 double GetConstanteValue(void *handle, const char * constanteName, bool & found)
 {
-	if (strcmp(constanteName, "pi") == 0)
+	static struct ConstanteInfo {const char * name; double value;} table [] =
 	{
-		found = true;
-		return pi;
+		{"pi", pi},
+		{NULL, 0.0}
+	};
+
+	for (size_t i = 0; table[i].name; i++)
+	{
+		struct ConstanteInfo & info = table[i];
+
+		if (strcmp(constanteName, info.name) == 0)
+		{
+			found = true;
+			return info.value;
+		}
+
 	}
 
 	found = false;
