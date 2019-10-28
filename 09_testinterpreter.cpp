@@ -1165,11 +1165,13 @@ void* GetVariablePtr(void *handle, const char * variableName, VariableType & typ
 {
 	static double abc = 0.0;
 	static int counter = 0;
+	static bool btest = false;
 
 	static struct VariableInfo {const char * name; void* addr; VariableType type;} table [] =
 	{
 		{"abc", (void*)&abc, DOUBLE},
 		{"counter", (void*)&counter, INT},
+		{"btest", (void*)&btest, BOOLEAN},
 		{NULL, NULL, VOID}
 	};
 
