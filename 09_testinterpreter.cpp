@@ -203,7 +203,7 @@ static const size_t NUMBER_DIGITS_MAX = 32;
 static const size_t NAME_NB_CHARS_MAX = 32;
 
 // ---------------------- VARIABLES (TEMP CODE) ------------------------------
-enum VariableType { VOID, DOUBLE, FLOAT, INT};
+enum VariableType { VOID, DOUBLE, FLOAT, INT, BOOLEAN };
 
 void* GetVariablePtr(void *handle, const char * variableName, VariableType & type);
 double GetConstanteValue(void *handle, const char * constanteName, bool & found);
@@ -376,6 +376,7 @@ struct Token
 				case DOUBLE: return *((double*)ptrvalue);
 				case FLOAT: return *((float*)ptrvalue);
 				case INT: return *((int*)ptrvalue);
+				case BOOLEAN: return *((bool*)ptrvalue);
 				default : assert(0); return 0.0;
 			}
 		}
@@ -1226,6 +1227,7 @@ bool SetVariable(void * address, const char * name, double value, VariableType t
 			case DOUBLE: *((double*)address) = value; return true;
 			case FLOAT: *((float*)address) = value; return true;
 			case INT: *((int*)address) = value; return true;
+			case BOOLEAN: *((bool*)address) = (value != 0.0); return true;
 			default : assert(0);
 		}
 	}
