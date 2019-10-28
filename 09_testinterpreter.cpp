@@ -203,7 +203,7 @@ static const size_t NUMBER_DIGITS_MAX = 32;
 static const size_t NAME_NB_CHARS_MAX = 32;
 
 // ---------------------- VARIABLES (TEMP CODE) ------------------------------
-enum VariableType { DOUBLE, FLOAT, INT, VOID};
+enum VariableType { VOID, DOUBLE, FLOAT, INT};
 
 void* GetVariablePtr(void *handle, const char * variableName, VariableType & type);
 double GetConstanteValue(void *handle, const char * constanteName, bool & found);
@@ -395,7 +395,7 @@ private:
 		cvalue = '?';
 		dvalue = 0.0;
 		dvaluePtr = NULL;
-		variableType = DOUBLE;
+		variableType = VOID;
 		functionAddr = NULL;
 		nbParams = 0;
 	}
