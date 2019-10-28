@@ -203,6 +203,7 @@ static const size_t NUMBER_DIGITS_MAX = 32;
 static const size_t NAME_NB_CHARS_MAX = 32;
 
 // ---------------------- VARIABLES (TEMP CODE) ------------------------------
+enum VariableType { DOUBLE, FLOAT, INT};
 
 double* GetVariablePtr(void *handle, const char * variableName);
 double GetConstanteValue(void *handle, const char * constanteName, bool & found);
@@ -396,6 +397,7 @@ struct Token
 	double dvalue;
 	double* dvaluePtr;
 	bool dvaluePtrIsConstante;
+	VariableType variableType;
 	void* functionAddr;
 	size_t nbParams;
 };
