@@ -1159,16 +1159,25 @@ void* GetVariablePtr(void *handle, const char * variableName, VariableType & typ
 	static double abc = 0.0;
 	static double counter = 0.0;
 
-	if (strcmp(variableName, "abc") == 0)
+	static struct VariableInfo {const char * name; void* addr; VariableType type;} table [] =
 	{
-		type = DOUBLE;
-		return &abc;
-	}
-	else if (strcmp(variableName, "counter") == 0)
+		{"abc", (void*)&abc, DOUBLE},
+		{"counter", (void*)&counter, DOUBLE},
+		{NULL, NULL, VOID}
+	};
+
+
+	for (size_t i = 0; table[i].name; i++)
 	{
-		type = DOUBLE;
-		return &counter;
+		VariableInfo & info = table[i];
+		if (strcmp(variableName, info.name) == 0)
+		{
+			type = info.type;
+			return info.addr;
+		}
+
 	}
+
 	type = VOID;
 	return NULL;
 }
