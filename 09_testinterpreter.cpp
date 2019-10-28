@@ -371,7 +371,13 @@ struct Token
 	{
 		if (type == VARIABLE_NAME && ptrvalue != NULL)
 		{
-			return *((double*)ptrvalue);
+			switch(variableType)
+			{
+				case DOUBLE: return *((double*)ptrvalue);
+				case FLOAT: return *((float*)ptrvalue);
+				case INT: return *((int*)ptrvalue);
+				default : assert(0); return 0.0;
+			}
 		}
 		else
 		{
