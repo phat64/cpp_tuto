@@ -1163,12 +1163,12 @@ int FindToken(const vector<Token> & tokens, int first, int last, TokenType type,
 void* GetVariablePtr(void *handle, const char * variableName, VariableType & type)
 {
 	static double abc = 0.0;
-	static double counter = 0.0;
+	static int counter = 0;
 
 	static struct VariableInfo {const char * name; void* addr; VariableType type;} table [] =
 	{
 		{"abc", (void*)&abc, DOUBLE},
-		{"counter", (void*)&counter, DOUBLE},
+		{"counter", (void*)&counter, INT},
 		{NULL, NULL, VOID}
 	};
 
