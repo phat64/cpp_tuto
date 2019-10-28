@@ -203,9 +203,9 @@ static const size_t NUMBER_DIGITS_MAX = 32;
 static const size_t NAME_NB_CHARS_MAX = 32;
 
 // ---------------------- VARIABLES (TEMP CODE) ------------------------------
-enum VariableType { DOUBLE, FLOAT, INT};
+enum VariableType { DOUBLE, FLOAT, INT, VOID};
 
-double* GetVariablePtr(void *handle, const char * variableName);
+void* GetVariablePtr(void *handle, const char * variableName, VariableType & type);
 double GetConstanteValue(void *handle, const char * constanteName, bool & found);
 unsigned int ComputeCRC32(const void * buffer, size_t len, unsigned int crc = 0xffffffff);
 
@@ -371,7 +371,7 @@ struct Token
 	{
 		if (type == VARIABLE_NAME && dvaluePtr != NULL)
 		{
-			return *dvaluePtr;
+			return *((double*)dvaluePtr);
 		}
 		else
 		{
@@ -382,7 +382,7 @@ struct Token
 	char strvalue[NAME_NB_CHARS_MAX + 1];
 	char cvalue;
 	double dvalue;
-	double* dvaluePtr;
+	void* dvaluePtr;
 	VariableType variableType;
 	void* functionAddr;
 	size_t nbParams;
@@ -759,8 +759,9 @@ bool CheckVariables(const vector<Token> & tokens, int first, int last)
 		if (currentToken.type == VARIABLE_NAME)
 		{
 			bool found = false;
+			VariableType typeNotUsed;
 
-			if (!GetVariablePtr(NULL, currentToken.strvalue)
+			if (!GetVariablePtr(NULL, currentToken.strvalue, typeNotUsed)
 				&& !(GetConstanteValue(NULL, currentToken.strvalue, found) && found))
 			{
 #if USE_STL
@@ -1153,19 +1154,22 @@ int FindToken(const vector<Token> & tokens, int first, int last, TokenType type,
 
 // ------------------------------ VARIABLES ----------------------------------
 
-double* GetVariablePtr(void *handle, const char * variableName)
+void* GetVariablePtr(void *handle, const char * variableName, VariableType & type)
 {
 	static double abc = 0.0;
 	static double counter = 0.0;
 
 	if (strcmp(variableName, "abc") == 0)
 	{
+		type = DOUBLE;
 		return &abc;
 	}
 	else if (strcmp(variableName, "counter") == 0)
 	{
+		type = DOUBLE;
 		return &counter;
 	}
+	type = VOID;
 	return NULL;
 }
 
@@ -1223,7 +1227,7 @@ void UpdateVariablesAddr(void* handle, vector<Token> & tokens, int first, int la
 			}
 			else
 			{
-				currentToken.dvaluePtr = GetVariablePtr(handle, currentToken.strvalue);
+				currentToken.dvaluePtr = GetVariablePtr(handle, currentToken.strvalue, currentToken.variableType);
 			}
 
 
