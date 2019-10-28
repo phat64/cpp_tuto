@@ -1250,6 +1250,7 @@ void UpdateVariablesAddr(void* handle, vector<Token> & tokens, int first, int la
 			if (isConstante)
 			{
 				currentToken.ptrvalue = NULL;
+				currentToken.variableType = VOID;
 			}
 			else
 			{
@@ -1439,7 +1440,7 @@ double Evaluate1Statement(const vector<Token> & tokens, int first, int last, boo
 #ifdef DEBUG
 		printf("_STORE %f\n", result);
 #endif
-		return result;
+		return variable.GetDoubleValue(); // useful if variable type is bool or int
 	}
 
 	// no parenthesis => easy to evaluate
@@ -1652,8 +1653,8 @@ double Evaluate1Statement(const vector<Token> & tokens, int first, int last, boo
 		}
 		else if (tokens[first].type == STORE)
 		{
-			result = nextValue;
-			SetVariable(firstToken.ptrvalue, firstToken.strvalue, result, firstToken.variableType);
+			SetVariable(firstToken.ptrvalue, firstToken.strvalue, nextValue, firstToken.variableType);
+			result = firstToken.GetDoubleValue();
 #ifdef DEBUG
 			printf("Store %f\n", result);
 #endif
