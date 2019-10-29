@@ -1226,20 +1226,20 @@ double GetConstanteValue(void *handle, const char * constanteName, bool & found)
 }
 
 
-bool SetVariableValue(void * address, const char * name, double value, VariableType type)
+bool SetVariableValue(const char * variableName, void * variableAddress, double value, VariableType variableType)
 {
-	assert(address != NULL);
-	assert(name != NULL);
-	assert(type != VOID);
+	assert(variableName != NULL);
+	assert(variableAddress != NULL);
+	assert(variableType != VOID);
 
-	if (address)
+	if (variableAddress)
 	{
-		switch(type)
+		switch(variableType)
 		{
-			case DOUBLE: *((double*)address) = value; return true;
-			case FLOAT: *((float*)address) = value; return true;
-			case INT: *((int*)address) = value; return true;
-			case BOOLEAN: *((bool*)address) = (value != 0.0); return true;
+			case DOUBLE: *((double*)variableAddress) = value; return true;
+			case FLOAT: *((float*)variableAddress) = value; return true;
+			case INT: *((int*)variableAddress) = value; return true;
+			case BOOLEAN: *((bool*)variableAddress) = (value != 0.0); return true;
 			default : assert(0);
 		}
 	}
@@ -1445,7 +1445,7 @@ double Evaluate1Statement(const vector<Token> & tokens, int first, int last, boo
 		Token variable = tokens[first];
 		double result = Evaluate1Statement(tokens, first + 2, last, hasReturn, hasIfConditionTrue);
 		variable.dvalue = result;
-		SetVariableValue(variable.ptrvalue, variable.strvalue, result, variable.variableType);
+		SetVariableValue(variable.strvalue, variable.ptrvalue, result, variable.variableType);
 
 #ifdef DEBUG
 		printf("_STORE %f\n", result);
@@ -1663,7 +1663,7 @@ double Evaluate1Statement(const vector<Token> & tokens, int first, int last, boo
 		}
 		else if (tokens[first].type == STORE)
 		{
-			SetVariableValue(firstToken.ptrvalue, firstToken.strvalue, nextValue, firstToken.variableType);
+			SetVariableValue(firstToken.strvalue, firstToken.ptrvalue, nextValue, firstToken.variableType);
 			result = firstToken.GetDoubleValue();
 #ifdef DEBUG
 			printf("Store %f\n", result);
