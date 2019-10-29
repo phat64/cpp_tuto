@@ -1443,7 +1443,6 @@ double Evaluate1Statement(const vector<Token> & tokens, int first, int last, boo
 	{
 		Token variable = tokens[first];
 		double result = Evaluate1Statement(tokens, first + 2, last, hasReturn, hasIfConditionTrue);
-		variable.dvalue = result;
 		SetVariableValue(variable.strvalue, variable.ptrvalue, result, variable.variableType);
 
 #ifdef DEBUG
