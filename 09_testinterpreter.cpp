@@ -9,7 +9,8 @@
  *	- 4 binary operations *, /, +, - and parenthesis ( and ).
  *	- 2 binary boolean operations && and ||.
  *	- 1 comparaison operation ==.
- *	- 1 variable/constante : pi.
+ *	- 1 constante : pi.
+ *	- 3 variables : abc (double), counter (int) and btest (boolean)
  *	- 2 functions : max(double, double) and cos(double).
  *	- 'return' keyword management.
  *	- 'if (<condition>) <statement>;' management.
@@ -18,7 +19,7 @@
  *
  * ps : I don't use yacc or lex but it can help you if you want to dev a compiler or a calculator
  *
- * [TODO] => It's only for the tutorial. It's not for advanced developers and it's obviously not yet high optimized ^^
+ * [TODO] => It's only for the tutorial. It's not for advanced developers and it's obviously not yet highly optimized ^^
  *	- It uses my old code. It needs more OOP.
  * 	- need the negative operator (unary operator).
  *	- need more math functions like sine or cosine.
@@ -2287,8 +2288,8 @@ int main(int argc, char ** argv)
 	// assertions for the strings + code (easy)
 	assert(0.0 == Evaluate("return \"\"")); // test return empty string ""
 	assert(0xcbf43926 == Evaluate("return \"123456789\"")); // test return "123456789"
-	assert(0xcbf43926 == Evaluate("max(\"\", \"123456789\")")); // test fonction + string
-	assert(0xcbf43926 == Evaluate("return max(\"\", \"123456789\")")); // test return + fonction + string
+	assert(0xcbf43926 == Evaluate("max(\"\", \"123456789\")")); // test function + string
+	assert(0xcbf43926 == Evaluate("return max(\"\", \"123456789\")")); // test return + function + string
 
 	while (true)
 	{
