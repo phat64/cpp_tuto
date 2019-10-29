@@ -207,6 +207,7 @@ static const size_t NAME_NB_CHARS_MAX = 32;
 enum VariableType { VOID, DOUBLE, FLOAT, INT, BOOLEAN };
 
 void* GetVariablePtr(void *handle, const char * variableName, VariableType & type);
+double GetVariableValue(void *variableAddr, const char * variableName, VariableType variableType);
 double GetConstanteValue(void *handle, const char * constanteName, bool & found);
 unsigned int ComputeCRC32(const void * buffer, size_t len, unsigned int crc = 0xffffffff);
 
@@ -1190,6 +1191,25 @@ void* GetVariablePtr(void *handle, const char * variableName, VariableType & typ
 
 	type = VOID;
 	return NULL;
+}
+
+double GetVariableValue(void *variableAddr, const char * variableName, VariableType variableType)
+{
+	if (variableAddr != NULL)
+	{
+		switch(variableType)
+		{
+			case DOUBLE: return *((double*)variableAddr);
+			case FLOAT: return *((float*)variableAddr);
+			case INT: return *((int*)variableAddr);
+			case BOOLEAN: return *((bool*)variableAddr);
+			default : assert(0); return 0.0;
+		}
+	}
+	else
+	{
+		return 0.0;
+	}
 }
 
 double GetConstanteValue(void *handle, const char * constanteName, bool & found)
