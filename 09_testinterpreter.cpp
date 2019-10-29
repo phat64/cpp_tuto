@@ -1228,12 +1228,11 @@ double GetConstanteValue(void *handle, const char * constanteName, bool & found)
 
 bool SetVariableValue(const char * variableName, void * variableAddress, double value, VariableType variableType)
 {
-	assert(variableName != NULL);
-	assert(variableAddress != NULL);
-	assert(variableType != VOID);
-
 	if (variableAddress)
 	{
+		assert(variableName != NULL);
+		assert(variableType != VOID);
+
 		switch(variableType)
 		{
 			case DOUBLE: *((double*)variableAddress) = value; return true;
