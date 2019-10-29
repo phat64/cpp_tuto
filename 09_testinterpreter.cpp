@@ -948,8 +948,7 @@ unsigned int ComputeCRC32(const void * buffer, size_t len, unsigned int crc /*= 
 {
 	static unsigned int crc32_table[256];
 	static bool initialized = false;
-
-	unsigned char *ptr = (unsigned char *)buffer;
+	unsigned char *ptr;
 
 	if (!initialized)
 	{
@@ -975,6 +974,7 @@ unsigned int ComputeCRC32(const void * buffer, size_t len, unsigned int crc /*= 
 		}
 	}
 
+	ptr = (unsigned char *)buffer;
 	while(len--)
 	{
 		crc = (crc >> 8) ^ crc32_table[(crc & 0xff) ^ *ptr++];
