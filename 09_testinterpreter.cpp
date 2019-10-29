@@ -1188,20 +1188,16 @@ void* GetVariablePtr(void *handle, const char * variableName, VariableType & typ
 
 double GetVariableValue(const char * variableName, void *variableAddr, VariableType variableType)
 {
-	if (variableAddr != NULL)
+	assert(variableName != NULL);
+	assert(variableAddr != NULL);
+
+	switch(variableType)
 	{
-		switch(variableType)
-		{
-			case DOUBLE: return *((double*)variableAddr);
-			case FLOAT: return *((float*)variableAddr);
-			case INT: return *((int*)variableAddr);
-			case BOOLEAN: return *((bool*)variableAddr);
-			default : assert(0); return 0.0;
-		}
-	}
-	else
-	{
-		return 0.0;
+		case DOUBLE: return *((double*)variableAddr);
+		case FLOAT: return *((float*)variableAddr);
+		case INT: return *((int*)variableAddr);
+		case BOOLEAN: return *((bool*)variableAddr);
+		default : assert(0); return 0.0;
 	}
 }
 
