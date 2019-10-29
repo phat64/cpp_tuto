@@ -755,6 +755,8 @@ bool CheckParenthesis(const vector<Token> & tokens, int first, int last)
 
 bool CheckVariables(const vector<Token> & tokens, int first, int last)
 {
+	bool result = true;
+
 	for (int i = first; i < last; i++)
 	{
 		const Token & currentToken = tokens[i];
@@ -771,11 +773,11 @@ bool CheckVariables(const vector<Token> & tokens, int first, int last)
 #else
 				printf("error : variable not found : %s\n", currentToken.strvalue);
 #endif
-				return false;
+				result = false;
 			}
 		}
 	}
-	return true;
+	return result;
 }
 
 bool CheckFunctions(const vector<Token> & tokens, int first, int last)
