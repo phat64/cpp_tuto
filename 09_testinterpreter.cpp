@@ -2298,6 +2298,12 @@ int main(int argc, char ** argv)
 	assert(0xcbf43926 == Evaluate("max(\"\", \"123456789\")")); // test function + string
 	assert(0xcbf43926 == Evaluate("return max(\"\", \"123456789\")")); // test return + function + string
 
+	// assertions for store + constante : the constante will not be modified (no warning message)
+	assert(pi == Evaluate("pi = 555"));
+	assert(pi == Evaluate("pi = 555 + 999 * 777"));
+	assert(pi == Evaluate("pi = max(555 + 999 * 777, 999)"));
+	assert(pi == Evaluate("pi = cos(0.0)"));
+
 	while (true)
 	{
 		string in;
