@@ -1226,7 +1226,7 @@ double GetConstanteValue(void *handle, const char * constanteName, bool & found)
 }
 
 
-bool SetVariable(void * address, const char * name, double value, VariableType type)
+bool SetVariableValue(void * address, const char * name, double value, VariableType type)
 {
 	assert(address != NULL);
 	assert(name != NULL);
@@ -1445,7 +1445,7 @@ double Evaluate1Statement(const vector<Token> & tokens, int first, int last, boo
 		Token variable = tokens[first];
 		double result = Evaluate1Statement(tokens, first + 2, last, hasReturn, hasIfConditionTrue);
 		variable.dvalue = result;
-		SetVariable(variable.ptrvalue, variable.strvalue, result, variable.variableType);
+		SetVariableValue(variable.ptrvalue, variable.strvalue, result, variable.variableType);
 
 #ifdef DEBUG
 		printf("_STORE %f\n", result);
@@ -1663,7 +1663,7 @@ double Evaluate1Statement(const vector<Token> & tokens, int first, int last, boo
 		}
 		else if (tokens[first].type == STORE)
 		{
-			SetVariable(firstToken.ptrvalue, firstToken.strvalue, nextValue, firstToken.variableType);
+			SetVariableValue(firstToken.ptrvalue, firstToken.strvalue, nextValue, firstToken.variableType);
 			result = firstToken.GetDoubleValue();
 #ifdef DEBUG
 			printf("Store %f\n", result);
