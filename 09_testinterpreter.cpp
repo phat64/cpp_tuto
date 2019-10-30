@@ -992,180 +992,104 @@ unsigned int ComputeCRC32(const void * buffer, size_t len, unsigned int crc /*= 
 
 // -------------------------------- MISC -------------------------------------
 
+typedef bool (*TokenEqualsCallback)(const Token & a, const Token & b);
+
+bool TokenCharEquals(const Token & a, const Token & b)
+{
+	return a.cvalue == b.strvalue[0] || a.cvalue == b.cvalue;
+}
+
+bool TokenOperatorEquals(const Token & a, const Token & b)
+{
+	return b.type == OPERATOR && TokenCharEquals(a, b);
+}
+
+bool TokenTypeEquals(const Token & a, const Token & b)
+{
+	return a.type == b.type;
+}
+
+int FindGeneric(const vector<Token> & tokens, int first, int last, const Token & token, TokenEqualsCallback equals,
+	int dir = 1, bool checkDepth = false)
+{
+	int depth = 0;
+
+	if (dir > 0)
+	{
+		for (int idx = first; idx < last; idx++)
+		{
+			const Token & currentToken = tokens[idx];
+
+			if (checkDepth)
+			{
+				if (currentToken.cvalue == '(' || currentToken.cvalue == '[')
+				{
+					depth++;
+				}
+
+				if (currentToken.cvalue == ')' || currentToken.cvalue == ']')
+				{
+					depth--;
+				}
+			}
+
+			if (depth == 0 && equals(token, currentToken))
+			{
+				return idx;
+			}
+		}
+	}
+	else if (dir < 0)
+	{
+		for (int idx = last-1; idx >= first; idx--)
+		{
+			const Token & currentToken = tokens[idx];
+
+			if (checkDepth)
+			{
+				if (currentToken.cvalue == '(' || currentToken.cvalue == '[')
+				{
+					depth++;
+				}
+
+				if (currentToken.cvalue == ')' || currentToken.cvalue == ']')
+				{
+					depth--;
+				}
+			}
+
+			if (depth == 0 && equals(token, currentToken))
+			{
+				return idx;
+			}
+		}
+	}
+
+	return -1;
+}
+
 int FindChar(const vector<Token> & tokens, int first, int last, char c, int dir = 1, bool checkDepth = false)
 {
-	int depth = 0;
+	static Token token;
+	token.cvalue = c;
 
-	if (dir > 0)
-	{
-		for (int idx = first; idx < last; idx++)
-		{
-			const Token & currentToken = tokens[idx];
-
-			if (checkDepth)
-			{
-				if (currentToken.cvalue == '(' || currentToken.cvalue == '[')
-				{
-					depth++;
-				}
-
-				if (currentToken.cvalue == ')' || currentToken.cvalue == ']')
-				{
-					depth--;
-				}
-			}
-
-			if (depth == 0 && (currentToken.strvalue[0] == c || currentToken.cvalue == c))
-			{
-				return idx;
-			}
-		}
-	}
-	else if (dir < 0)
-	{
-		for (int idx = last-1; idx >= first; idx--)
-		{
-			const Token & currentToken = tokens[idx];
-
-			if (checkDepth)
-			{
-				if (currentToken.cvalue == '(' || currentToken.cvalue == '[')
-				{
-					depth++;
-				}
-
-				if (currentToken.cvalue == ')' || currentToken.cvalue == ']')
-				{
-					depth--;
-				}
-			}
-
-			if (depth == 0 && (currentToken.strvalue[0] == c || currentToken.cvalue == c))
-			{
-				return idx;
-			}
-		}
-	}
-
-	return -1;
+	return FindGeneric(tokens, first, last, token, TokenCharEquals, dir, checkDepth);
 }
 
-// [TODO] need to be refactored with FindChar
 int FindOperator(const vector<Token> & tokens, int first, int last, char c, int dir = 1, bool checkDepth = false)
 {
-	int depth = 0;
+	static Token token('+');
+	token.cvalue = c;
 
-	if (dir > 0)
-	{
-		for (int idx = first; idx < last; idx++)
-		{
-			const Token & currentToken = tokens[idx];
-
-			if (checkDepth)
-			{
-				if (currentToken.cvalue == '(' || currentToken.cvalue == '[')
-				{
-					depth++;
-				}
-
-				if (currentToken.cvalue == ')' || currentToken.cvalue == ']')
-				{
-					depth--;
-				}
-			}
-
-			if (depth == 0 && currentToken.type == OPERATOR && (currentToken.strvalue[0] == c || currentToken.cvalue == c))
-			{
-				return idx;
-			}
-		}
-	}
-	else if (dir < 0)
-	{
-		for (int idx = last-1; idx >= first; idx--)
-		{
-			const Token & currentToken = tokens[idx];
-
-			if (checkDepth)
-			{
-				if (currentToken.cvalue == '(' || currentToken.cvalue == '[')
-				{
-					depth++;
-				}
-
-				if (currentToken.cvalue == ')' || currentToken.cvalue == ']')
-				{
-					depth--;
-				}
-			}
-
-			if (depth == 0 && currentToken.type == OPERATOR && (currentToken.strvalue[0] == c || currentToken.cvalue == c))
-			{
-				return idx;
-			}
-		}
-	}
-
-	return -1;
+	return FindGeneric(tokens, first, last, token, TokenOperatorEquals, dir, checkDepth);
 }
 
-// [TODO] need to be refactored with FindChar
 int FindToken(const vector<Token> & tokens, int first, int last, TokenType type, int dir = 1, bool checkDepth = false)
 {
-	int depth = 0;
+	static Token token;
+	token.type = type;
 
-	if (dir > 0)
-	{
-		for (int idx = first; idx < last; idx++)
-		{
-			const Token & currentToken = tokens[idx];
-
-			if (checkDepth)
-			{
-				if (currentToken.cvalue == '(' || currentToken.cvalue == '[')
-				{
-					depth++;
-				}
-
-				if (currentToken.cvalue == ')' || currentToken.cvalue == ']')
-				{
-					depth--;
-				}
-			}
-
-			if (depth == 0 && currentToken.type == type)
-			{
-				return idx;
-			}
-		}
-	}
-	else if (dir < 0)
-	{
-		for (int idx = last-1; idx >= first; idx--)
-		{
-			const Token & currentToken = tokens[idx];
-
-			if (checkDepth)
-			{
-				if (currentToken.cvalue == '(' || currentToken.cvalue == '[')
-				{
-					depth++;
-				}
-
-				if (currentToken.cvalue == ')' || currentToken.cvalue == ']')
-				{
-					depth--;
-				}
-			}
-
-			if (depth == 0 && currentToken.type == type)
-			{
-				return idx;
-			}
-		}
-	}
-
-	return -1;
+	return FindGeneric(tokens, first, last, token, TokenTypeEquals, dir, checkDepth);
 }
 
 
