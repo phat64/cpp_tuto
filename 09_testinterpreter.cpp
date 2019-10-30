@@ -1114,20 +1114,22 @@ int FindToken(const vector<Token> & tokens, int first, int last, TokenType type,
 	{
 		for (int idx = first; idx < last; idx++)
 		{
+			const Token & currentToken = tokens[idx];
+
 			if (checkDepth)
 			{
-				if (tokens[idx].cvalue == '(' || tokens[idx].cvalue == '[')
+				if (currentToken.cvalue == '(' || currentToken.cvalue == '[')
 				{
 					depth++;
 				}
 
-				if (tokens[idx].cvalue == ')' || tokens[idx].cvalue == ']')
+				if (currentToken.cvalue == ')' || currentToken.cvalue == ']')
 				{
 					depth--;
 				}
 			}
 
-			if (depth == 0 && tokens[idx].type == type)
+			if (depth == 0 && currentToken.type == type)
 			{
 
 				return idx;
@@ -1138,20 +1140,22 @@ int FindToken(const vector<Token> & tokens, int first, int last, TokenType type,
 	{
 		for (int idx = last-1; idx >= first; idx--)
 		{
+			const Token & currentToken = tokens[idx];
+
 			if (checkDepth)
 			{
-				if (tokens[idx].cvalue == '(' || tokens[idx].cvalue == '[')
+				if (currentToken.cvalue == '(' || currentToken.cvalue == '[')
 				{
 					depth++;
 				}
 
-				if (tokens[idx].cvalue == ')' || tokens[idx].cvalue == ']')
+				if (currentToken.cvalue == ')' || currentToken.cvalue == ']')
 				{
 					depth--;
 				}
 			}
 
-			if (depth == 0 && tokens[idx].type == type)
+			if (depth == 0 && currentToken.type == type)
 			{
 
 				return idx;
@@ -1188,7 +1192,6 @@ void* GetVariablePtr(void *handle, const char * variableName, VariableType & typ
 			type = info.type;
 			return info.addr;
 		}
-
 	}
 
 	type = VOID;
@@ -1300,7 +1303,6 @@ double myMin(double a, double b)
 {
 	return a < b? a : b;
 }
-
 
 double myMax(double a, double b)
 {
