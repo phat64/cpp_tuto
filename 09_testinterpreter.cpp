@@ -1057,22 +1057,23 @@ int FindOperator(const vector<Token> & tokens, int first, int last, char c, int 
 	{
 		for (int idx = first; idx < last; idx++)
 		{
+			const Token & currentToken = tokens[idx];
+
 			if (checkDepth)
 			{
-				if (tokens[idx].cvalue == '(' || tokens[idx].cvalue == '[')
+				if (currentToken.cvalue == '(' || currentToken.cvalue == '[')
 				{
 					depth++;
 				}
 
-				if (tokens[idx].cvalue == ')' || tokens[idx].cvalue == ']')
+				if (currentToken.cvalue == ')' || currentToken.cvalue == ']')
 				{
 					depth--;
 				}
 			}
 
-			if (depth == 0 && tokens[idx].type == OPERATOR && (tokens[idx].strvalue[0] == c || tokens[idx].cvalue == c))
+			if (depth == 0 && currentToken.type == OPERATOR && (currentToken.strvalue[0] == c || currentToken.cvalue == c))
 			{
-
 				return idx;
 			}
 		}
@@ -1081,22 +1082,23 @@ int FindOperator(const vector<Token> & tokens, int first, int last, char c, int 
 	{
 		for (int idx = last-1; idx >= first; idx--)
 		{
+			const Token & currentToken = tokens[idx];
+
 			if (checkDepth)
 			{
-				if (tokens[idx].cvalue == '(' || tokens[idx].cvalue == '[')
+				if (currentToken.cvalue == '(' || currentToken.cvalue == '[')
 				{
 					depth++;
 				}
 
-				if (tokens[idx].cvalue == ')' || tokens[idx].cvalue == ']')
+				if (currentToken.cvalue == ')' || currentToken.cvalue == ']')
 				{
 					depth--;
 				}
 			}
 
-			if (depth == 0 && tokens[idx].type == OPERATOR && (tokens[idx].strvalue[0] == c || tokens[idx].cvalue == c))
+			if (depth == 0 && currentToken.type == OPERATOR && (currentToken.strvalue[0] == c || currentToken.cvalue == c))
 			{
-
 				return idx;
 			}
 		}
@@ -1131,7 +1133,6 @@ int FindToken(const vector<Token> & tokens, int first, int last, TokenType type,
 
 			if (depth == 0 && currentToken.type == type)
 			{
-
 				return idx;
 			}
 		}
@@ -1157,7 +1158,6 @@ int FindToken(const vector<Token> & tokens, int first, int last, TokenType type,
 
 			if (depth == 0 && currentToken.type == type)
 			{
-
 				return idx;
 			}
 		}
