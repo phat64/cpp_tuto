@@ -896,11 +896,14 @@ bool Compute2(double & result, double val, const vector<Token> & tokens, int fir
 {
 	//if (Check3(tokens, first))
 	{
-		if (tokens[first].type == OPERATOR)
+		const Token & token0 = tokens[first];
+		const Token & token1 = tokens[first + 1];
+
+		if (token0.type == OPERATOR)
 		{
 			double a = val;
-			double b = tokens[first+1].GetDoubleValue();
-			result = Compute(a, tokens[first].strvalue[0], b);
+			double b = token1.GetDoubleValue();
+			result = Compute(a, token0.strvalue[0], b);
 			/*switch(tokens[first].strvalue[0])
 			{
 				case '+': result = a + b; break;
@@ -919,12 +922,16 @@ bool Compute3(double & result, const vector<Token> & tokens, int first)
 {
 	if (Check3(tokens, first))
 	{
+		const Token & token0 = tokens[first];
+		const Token & token1 = tokens[first + 1];
+		const Token & token2 = tokens[first + 2];
+
 		// NON
-		if (tokens[first + 1].type == OPERATOR)
+		if (token1.type == OPERATOR)
 		{
-			double a = tokens[first].GetDoubleValue();
-			double b = tokens[first+2].GetDoubleValue();
-			result = Compute(a, tokens[first + 1].strvalue[0], b);
+			double a = token0.GetDoubleValue();
+			double b = token2.GetDoubleValue();
+			result = Compute(a, token1.strvalue[0], b);
 			/*switch(tokens[first + 1].strvalue[0])
 			{
 				case '+': result = a + b; break;
@@ -935,9 +942,9 @@ bool Compute3(double & result, const vector<Token> & tokens, int first)
 			return true;
 		}
 		// (N)
-		if (tokens[first + 1].type == NUMBER || tokens[first + 1].type == VARIABLE_NAME)
+		if (token1.type == NUMBER || token1.type == VARIABLE_NAME)
 		{
-			result = tokens[first+1].GetDoubleValue();
+			result = token1.GetDoubleValue();
 			return true;
 		}
 	}
