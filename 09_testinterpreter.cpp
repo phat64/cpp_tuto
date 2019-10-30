@@ -1000,22 +1000,23 @@ int FindChar(const vector<Token> & tokens, int first, int last, char c, int dir 
 	{
 		for (int idx = first; idx < last; idx++)
 		{
+			const Token & currentToken = tokens[idx];
+
 			if (checkDepth)
 			{
-				if (tokens[idx].cvalue == '(' || tokens[idx].cvalue == '[')
+				if (currentToken.cvalue == '(' || currentToken.cvalue == '[')
 				{
 					depth++;
 				}
 
-				if (tokens[idx].cvalue == ')' || tokens[idx].cvalue == ']')
+				if (currentToken.cvalue == ')' || currentToken.cvalue == ']')
 				{
 					depth--;
 				}
 			}
 
-			if (depth == 0 && (tokens[idx].strvalue[0] == c || tokens[idx].cvalue == c))
+			if (depth == 0 && (currentToken.strvalue[0] == c || currentToken.cvalue == c))
 			{
-
 				return idx;
 			}
 		}
@@ -1024,22 +1025,23 @@ int FindChar(const vector<Token> & tokens, int first, int last, char c, int dir 
 	{
 		for (int idx = last-1; idx >= first; idx--)
 		{
+			const Token & currentToken = tokens[idx];
+
 			if (checkDepth)
 			{
-				if (tokens[idx].cvalue == '(' || tokens[idx].cvalue == '[')
+				if (currentToken.cvalue == '(' || currentToken.cvalue == '[')
 				{
 					depth++;
 				}
 
-				if (tokens[idx].cvalue == ')' || tokens[idx].cvalue == ']')
+				if (currentToken.cvalue == ')' || currentToken.cvalue == ']')
 				{
 					depth--;
 				}
 			}
 
-			if (depth == 0 && (tokens[idx].strvalue[0] == c || tokens[idx].cvalue == c))
+			if (depth == 0 && (currentToken.strvalue[0] == c || currentToken.cvalue == c))
 			{
-
 				return idx;
 			}
 		}
