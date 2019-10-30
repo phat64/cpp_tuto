@@ -941,8 +941,8 @@ bool Compute3(double & result, const vector<Token> & tokens, int first)
 			}*/
 			return true;
 		}
-		// (N)
-		if (token1.type == NUMBER || token1.type == VARIABLE_NAME)
+		// (N) or (S)
+		if (token1.type == NUMBER || token1.type == VARIABLE_NAME || token1.type == STRING)
 		{
 			result = token1.GetDoubleValue();
 			return true;
