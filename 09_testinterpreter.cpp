@@ -672,20 +672,24 @@ bool Check3(const vector<Token> & tokens, int idx)
 {
 	const char * validcombo[] = {"(N)", "(S)", "NON", "F[]", "ERN", "{N}", "{S}", "{;}", NULL};
 
+	const Token & token0 = tokens[idx];
+	const Token & token1 = tokens[idx + 1];
+	const Token & token2 = tokens[idx + 2];
+
 	for (int i = 0; validcombo[i]; i++)
 	{
-		if (tokens[idx + 0].cvalue == validcombo[i][0]
-			&& tokens[idx + 1].cvalue == validcombo[i][1]
-			&& tokens[idx + 2].cvalue == validcombo[i][2])
+		if (token0.cvalue == validcombo[i][0]
+			&& token1.cvalue == validcombo[i][1]
+			&& token2.cvalue == validcombo[i][2])
 		{
 			return true;
 		}
 	}
 
 	// special case : 'Variable = Number' or 'Variable = Variable' or 'Variable = ('
-	if (tokens[idx + 0].type == VARIABLE_NAME
-		&& tokens[idx + 1].cvalue == '='
-		&& tokens[idx + 2].cvalue == 'N')
+	if (token0.type == VARIABLE_NAME
+		&& token1.cvalue == '='
+		&& token2.cvalue == 'N')
 	{
 		return true;
 	}
