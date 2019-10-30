@@ -738,12 +738,14 @@ bool CheckParenthesis(const vector<Token> & tokens, int first, int last)
 	// check classic parenthesis
 	for (int i = first; i < last; i++)
 	{
-		if (tokens[i].cvalue == '(')
+		const Token & token = tokens[i];
+
+		if (token.cvalue == '(')
 		{
 			depth++;
 		}
 
-		if (tokens[i].cvalue == ')')
+		if (token.cvalue == ')')
 		{
 			depth--;
 			if (depth < 0)
@@ -759,12 +761,14 @@ bool CheckParenthesis(const vector<Token> & tokens, int first, int last)
 	// check function start / end
 	for (int i = first; i < last; i++)
 	{
-		if (tokens[i].cvalue == '[')
+		const Token & token = tokens[i];
+
+		if (token.cvalue == '[')
 		{
 			depth++;
 		}
 
-		if (tokens[i].cvalue == ']')
+		if (token.cvalue == ']')
 		{
 			depth--;
 			if (depth < 0)
