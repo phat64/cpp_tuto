@@ -248,7 +248,8 @@ struct Token
 		else if (c == '+' || c == '-' || c == '*' || c == '/'
 			|| (c == '&' && c2 == '&')
 			|| (c == '|' && c2 == '|')
-			|| (c == '=' && c2 == '='))
+			|| (c == '=' && c2 == '=')
+			|| (c == '!' && c2 == '='))
 		{
 			type = OPERATOR;
 			cvalue = 'O';
@@ -301,7 +302,7 @@ struct Token
 		{
 			*this = Token(c);
 		}
-		else if	((c == '&' && c2 == '&') || (c == '|' && c2 == '|') || (c == '=' && c2 == '='))
+		else if	((c == '&' && c2 == '&') || (c == '|' && c2 == '|') || (c == '=' && c2 == '=') || (c == '!' && c2 == '='))
 		{
 			*this = Token(c, c2);
 			strvalue[0] = c;
@@ -499,7 +500,7 @@ void Tokenize(vector<Token> & tokens, const string & str)
 		{
 			tokens.push_back(Token(c));
 		}
-		else if ((c == '&' && c2 == '&') || (c == '|' && c2 == '|') || (c == '=' && c2 == '='))
+		else if ((c == '&' && c2 == '&') || (c == '|' && c2 == '|') || (c == '=' && c2 == '=') || (c == '!' && c2 == '='))
 		{
 			char tmp[3] = {c, c2, '\0'};
 			tokens.push_back(Token(tmp));
@@ -926,6 +927,7 @@ double Compute(double a, char op, double b)
 		case '&': result = double(a != 0.0 && b != 0.0); break;
 		case '|': result = double(a != 0.0 || b != 0.0); break;
 		case '=': result = double(a == b); break; // TODO: need an epsilon
+		case '!': result = double(a != b); break;
 		default :
 #if USE_STL
 			cout << "[Compute] unknown operator " << op << endl;
