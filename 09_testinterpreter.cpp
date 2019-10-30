@@ -2303,7 +2303,9 @@ int main(int argc, char ** argv)
 
 	// assertions for the strings + code (easy)
 	assert(0.0 == Evaluate("return \"\"")); // test return empty string ""
-	assert(0xcbf43926 == Evaluate("return \"123456789\"")); // test return "123456789"
+	assert(0.0 == Evaluate("(\"\")")); // test '("")'
+	assert(0xcbf43926 == Evaluate("(\"123456789\")")); // test '("123456789")'
+	assert(0xcbf43926 == Evaluate("return \"123456789\"")); // test 'return "123456789"'
 	assert(0xcbf43926 == Evaluate("max(\"\", \"123456789\")")); // test function + string
 	assert(0xcbf43926 == Evaluate("return max(\"\", \"123456789\")")); // test return + function + string
 
