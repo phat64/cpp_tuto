@@ -707,26 +707,29 @@ bool CheckCombo(const vector<Token> & tokens, int idx0, int idx1)
 		"=N", "=(", "=F",
 		"S,", ",S", "(S", "S)","[S", "S]", "S;", ";S", "RS", NULL};
 
+	const Token & token0 = tokens[idx0];
+	const Token & token1 = tokens[idx1];
+
 	for (int i = 0; validcombo[i]; i++)
 	{
-		if (tokens[idx0].cvalue == validcombo[i][0]
-			&& tokens[idx1].cvalue == validcombo[i][1])
+		if (token0.cvalue == validcombo[i][0]
+			&& token1.cvalue == validcombo[i][1])
 		{
 			return true;
 		}
 	}
 
 	// special case : only 'Variable ='  is accepted
-	if (tokens[idx0].type == VARIABLE_NAME
-		&& tokens[idx1].cvalue == '=')
+	if (token0.type == VARIABLE_NAME
+		&& token1.cvalue == '=')
 	{
 		return true;
 	}
 
 #if USE_STL
-	cout << "[CheckCombo] wrong combo " << tokens[idx0].cvalue << tokens[idx1].cvalue << endl;
+	cout << "[CheckCombo] wrong combo " << token0.cvalue << token1.cvalue << endl;
 #else
-	printf("[CheckCombo] wrong combo %c%c\n", tokens[idx0].cvalue, tokens[idx1].cvalue);
+	printf("[CheckCombo] wrong combo %c%c\n", token0.cvalue, token1.cvalue);
 #endif
 	return false;
 }
