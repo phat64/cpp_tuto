@@ -791,8 +791,15 @@ bool CheckVariables(const vector<Token> & tokens, int first, int last)
 			bool found = false;
 			VariableType typeNotUsed;
 
-			if (!GetVariablePtr(NULL, currentToken.strvalue, typeNotUsed)
-				&& !(GetConstanteValue(NULL, currentToken.strvalue, found) && found))
+			if (GetVariablePtr(NULL, currentToken.strvalue, typeNotUsed))
+			{
+				found = true;
+			}
+			else if (GetConstanteValue(NULL, currentToken.strvalue, found))
+			{
+			}
+
+			if (!found)
 			{
 #if USE_STL
 				cout << "error : variable not found : " << currentToken.strvalue << endl;
