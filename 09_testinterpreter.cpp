@@ -659,13 +659,16 @@ bool Check1(const vector<Token> & tokens, int idx)
 
 bool Check2(const vector<Token> & tokens, int idx)
 {
+	const Token & token0 = tokens[idx];
+	const Token & token1 = tokens[idx + 1];
+
 	return	(
-			(tokens[idx].type == RETURN || tokens[idx].type == ELSE)
-			&& (tokens[idx + 1].type == NUMBER || tokens[idx + 1].type == VARIABLE_NAME || tokens[idx + 1].type == STRING)
+			(token0.type == RETURN || token0.type == ELSE)
+			&& (token1.type == NUMBER || token1.type == VARIABLE_NAME || token1.type == STRING)
 		)
 		||
-			(tokens[idx].type == SCOPE && tokens[idx].cvalue == '{'
-			&& tokens[idx + 1].type == SCOPE && tokens[idx + 1].cvalue == '}');
+			(token0.type == SCOPE && token0.cvalue == '{'
+			&& token1.type == SCOPE && token1.cvalue == '}');
 }
 
 bool Check3(const vector<Token> & tokens, int idx)
