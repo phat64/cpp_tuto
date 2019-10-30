@@ -1844,21 +1844,23 @@ bool GetGenericExpression(const vector<Token> & tokens, int first, int last, int
 		return false;
 	}
 
-	if (tokens[idx].type == token_type)
+	const Token & currentToken = tokens[idx];
+	if (currentToken.type == token_type)
 	{
 		int depth = 0;
-		if (tokens[idx].cvalue == token_cvalue_begin)
+		if (currentToken.cvalue == token_cvalue_begin)
 		{
 			firstIdx = idx;
 			for(;idx < last;idx++)
 			{
-				if (tokens[idx].type == token_type)
+				const Token & currentToken = tokens[idx];
+				if (currentToken.type == token_type)
 				{
-					if (tokens[idx].cvalue == token_cvalue_begin)
+					if (currentToken.cvalue == token_cvalue_begin)
 					{
 						depth++;
 					}
-					else if (tokens[idx].cvalue == token_cvalue_end)
+					else if (currentToken.cvalue == token_cvalue_end)
 					{
 						depth--;
 						if (depth == 0)
@@ -1870,14 +1872,15 @@ bool GetGenericExpression(const vector<Token> & tokens, int first, int last, int
 				}
 			}
 		}
-		else if (tokens[idx].cvalue == token_cvalue_end)
+		else if (currentToken.cvalue == token_cvalue_end)
 		{
 			lastIdx = idx + 1;
 			for(;idx >= first;idx--)
 			{
-				if (tokens[idx].type == token_type)
+				const Token & currentToken = tokens[idx];
+				if (currentToken.type == token_type)
 				{
-					if (tokens[idx].cvalue == token_cvalue_begin)
+					if (currentToken.cvalue == token_cvalue_begin)
 					{
 						depth++;
 						if (depth == 0)
@@ -1887,7 +1890,7 @@ bool GetGenericExpression(const vector<Token> & tokens, int first, int last, int
 						}
 
 					}
-					else if (tokens[idx].cvalue == token_cvalue_end)
+					else if (currentToken.cvalue == token_cvalue_end)
 					{
 						depth--;
 					}
