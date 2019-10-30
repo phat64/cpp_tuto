@@ -654,7 +654,9 @@ void PrintTokensList(const vector<Token> & tokens, int first, int last)
 
 bool Check1(const vector<Token> & tokens, int idx)
 {
-	return tokens[idx].type == NUMBER || tokens[idx].type == VARIABLE_NAME || tokens[idx].type == STRING;
+	const Token & token = tokens[idx];
+
+	return token.type == NUMBER || token.type == VARIABLE_NAME || token.type == STRING;
 }
 
 bool Check2(const vector<Token> & tokens, int idx)
