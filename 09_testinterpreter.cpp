@@ -2187,6 +2187,15 @@ int main(int argc, char ** argv)
 	assert(222.0 == Evaluate("111; return 222;333"));
 	assert(333.0 == Evaluate("111; 222; return 333"));
 
+	// assertion for equality checks
+	assert(1.0 == Evaluate("2 == 2"));
+	assert(1.0 == Evaluate("pi == pi"));
+	assert(1.0 == Evaluate("1 != 2"));
+	assert(1.0 == Evaluate("pi != 999"));
+	assert(0.0 == Evaluate("2 != 2"));
+	assert(0.0 == Evaluate("999 != 999"));
+	assert(0.0 == Evaluate("pi != pi"));
+
 	// assertion for boolean operations checks
 	assert(1 && 0 == Evaluate("1 && 0"));
 	assert(1 || 0 == Evaluate("1 || 0"));
