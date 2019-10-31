@@ -2301,9 +2301,8 @@ int main(int argc, char ** argv)
 	assert(0.0 == script.Evaluate("!1"));
 	assert(0.0 == script.Evaluate("!2 == 2"));
 	assert(1.0 == script.Evaluate("!2 != 2"));
-	//printf("!!2==2 : %d\n", !!2==2);
-	//printf("!!pi == pi : %d\n", !!pi == pi);
-	//assert(1.0 == script.Evaluate("!!pi == pi")); -> broken
+	assert((!!2==2) == script.Evaluate("!!2==2"));
+	assert((!!pi == pi) == script.Evaluate("!!pi == pi"));
 
 	// assertion for simple/direct if checks
 	assert(22 == script.Evaluate("if (1) return 22"));
