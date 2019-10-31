@@ -260,7 +260,7 @@ private:
 
 enum TokenType
 {
-	NONE, NUMBER, STRING, OPERATOR, PARENTHESIS, COMMA,
+	NONE, NUMBER, STRING, OPERATOR, UNARY_OPERATOR, PARENTHESIS, COMMA,
 	NAME, VARIABLE_NAME, FUNCTION_NAME, /* NAME =  VARIABLE_NAME or FUNCTION_NAME*/
 	FUNCTION_ARGS_BEGIN, FUNCTION_ARGS_SEPARATOR, FUNCTION_ARGS_END, /* ( , ) */
 	IF, ELSE, RETURN, SEMICOLON, SCOPE, /* SEMICOLON = ';'*/
@@ -541,11 +541,24 @@ void Tokenize(vector<Token> & tokens, const string & str)
 		else if (c == '+' || c == '-' || c == '*' || c == '/')
 		{
 			// check NEGATIVE (UNARY OPERATOR)
-			if (c == '-'&& (tokens.empty() || tokens[tokens.size() - 1].cvalue != 'N'))
+			/*if (c == '-'&& (tokens.empty() || tokens[tokens.size() - 1].cvalue != 'N'))
 			{
 				tokens.push_back(Token("0"));
+			}*/
+			Token t(c);
+			if (c == '-')
+			{
+				if (tokens.empty())
+				{
+					tokens.push_back(Token("0")); // simple case
+				}
+				else if (tokens[tokens.size() - 1].cvalue != 'N')
+				{
+					t.type = UNARY_OPERATOR;
+					t.cvalue = 'U';
+				}
 			}
-			tokens.push_back(Token(c));
+			tokens.push_back(t);
 		}
 		else if ((c == '&' && c2 == '&') || (c == '|' && c2 == '|')
 			|| (c == '=' && c2 == '=') || (c == '!' && c2 == '='))
