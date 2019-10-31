@@ -2340,8 +2340,12 @@ int main(int argc, char ** argv)
 	// assertion for unary operator checks
 	assert(-5.0 == script.Evaluate("-5"));
 	assert(-10.0 == script.Evaluate("-5-5"));
-	//assert(25.0 == script.Evaluate("-5*-5")); -> broken
-	//printf("-5*-5 %d\n", -5*-5);
+	assert(25.0 == script.Evaluate("-5*-5"));
+	assert(25.0 == script.Evaluate("-5*(-5)"));
+	assert(25.0 == script.Evaluate("(-5)*(-5)"));
+	assert(25.0 == script.Evaluate("(-5)*-5"));
+	assert(-25.0 == script.Evaluate("-5*-(-5)"));
+	assert(25.0 == script.Evaluate("-5*-(-(-5))"));
 	assert(1.0 == script.Evaluate("!0"));
 	assert(0.0 == script.Evaluate("!1"));
 	assert(0.0 == script.Evaluate("!2 == 2"));
