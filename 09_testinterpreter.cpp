@@ -215,6 +215,14 @@ unsigned int ComputeCRC32(const void * buffer, size_t len, unsigned int crc = 0x
 
 void* GetFunctionAddr(const char* functionName, size_t & nbParams);
 
+
+// ----------------------- EVALUATE PROTOTYPES -------------------------------
+
+class string;
+struct ScriptEngineContext;
+
+double Evaluate(const string & str, struct ScriptEngineContext * ctx = NULL);
+
 // -------------------------- SCRIPT CONTEXT ---------------------------------
 
 typedef void* (*GetVariablePtrCallback) (void *handle, const char * variableName, VariableType & type);
@@ -230,6 +238,21 @@ struct ScriptEngineContext
 	GetConstanteValueCallback pGetConstanteValueCallback;
 	GetFunctionAddrCallback pGetFunctionAddrCallback;
 };
+
+class ScriptEngine
+{
+public:
+	ScriptEngine(ScriptEngineContext * ctx = NULL) : pCtx(ctx) {}
+
+	double Evaluate(const string & str)
+	{
+		return ::Evaluate(str, pCtx);
+	}
+
+private:
+	ScriptEngineContext * pCtx;
+};
+
 
 // ------------------------------- TOKEN -------------------------------------
 
@@ -2159,7 +2182,7 @@ void PriorizeFunctions(vector<Token> & tokens, int & first, int & last)
 	}
 }
 
-double Evaluate(const string & str, struct ScriptEngineContext * ctx = NULL)
+double Evaluate(const string & str, struct ScriptEngineContext * ctx)
 {
 	vector<Token> tokens;
 	Tokenize(tokens, str);
