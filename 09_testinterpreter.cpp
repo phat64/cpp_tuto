@@ -696,14 +696,28 @@ void TokenizePostProcess(vector<Token> & tokens)
 			Token & prev = tokens[i - 1];
 			Token & cur = tokens[i];
 			Token & next = tokens[i + 1];
-			if (prev.type == OPERATOR && cur.type == UNARY_OPERATOR)
+			if (cur.type == UNARY_OPERATOR)
 			{
-				cur = Token('-');
 				if (next.cvalue == 'N')
 				{
+					cur = Token('-');
 					tokens.insert(tokens.begin() + i, Token("("));
 					tokens.insert(tokens.begin() + i + 1, Token("0"));
 					tokens.insert(tokens.begin() + i + 4, Token(")"));
+				}
+				else if (next.cvalue == '(')
+				{
+					int firstIdx;
+					int lastIdx;
+
+					if (GetParenthesedExpression(tokens, 0, tokens.size(), i+1,
+						firstIdx, lastIdx))
+					{
+						cur = Token('-');
+						tokens.insert(tokens.begin() + i, Token("("));
+						tokens.insert(tokens.begin() + i + 1, Token("0"));
+						tokens.insert(tokens.begin() + lastIdx + 2, Token(")"));
+					}
 				}
 			}
 		}
