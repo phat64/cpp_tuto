@@ -112,6 +112,7 @@ public:
 	}
 
 	size_t size() const { return m_size;}
+	bool empty() const { return m_size == 0;}
 	T* begin(){ return m_data;}
 	T* end() { return m_data + m_size;}
 
@@ -539,13 +540,24 @@ void Tokenize(vector<Token> & tokens, const string & str)
 		}
 		else if (c == '+' || c == '-' || c == '*' || c == '/')
 		{
+			// check NEGATIVE (UNARY OPERATOR)
+			if (c == '-'&& (tokens.empty() || tokens[tokens.size() - 1].cvalue != 'N'))
+			{
+				tokens.push_back(Token("0"));
+			}
 			tokens.push_back(Token(c));
 		}
-		else if ((c == '&' && c2 == '&') || (c == '|' && c2 == '|') || (c == '=' && c2 == '=') || (c == '!' && c2 == '='))
+		else if ((c == '&' && c2 == '&') || (c == '|' && c2 == '|')
+			|| (c == '=' && c2 == '=') || (c == '!' && c2 == '='))
 		{
 			char tmp[3] = {c, c2, '\0'};
 			tokens.push_back(Token(tmp));
 			s++;
+		}
+		else if (c == '!') // check the boolean NOT (UNARY OPERATOR)
+		{
+			tokens.push_back(Token("0"));
+			tokens.push_back(Token('=', '='));
 		}
 		else if (c == '=' && c2!='=')
 		{
