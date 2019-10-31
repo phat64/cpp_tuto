@@ -2377,9 +2377,10 @@ int main(int argc, char ** argv)
 	assert(pi == script.Evaluate("pi = max(555 + 999 * 777, 999)"));
 	assert(pi == script.Evaluate("pi = cos(0.0)"));
 
+	// check variable modification
 	assert(777.0 == script.Evaluate("if (abc = 777) return abc;"));
 	assert(777.0 == script.Evaluate("return abc"));
-	// assert(777.0 == script.Evaluate("return abc;")); -> broken
+	assert(777.0 == script.Evaluate("return abc;"));
 
 	while (true)
 	{
