@@ -2214,143 +2214,145 @@ int main(int argc, char ** argv)
 	ctx.pGetConstanteValueCallback = GetConstanteValue;
 	ctx.pGetFunctionAddrCallback = GetFunctionAddr;
 
+	struct ScriptEngine script(&ctx);
+
 	// assertion for constants check
-	assert(42 == Evaluate("42"));
-	assert(2.5 == Evaluate("5/2"));
+	assert(42 == script.Evaluate("42"));
+	assert(2.5 == script.Evaluate("5/2"));
 
 	// assertion of binary operations check
-	assert(99 + 42 == Evaluate("99 + 42"));
-	assert(99 * 42 == Evaluate("99 * 42"));
-	assert(11 + 22 * 33 == Evaluate("11 + 22 * 33"));
-	assert(36.0 + 50.0 * 100.0 / 2.0 * 3.0 == Evaluate("36 + 50 * 100 / 2 * 3"));
-	assert(99.0 * 56.0 + 25.0 * 37.0 / 3.0 * 5.0 == Evaluate("99 * 56 + 25 * 37 / 3 * 5"));
+	assert(99 + 42 == script.Evaluate("99 + 42"));
+	assert(99 * 42 == script.Evaluate("99 * 42"));
+	assert(11 + 22 * 33 == script.Evaluate("11 + 22 * 33"));
+	assert(36.0 + 50.0 * 100.0 / 2.0 * 3.0 == script.Evaluate("36 + 50 * 100 / 2 * 3"));
+	assert(99.0 * 56.0 + 25.0 * 37.0 / 3.0 * 5.0 == script.Evaluate("99 * 56 + 25 * 37 / 3 * 5"));
 
 	// assertion for variables check
-	assert(pi == Evaluate("pi", &ctx));
-	assert(2.0 * pi == Evaluate("2 * pi", &ctx));
+	assert(pi == script.Evaluate("pi"));
+	assert(2.0 * pi == script.Evaluate("2 * pi"));
 
 	// assertion for functions check (simple)
-	assert(55.0 == Evaluate("max(55,22)", &ctx));
-	assert(55.0 == Evaluate("max(22,55)", &ctx));
-	assert(1.0 == Evaluate("cos(0)", &ctx));
-	assert(cos(pi) == Evaluate("cos(pi)", &ctx));
-	assert(cos(2 * pi) == Evaluate("cos(2 * pi)", &ctx));
+	assert(55.0 == script.Evaluate("max(55,22)"));
+	assert(55.0 == script.Evaluate("max(22,55)"));
+	assert(1.0 == script.Evaluate("cos(0)"));
+	assert(cos(pi) == script.Evaluate("cos(pi)"));
+	assert(cos(2 * pi) == script.Evaluate("cos(2 * pi)"));
 
 	// assertion for functions check (multiple functions or "function inception")
-	assert(cos(cos(0.5 * pi)) == Evaluate("cos(cos(0.5 * pi))", &ctx));
-	assert(cos(0) + cos(0) + cos(cos(0.5*pi)) == Evaluate("cos(0) + cos(0) + cos(cos(0.5*pi))", &ctx));
-	assert(99.0 == Evaluate("max(22,max(99,55))", &ctx));
-	assert(99.0 == Evaluate("max(max(99,55), 22)", &ctx));
-	assert(44.0 == Evaluate("max(max(11,22), max(33,44))", &ctx));
-	assert(44.0 == Evaluate("max(max(33,44), max(11,22))", &ctx));
-	assert(45.0 == Evaluate("max(max(11,22) + 1, max(33,44) + 1)", &ctx));
-	assert(45.0 == Evaluate("max(max(33,44) + 1, max(11,22) + 1)", &ctx));
+	assert(cos(cos(0.5 * pi)) == script.Evaluate("cos(cos(0.5 * pi))"));
+	assert(cos(0) + cos(0) + cos(cos(0.5*pi)) == script.Evaluate("cos(0) + cos(0) + cos(cos(0.5*pi))"));
+	assert(99.0 == script.Evaluate("max(22,max(99,55))"));
+	assert(99.0 == script.Evaluate("max(max(99,55), 22)"));
+	assert(44.0 == script.Evaluate("max(max(11,22), max(33,44))"));
+	assert(44.0 == script.Evaluate("max(max(33,44), max(11,22))"));
+	assert(45.0 == script.Evaluate("max(max(11,22) + 1, max(33,44) + 1)"));
+	assert(45.0 == script.Evaluate("max(max(33,44) + 1, max(11,22) + 1)"));
 
 	// assertion for returns check
-	assert(123.0 == Evaluate("return 123", &ctx));
-	assert(pi == Evaluate("return pi", &ctx));
-	assert(cos(1.0) == Evaluate("return cos(1)", &ctx));
-	assert(33.0 == Evaluate("return max(22,33)", &ctx));
-	assert(cos(0.25 * pi) == Evaluate("return cos(0.25 * pi)", &ctx));
-	assert(11.0 + 22.0 * 2.0 + 5.0 == Evaluate("return 11 + 22 * 2 + 5", &ctx));
-	assert(11.0 + 22.0 * (2.0 + 5.0) == Evaluate("return (11 + 22 * (2 + 5))", &ctx));
+	assert(123.0 == script.Evaluate("return 123"));
+	assert(pi == script.Evaluate("return pi"));
+	assert(cos(1.0) == script.Evaluate("return cos(1)"));
+	assert(33.0 == script.Evaluate("return max(22,33)"));
+	assert(cos(0.25 * pi) == script.Evaluate("return cos(0.25 * pi)"));
+	assert(11.0 + 22.0 * 2.0 + 5.0 == script.Evaluate("return 11 + 22 * 2 + 5"));
+	assert(11.0 + 22.0 * (2.0 + 5.0) == script.Evaluate("return (11 + 22 * (2 + 5))"));
 
 	// assertion for multiple statements check
-	assert(111.0 == Evaluate("return 111; return 222; return 333", &ctx));
-	assert(222.0 == Evaluate("111; return 222;333", &ctx));
-	assert(333.0 == Evaluate("111; 222; return 333", &ctx));
+	assert(111.0 == script.Evaluate("return 111; return 222; return 333"));
+	assert(222.0 == script.Evaluate("111; return 222;333"));
+	assert(333.0 == script.Evaluate("111; 222; return 333"));
 
 	// assertion for equality checks
-	assert(1.0 == Evaluate("2 == 2", &ctx));
-	assert(1.0 == Evaluate("pi == pi", &ctx));
-	assert(1.0 == Evaluate("1 != 2", &ctx));
-	assert(1.0 == Evaluate("pi != 999", &ctx));
-	assert(0.0 == Evaluate("2 != 2", &ctx));
-	assert(0.0 == Evaluate("999 != 999", &ctx));
-	assert(0.0 == Evaluate("pi != pi", &ctx));
+	assert(1.0 == script.Evaluate("2 == 2"));
+	assert(1.0 == script.Evaluate("pi == pi"));
+	assert(1.0 == script.Evaluate("1 != 2"));
+	assert(1.0 == script.Evaluate("pi != 999"));
+	assert(0.0 == script.Evaluate("2 != 2"));
+	assert(0.0 == script.Evaluate("999 != 999"));
+	assert(0.0 == script.Evaluate("pi != pi"));
 
 	// assertion for boolean operations checks
-	assert(1 && 0 == Evaluate("1 && 0", &ctx));
-	assert(1 || 0 == Evaluate("1 || 0", &ctx));
-	assert(1 + 1 && 0 + 1 == Evaluate("1 + 1 && 0 + 1", &ctx));
-	assert(0 + 1 || 0 + 1 == Evaluate("0 + 1 || 0 + 1", &ctx));
-	assert(1 || 1 && 0 == Evaluate("1 || 1 && 0", &ctx));
-	assert((1 == 2 && 2 == 1) == Evaluate("1 == 2 && 2 == 1", &ctx));
-	assert((1 + 1 && 2 == 2) == Evaluate("1 + 1 && 2 == 2", &ctx));
+	assert(1 && 0 == script.Evaluate("1 && 0"));
+	assert(1 || 0 == script.Evaluate("1 || 0"));
+	assert(1 + 1 && 0 + 1 == script.Evaluate("1 + 1 && 0 + 1"));
+	assert(0 + 1 || 0 + 1 == script.Evaluate("0 + 1 || 0 + 1"));
+	assert(1 || 1 && 0 == script.Evaluate("1 || 1 && 0"));
+	assert((1 == 2 && 2 == 1) == script.Evaluate("1 == 2 && 2 == 1"));
+	assert((1 + 1 && 2 == 2) == script.Evaluate("1 + 1 && 2 == 2"));
 
 	// assertion for simple/direct if checks
-	assert(22 == Evaluate("if (1) return 22", &ctx));
-	assert(22 == Evaluate("if (1) return 22;", &ctx));
-	assert(22 == Evaluate("if (1) return 22; return 33", &ctx));
-	assert(22 == Evaluate("if (1) return 22; return 33;", &ctx));
-	assert(33 == Evaluate("if (0) return 22; return 33", &ctx));
-	assert(33 == Evaluate("if (0) return 22; return 33;", &ctx));
+	assert(22 == script.Evaluate("if (1) return 22"));
+	assert(22 == script.Evaluate("if (1) return 22;"));
+	assert(22 == script.Evaluate("if (1) return 22; return 33"));
+	assert(22 == script.Evaluate("if (1) return 22; return 33;"));
+	assert(33 == script.Evaluate("if (0) return 22; return 33"));
+	assert(33 == script.Evaluate("if (0) return 22; return 33;"));
 
 	// assertion for if+simple condition checks
-	assert(33 == Evaluate("if (0 && 0) return 22; return 33;", &ctx));
-	assert(33 == Evaluate("if (1 && 0) return 22; return 33;", &ctx));
-	assert(33 == Evaluate("if (0 && 1) return 22; return 33;", &ctx));
-	assert(22 == Evaluate("if (1 && 1) return 22; return 33;", &ctx));
-	assert(33 == Evaluate("if (0 || 0) return 22; return 33;", &ctx));
-	assert(22 == Evaluate("if (1 || 0) return 22; return 33;", &ctx));
-	assert(22 == Evaluate("if (0 || 1) return 22; return 33;", &ctx));
-	assert(22 == Evaluate("if (1 || 1) return 22; return 33;", &ctx));
+	assert(33 == script.Evaluate("if (0 && 0) return 22; return 33;"));
+	assert(33 == script.Evaluate("if (1 && 0) return 22; return 33;"));
+	assert(33 == script.Evaluate("if (0 && 1) return 22; return 33;"));
+	assert(22 == script.Evaluate("if (1 && 1) return 22; return 33;"));
+	assert(33 == script.Evaluate("if (0 || 0) return 22; return 33;"));
+	assert(22 == script.Evaluate("if (1 || 0) return 22; return 33;"));
+	assert(22 == script.Evaluate("if (0 || 1) return 22; return 33;"));
+	assert(22 == script.Evaluate("if (1 || 1) return 22; return 33;"));
 
 	// assertion for if+complex condition checks
-	assert(99 == Evaluate("if (pi == 111) return 88; return 99;", &ctx));
-	assert(88 == Evaluate("if (pi == pi && 1 == 1) return 88; return 99;", &ctx));
-	assert(3 * pi == Evaluate("if (pi == 111 || 1 == 1) return 3 * pi; return 5 * pi;", &ctx));
+	assert(99 == script.Evaluate("if (pi == 111) return 88; return 99;"));
+	assert(88 == script.Evaluate("if (pi == pi && 1 == 1) return 88; return 99;"));
+	assert(3 * pi == script.Evaluate("if (pi == 111 || 1 == 1) return 3 * pi; return 5 * pi;"));
 
 	// assertion for if/else checks
-	assert(111 == Evaluate("if (1) return 111; else return 222; return 333;", &ctx));
-	assert(222 == Evaluate("if (0) return 111; else return 222; return 333;", &ctx));
+	assert(111 == script.Evaluate("if (1) return 111; else return 222; return 333;"));
+	assert(222 == script.Evaluate("if (0) return 111; else return 222; return 333;"));
 
 	// assertion for double-if checks
-	assert(111 == Evaluate("if (1) if (1) return 111; return 555;", &ctx));
-	assert(555 == Evaluate("if (1) if (0) return 111; return 555;", &ctx));
-	assert(555 == Evaluate("if (0) if (1) return 111; return 555;", &ctx));
-	assert(555 == Evaluate("if (0) if (0) return 111; return 555;", &ctx));
+	assert(111 == script.Evaluate("if (1) if (1) return 111; return 555;"));
+	assert(555 == script.Evaluate("if (1) if (0) return 111; return 555;"));
+	assert(555 == script.Evaluate("if (0) if (1) return 111; return 555;"));
+	assert(555 == script.Evaluate("if (0) if (0) return 111; return 555;"));
 
 	// assertion for triple-if checks
-	assert(555 == Evaluate("if (0) if (0) if (0) return 111; return 555;", &ctx));
-	assert(555 == Evaluate("if (0) if (0) if (1) return 111; return 555;", &ctx));
-	assert(555 == Evaluate("if (0) if (1) if (0) return 111; return 555;", &ctx));
-	assert(555 == Evaluate("if (0) if (1) if (1) return 111; return 555;", &ctx));
-	assert(555 == Evaluate("if (1) if (0) if (0) return 111; return 555;", &ctx));
-	assert(555 == Evaluate("if (1) if (0) if (1) return 111; return 555;", &ctx));
-	assert(555 == Evaluate("if (1) if (1) if (0) return 111; return 555;", &ctx));
-	assert(111 == Evaluate("if (1) if (1) if (1) return 111; return 555;", &ctx));
+	assert(555 == script.Evaluate("if (0) if (0) if (0) return 111; return 555;"));
+	assert(555 == script.Evaluate("if (0) if (0) if (1) return 111; return 555;"));
+	assert(555 == script.Evaluate("if (0) if (1) if (0) return 111; return 555;"));
+	assert(555 == script.Evaluate("if (0) if (1) if (1) return 111; return 555;"));
+	assert(555 == script.Evaluate("if (1) if (0) if (0) return 111; return 555;"));
+	assert(555 == script.Evaluate("if (1) if (0) if (1) return 111; return 555;"));
+	assert(555 == script.Evaluate("if (1) if (1) if (0) return 111; return 555;"));
+	assert(111 == script.Evaluate("if (1) if (1) if (1) return 111; return 555;"));
 
 	// assertion for double-if-else checks
-	assert(111 == Evaluate("if (1) if (1) return 111; else return 555; return 777;", &ctx));
-	assert(555 == Evaluate("if (1) if (0) return 111; else return 555; return 777;", &ctx));
-	assert(555 == Evaluate("if (0) if (1) return 111; else return 555; return 777;", &ctx));
-	assert(555 == Evaluate("if (0) if (0) return 111; else return 555; return 777;", &ctx));
+	assert(111 == script.Evaluate("if (1) if (1) return 111; else return 555; return 777;"));
+	assert(555 == script.Evaluate("if (1) if (0) return 111; else return 555; return 777;"));
+	assert(555 == script.Evaluate("if (0) if (1) return 111; else return 555; return 777;"));
+	assert(555 == script.Evaluate("if (0) if (0) return 111; else return 555; return 777;"));
 
 	// assertion for triple-if-else checks
-	assert(555 == Evaluate("if (0) if (0) if (0) return 111; else return 555; return 777;", &ctx));
-	assert(555 == Evaluate("if (0) if (0) if (1) return 111; else return 555; return 777;", &ctx));
-	assert(555 == Evaluate("if (0) if (1) if (0) return 111; else return 555; return 777;", &ctx));
-	assert(555 == Evaluate("if (0) if (1) if (1) return 111; else return 555; return 777;", &ctx));
-	assert(555 == Evaluate("if (1) if (0) if (0) return 111; else return 555; return 777;", &ctx));
-	assert(555 == Evaluate("if (1) if (0) if (1) return 111; else return 555; return 777;", &ctx));
-	assert(555 == Evaluate("if (1) if (1) if (0) return 111; else return 555; return 777;", &ctx));
-	assert(111 == Evaluate("if (1) if (1) if (1) return 111; else return 555; return 777;", &ctx));
+	assert(555 == script.Evaluate("if (0) if (0) if (0) return 111; else return 555; return 777;"));
+	assert(555 == script.Evaluate("if (0) if (0) if (1) return 111; else return 555; return 777;"));
+	assert(555 == script.Evaluate("if (0) if (1) if (0) return 111; else return 555; return 777;"));
+	assert(555 == script.Evaluate("if (0) if (1) if (1) return 111; else return 555; return 777;"));
+	assert(555 == script.Evaluate("if (1) if (0) if (0) return 111; else return 555; return 777;"));
+	assert(555 == script.Evaluate("if (1) if (0) if (1) return 111; else return 555; return 777;"));
+	assert(555 == script.Evaluate("if (1) if (1) if (0) return 111; else return 555; return 777;"));
+	assert(111 == script.Evaluate("if (1) if (1) if (1) return 111; else return 555; return 777;"));
 
 	// assertion for scope checks
-	assert(99 == Evaluate("{{5+5;} return 99; 9+9;} return 123;", &ctx));
+	assert(99 == script.Evaluate("{{5+5;} return 99; 9+9;} return 123;"));
 
 	// assertion for if/else+scope checks
-	assert(789 == Evaluate("if (1) {return 789;}", &ctx));
-	assert(999 == Evaluate("if (0) {return 789;} else {return 999;}", &ctx));
-	assert(123 == Evaluate("if (1) return 123; else {return 555;}", &ctx));
-	assert(123 == Evaluate("if (1) {return 123;} else return 555;", &ctx));
-	assert(555 == Evaluate("if (0) return 123; else {return 555;}", &ctx));
-	assert(555 == Evaluate("if (0) {return 123;} else return 555;", &ctx));
+	assert(789 == script.Evaluate("if (1) {return 789;}"));
+	assert(999 == script.Evaluate("if (0) {return 789;} else {return 999;}"));
+	assert(123 == script.Evaluate("if (1) return 123; else {return 555;}"));
+	assert(123 == script.Evaluate("if (1) {return 123;} else return 555;"));
+	assert(555 == script.Evaluate("if (0) return 123; else {return 555;}"));
+	assert(555 == script.Evaluate("if (0) {return 123;} else return 555;"));
 
 	// assertion for multiple-"if/else+scope"
-	assert(pi == Evaluate("if (1) { if (1) {return pi;} }", &ctx));
-	assert(222 == Evaluate("if (1){ if (0) return 111;else {return 222;}}", &ctx));
+	assert(pi == script.Evaluate("if (1) { if (1) {return pi;} }"));
+	assert(222 == script.Evaluate("if (1){ if (0) return 111;else {return 222;}}"));
 
 	// assertions for the crc32
 	assert(0 == ComputeCRC32("", 0));
@@ -2358,26 +2360,26 @@ int main(int argc, char ** argv)
 	assert(0xcbf43926 == ComputeCRC32("123456789", 9));
 
 	// assertions for the strings (easy)
-	assert(0.0 == Evaluate("\"\"", &ctx)); // test empty string ""
-	assert(0xcbf43926 == Evaluate("\"123456789\"", &ctx)); // test "123456789"
+	assert(0.0 == script.Evaluate("\"\"")); // test empty string ""
+	assert(0xcbf43926 == script.Evaluate("\"123456789\"")); // test "123456789"
 
 	// assertions for the strings + code (easy)
-	assert(0.0 == Evaluate("return \"\"", &ctx)); // test return empty string ""
-	assert(0.0 == Evaluate("(\"\")", &ctx)); // test '("")'
-	assert(0xcbf43926 == Evaluate("(\"123456789\")", &ctx)); // test '("123456789")'
-	assert(0xcbf43926 == Evaluate("return \"123456789\"", &ctx)); // test 'return "123456789"'
-	assert(0xcbf43926 == Evaluate("max(\"\", \"123456789\")", &ctx)); // test function + string
-	assert(0xcbf43926 == Evaluate("return max(\"\", \"123456789\")", &ctx)); // test return + function + string
+	assert(0.0 == script.Evaluate("return \"\"")); // test return empty string ""
+	assert(0.0 == script.Evaluate("(\"\")")); // test '("")'
+	assert(0xcbf43926 == script.Evaluate("(\"123456789\")")); // test '("123456789")'
+	assert(0xcbf43926 == script.Evaluate("return \"123456789\"")); // test 'return "123456789"'
+	assert(0xcbf43926 == script.Evaluate("max(\"\", \"123456789\")")); // test function + string
+	assert(0xcbf43926 == script.Evaluate("return max(\"\", \"123456789\")")); // test return + function + string
 
 	// assertions for store + constante : the constante will not be modified (no warning message)
-	assert(pi == Evaluate("pi = 555", &ctx));
-	assert(pi == Evaluate("pi = 555 + 999 * 777", &ctx));
-	assert(pi == Evaluate("pi = max(555 + 999 * 777, 999)", &ctx));
-	assert(pi == Evaluate("pi = cos(0.0)", &ctx));
+	assert(pi == script.Evaluate("pi = 555"));
+	assert(pi == script.Evaluate("pi = 555 + 999 * 777"));
+	assert(pi == script.Evaluate("pi = max(555 + 999 * 777, 999)"));
+	assert(pi == script.Evaluate("pi = cos(0.0)"));
 
-	assert(777.0 == Evaluate("if (abc = 777) return abc;", &ctx));
-	assert(777.0 == Evaluate("return abc", &ctx));
-	// assert(777.0 == Evaluate("return abc;", &ctx)); -> broken
+	assert(777.0 == script.Evaluate("if (abc = 777) return abc;"));
+	assert(777.0 == script.Evaluate("return abc"));
+	// assert(777.0 == script.Evaluate("return abc;")); -> broken
 
 	while (true)
 	{
