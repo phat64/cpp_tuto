@@ -540,23 +540,12 @@ void Tokenize(vector<Token> & tokens, const string & str)
 		}
 		else if (c == '+' || c == '-' || c == '*' || c == '/')
 		{
-			// check NEGATIVE (UNARY OPERATOR)
-			/*if (c == '-'&& (tokens.empty() || tokens[tokens.size() - 1].cvalue != 'N'))
-			{
-				tokens.push_back(Token("0"));
-			}*/
 			Token t(c);
-			if (c == '-')
+			if (c == '-' && (tokens.empty() || tokens[tokens.size() - 1].cvalue != 'N'))
 			{
-				if (tokens.empty())
-				{
-					tokens.push_back(Token("0")); // simple case
-				}
-				else if (tokens[tokens.size() - 1].cvalue != 'N')
-				{
-					t.type = UNARY_OPERATOR;
-					t.cvalue = 'U';
-				}
+				// convert to unary operator
+				t.type = UNARY_OPERATOR;
+				t.cvalue = 'U';
 			}
 			tokens.push_back(t);
 		}
@@ -698,6 +687,34 @@ void TokenizePostProcess(vector<Token> & tokens)
 			lastToken.cvalue = 'N';
 		}
 	}
+
+
+	if (!tokens.empty())
+	{
+		for (size_t i = 1; i < tokens.size() - 1; i++)
+		{
+			Token & prev = tokens[i - 1];
+			Token & cur = tokens[i];
+			Token & next = tokens[i + 1];
+			if (prev.type == OPERATOR && cur.type == UNARY_OPERATOR)
+			{
+				cur = Token('-');
+				if (next.cvalue == 'N')
+				{
+					tokens.insert(tokens.begin() + i, Token("("));
+					tokens.insert(tokens.begin() + i + 1, Token("0"));
+					tokens.insert(tokens.begin() + i + 4, Token(")"));
+				}
+			}
+		}
+
+		Token & cur = tokens[0];
+		if (cur.type == UNARY_OPERATOR)
+		{
+			cur = Token('-');
+			tokens.insert(tokens.begin() + 0, Token("0"));
+		}
+	}
 }
 
 void PrintTokensList(const vector<Token> & tokens, int first, int last)
@@ -774,6 +791,7 @@ bool CheckCombo(const vector<Token> & tokens, int idx0, int idx1)
 {
 	const char * validcombo[] = {"((", "))",
 		"(N", "N)", "NO", "ON", "O(", ")O",
+		"OU", "UN", "UF", "U(", "(U", "RU", "EU", "=U",
 		"F[", "[F", ",F", "],", ")]", "]], ""[(", "[]", ",(", "),",
 		"[N", "N]", "N,", ",N", "OF", "]O",
 		"I(", ")I", "RN", "R(", ")R", "RF", ";R",
