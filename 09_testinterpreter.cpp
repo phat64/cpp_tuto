@@ -2292,6 +2292,19 @@ int main(int argc, char ** argv)
 	assert((1 == 2 && 2 == 1) == script.Evaluate("1 == 2 && 2 == 1"));
 	assert((1 + 1 && 2 == 2) == script.Evaluate("1 + 1 && 2 == 2"));
 
+	// assertion for unary operator checks
+	assert(-5.0 == script.Evaluate("-5"));
+	assert(-10.0 == script.Evaluate("-5-5"));
+	//assert(25.0 == script.Evaluate("-5*-5")); -> broken
+	//printf("-5*-5 %d\n", -5*-5);
+	assert(1.0 == script.Evaluate("!0"));
+	assert(0.0 == script.Evaluate("!1"));
+	assert(0.0 == script.Evaluate("!2 == 2"));
+	assert(1.0 == script.Evaluate("!2 != 2"));
+	//printf("!!2==2 : %d\n", !!2==2);
+	//printf("!!pi == pi : %d\n", !!pi == pi);
+	//assert(1.0 == script.Evaluate("!!pi == pi")); -> broken
+
 	// assertion for simple/direct if checks
 	assert(22 == script.Evaluate("if (1) return 22"));
 	assert(22 == script.Evaluate("if (1) return 22;"));
