@@ -7,6 +7,7 @@
 /*
  * A simple C-like interpreter with :
  *	- 4 binary operations *, /, +, - and parenthesis ( and ).
+ *	- 2 unary operations : neg(-) and not(!).
  *	- 2 binary boolean operations && and ||.
  *	- 1 comparaison operation ==.
  *	- 1 constante : pi.
@@ -21,7 +22,6 @@
  *
  * [TODO] => It's only for the tutorial. It's not for advanced developers and it's obviously not yet highly optimized ^^
  *	- It uses my old code. It needs more OOP.
- * 	- need the negative operator (unary operator).
  *	- need more math functions like sine or cosine.
  *	- need a bytecode translator/compiler and a Virtual Machine.
  */
