@@ -570,13 +570,14 @@ void Tokenize(vector<Token> & tokens, const string & str)
 		else if ((c == '&' && c2 == '&') || (c == '|' && c2 == '|')
 			|| (c == '=' && c2 == '=') || (c == '!' && c2 == '='))
 		{
-			char tmp[3] = {c, c2, '\0'};
-			tokens.push_back(Token(tmp));
+			tokens.push_back(Token(c, c2));
 			s++;
 		}
 		else if (c == '!') // check the boolean NOT (UNARY OPERATOR)
 		{
-			tokens.push_back(Token("0"));
+			static Token ZERO("0");
+
+			tokens.push_back(ZERO);
 			tokens.push_back(Token('=', '='));
 		}
 		else if (c == '=' && c2!='=')
@@ -704,17 +705,14 @@ void TokenizePostProcess(vector<Token> & tokens)
 			lastToken.type = VARIABLE_NAME;
 			lastToken.cvalue = 'N';
 		}
-	}
 
-
-	if (!tokens.empty())
-	{
-		for (size_t i = 1; i < tokens.size() - 1; i++)
+		// Step 3.1
+		// Replace NEG(-) by '0 - '
+		for (size_t i = 0; i < tokens.size() - 1; i++)
 		{
-			Token & prev = tokens[i - 1];
 			Token & cur = tokens[i];
 			Token & next = tokens[i + 1];
-			if (cur.type == UNARY_OPERATOR)
+			if (cur.type == UNARY_OPERATOR && cur.strvalue[0] == '-')
 			{
 				if (next.cvalue == 'N')
 				{
@@ -728,7 +726,7 @@ void TokenizePostProcess(vector<Token> & tokens)
 					int firstIdx;
 					int lastIdx;
 
-					if (GetParenthesedExpression(tokens, 0, tokens.size(), i+1,
+					if (GetParenthesedExpression(tokens, 0, tokens.size(), i + 1,
 						firstIdx, lastIdx))
 					{
 						cur = Token('-');
@@ -738,13 +736,6 @@ void TokenizePostProcess(vector<Token> & tokens)
 					}
 				}
 			}
-		}
-
-		Token & cur = tokens[0];
-		if (cur.type == UNARY_OPERATOR)
-		{
-			cur = Token('-');
-			tokens.insert(tokens.begin() + 0, Token("0"));
 		}
 	}
 }
@@ -1351,6 +1342,8 @@ void UpdateVariablesAddr(struct ScriptEngineContext * ctx, vector<Token> & token
 	}
 }
 
+// ------------------------------ FUNCTIONS ----------------------------------
+
 void UpdateFunctionsAddr(struct ScriptEngineContext * ctx, vector<Token> & tokens, int first, int last)
 {
 	GetFunctionAddrCallback pGetFunctionAddrCallback = NULL;
@@ -1374,9 +1367,6 @@ void UpdateFunctionsAddr(struct ScriptEngineContext * ctx, vector<Token> & token
 		}
 	}
 }
-
-// ------------------------------ FUNCTIONS ----------------------------------
-
 
 double CallFunction(const Token& function, vector<double> & args)
 {
