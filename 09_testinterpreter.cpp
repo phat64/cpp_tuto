@@ -312,6 +312,11 @@ struct Token
 			type = OPERATOR;
 			cvalue = 'O';
 		}
+		else if (c == '!' && c2 == '\0')
+		{
+			type = UNARY_OPERATOR;
+			cvalue = 'U';
+		}
 		else if (c == '=')
 		{
 			type = STORE;
@@ -360,14 +365,18 @@ struct Token
 		{
 			*this = Token(c);
 		}
-		else if	((c == '&' && c2 == '&') || (c == '|' && c2 == '|') || (c == '=' && c2 == '=') || (c == '!' && c2 == '='))
+		else if	((c == '&' && c2 == '&')	// AND
+			|| (c == '|' && c2 == '|')	// OR
+			|| (c == '=' && c2 == '=')	// EQUALS
+			|| (c == '!' && c2 == '=')	// NOT EQUALS
+			|| (c == '!' && c2 == '\0'))	// NOT
 		{
 			*this = Token(c, c2);
 			strvalue[0] = c;
 			strvalue[1] = c2;
 			strvalue[2] = '\0';
 		}
-		else if (c == '=')
+		else if (c == '=')			// STORE
 		{
 			*this = Token(c);
 		}
