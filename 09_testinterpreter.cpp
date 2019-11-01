@@ -740,6 +740,20 @@ void TokenizePostProcess(vector<Token> & tokens)
 						tokens.insert(tokens.begin() + lastIdx + 2, /* Token(")") */ PARENTHESIS_CLOSE);
 					}
 				}
+				else if (next.type = FUNCTION_NAME)
+				{
+					int firstIdx;
+					int lastIdx;
+
+					if (GetFunctionExpression(tokens, 0, tokens.size(), i + 1,
+						firstIdx, lastIdx))
+					{
+						cur = SUB;
+						tokens.insert(tokens.begin() + i, /* Token("(") */ PARENTHESIS_OPEN);
+						tokens.insert(tokens.begin() + i + 1, /* Token("0")*/ ZERO);
+						tokens.insert(tokens.begin() + lastIdx + 2, /* Token(")") */ PARENTHESIS_CLOSE);
+					}
+				}
 			}
 		}
 	}
@@ -820,7 +834,7 @@ bool CheckCombo(const vector<Token> & tokens, int idx0, int idx1)
 	const char * validcombo[] = {"((", "))",
 		"(N", "N)", "NO", "ON", "O(", ")O",
 		"OU", "UN", "UF", "U(", "(U", "RU", "EU", "=U",
-		"F[", "[F", ",F", "],", ")]", "]]", "[(", "[]", ",(", "),",
+		"F[", "[F", ",F", "],", ")]", "]]", "[(", "([", "])", "[]", ",(", "),",
 		"[N", "N]", "N,", ",N", "OF", "]O",
 		"I(", ")I", "RN", "R(", ")R", "RF", ";R",
 		";E", "EN", "ER", "E(", "EF", "E;",
