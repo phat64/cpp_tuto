@@ -1323,7 +1323,7 @@ void UpdateVariablesAddr(struct ScriptEngineContext * ctx, vector<Token> & token
 
 void UpdateFunctionsAddr(struct ScriptEngineContext * ctx, vector<Token> & tokens, int first, int last)
 {
-	if (ctx == NULL)
+	if (ctx == NULL || ctx->pGetFunctionAddrCallback == NULL)
 	{
 		return;
 	}
