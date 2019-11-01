@@ -714,20 +714,10 @@ void TokenizePostProcess(vector<Token> & tokens)
 		}
 
 		// Step 3.1
-		// [TODO] need more optimisation : too much loops when too much '!!'
 		// Replace NEG(-) by '0 - '
 		// Replace NOT(!) by '0 == '
 		bool restart = true;
 		size_t restartIdx = 0;
-		size_t counter = 0; // [optimisation] unary operators counter
-		for (size_t i = 0; i < tokens.size() - 1; i++)
-		{
-			Token & cur = tokens[i];
-			if (cur.type == UNARY_OPERATOR && (cur.strvalue[0] == '-' || cur.strvalue[0] == '!'))
-			{
-				counter++;
-			}
-		}
 		while (restart)
 		{
 			restart = false;
@@ -747,7 +737,6 @@ void TokenizePostProcess(vector<Token> & tokens)
 
 					if (next.cvalue == 'N')
 					{
-						counter--;
 						cur = REPLACE;
 						tokens.insert(tokens.begin() + i, /* Token("(") */ PARENTHESIS_OPEN);
 						tokens.insert(tokens.begin() + i + 1, /* Token("0")*/ ZERO);
@@ -761,7 +750,6 @@ void TokenizePostProcess(vector<Token> & tokens)
 						if (GetParenthesedExpression(tokens, 0, tokens.size(), i + 1,
 							firstIdx, lastIdx))
 						{
-							counter--;
 							cur = REPLACE;
 							tokens.insert(tokens.begin() + i, /* Token("(") */ PARENTHESIS_OPEN);
 							tokens.insert(tokens.begin() + i + 1, /* Token("0")*/ ZERO);
@@ -776,7 +764,6 @@ void TokenizePostProcess(vector<Token> & tokens)
 						if (GetFunctionExpression(tokens, 0, tokens.size(), i + 1,
 							firstIdx, lastIdx))
 						{
-							counter--;
 							cur = REPLACE;
 							tokens.insert(tokens.begin() + i, /* Token("(") */ PARENTHESIS_OPEN);
 							tokens.insert(tokens.begin() + i + 1, /* Token("0")*/ ZERO);
@@ -789,10 +776,9 @@ void TokenizePostProcess(vector<Token> & tokens)
 						restart = true;
 						restartIdx = (i == 0 ? 0: i - 1); // [fix] for '!!!!5' or more
 					}
-
-					if (counter == 0)
+					else if (restart) // [optimisation] restart asap to avoid too much loops
 					{
-						break; // optimisation when too much restart
+						break;
 					}
 				}
 			}
