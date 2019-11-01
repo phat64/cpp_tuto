@@ -740,7 +740,7 @@ void TokenizePostProcess(vector<Token> & tokens)
 						tokens.insert(tokens.begin() + lastIdx + 2, /* Token(")") */ PARENTHESIS_CLOSE);
 					}
 				}
-				else if (next.type = FUNCTION_NAME)
+				else if (next.type == FUNCTION_NAME)
 				{
 					int firstIdx;
 					int lastIdx;
