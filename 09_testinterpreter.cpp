@@ -714,12 +714,17 @@ void TokenizePostProcess(vector<Token> & tokens)
 			Token & next = tokens[i + 1];
 			if (cur.type == UNARY_OPERATOR && cur.strvalue[0] == '-')
 			{
+				static Token ZERO("0");
+				static Token SUB('-');
+				static Token PARENTHESIS_OPEN('(');
+				static Token PARENTHESIS_CLOSE(')');
+
 				if (next.cvalue == 'N')
 				{
-					cur = Token('-');
-					tokens.insert(tokens.begin() + i, Token("("));
-					tokens.insert(tokens.begin() + i + 1, Token("0"));
-					tokens.insert(tokens.begin() + i + 4, Token(")"));
+					cur = SUB;
+					tokens.insert(tokens.begin() + i, /* Token("(") */ PARENTHESIS_OPEN);
+					tokens.insert(tokens.begin() + i + 1, /* Token("0")*/ ZERO);
+					tokens.insert(tokens.begin() + i + 4, /* Token(")") */ PARENTHESIS_CLOSE);
 				}
 				else if (next.cvalue == '(')
 				{
@@ -729,10 +734,10 @@ void TokenizePostProcess(vector<Token> & tokens)
 					if (GetParenthesedExpression(tokens, 0, tokens.size(), i + 1,
 						firstIdx, lastIdx))
 					{
-						cur = Token('-');
-						tokens.insert(tokens.begin() + i, Token("("));
-						tokens.insert(tokens.begin() + i + 1, Token("0"));
-						tokens.insert(tokens.begin() + lastIdx + 2, Token(")"));
+						cur = SUB;
+						tokens.insert(tokens.begin() + i, /* Token("(") */ PARENTHESIS_OPEN);
+						tokens.insert(tokens.begin() + i + 1, /* Token("0")*/ ZERO);
+						tokens.insert(tokens.begin() + lastIdx + 2, /* Token(")") */ PARENTHESIS_CLOSE);
 					}
 				}
 			}
