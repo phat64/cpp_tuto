@@ -1353,9 +1353,16 @@ void UpdateVariablesAddr(struct ScriptEngineContext * ctx, vector<Token> & token
 
 void UpdateFunctionsAddr(struct ScriptEngineContext * ctx, vector<Token> & tokens, int first, int last)
 {
-	if (ctx == NULL || ctx->pGetFunctionAddrCallback == NULL)
+	GetFunctionAddrCallback pGetFunctionAddrCallback = NULL;
+
+	if (ctx != NULL)
 	{
-		return;
+		pGetFunctionAddrCallback = ctx->pGetFunctionAddrCallback;
+	}
+
+	if (pGetFunctionAddrCallback == NULL)
+	{
+		pGetFunctionAddrCallback = emptyGetFunctionAddrCallback;
 	}
 
 	for (int i = first; i < last; i++)
@@ -1363,7 +1370,7 @@ void UpdateFunctionsAddr(struct ScriptEngineContext * ctx, vector<Token> & token
 		Token & currentToken = tokens[i];
 		if (currentToken.type == FUNCTION_NAME)
 		{
-			currentToken.functionAddr = ctx->pGetFunctionAddrCallback(currentToken.strvalue, currentToken.nbParams);
+			currentToken.functionAddr = pGetFunctionAddrCallback(currentToken.strvalue, currentToken.nbParams);
 		}
 	}
 }
