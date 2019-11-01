@@ -820,7 +820,7 @@ bool CheckCombo(const vector<Token> & tokens, int idx0, int idx1)
 	const char * validcombo[] = {"((", "))",
 		"(N", "N)", "NO", "ON", "O(", ")O",
 		"OU", "UN", "UF", "U(", "(U", "RU", "EU", "=U",
-		"F[", "[F", ",F", "],", ")]", "]], ""[(", "[]", ",(", "),",
+		"F[", "[F", ",F", "],", ")]", "]]", "[(", "[]", ",(", "),",
 		"[N", "N]", "N,", ",N", "OF", "]O",
 		"I(", ")I", "RN", "R(", ")R", "RF", ";R",
 		";E", "EN", "ER", "E(", "EF", "E;",
