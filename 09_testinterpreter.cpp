@@ -1116,6 +1116,18 @@ bool Compute2(double & result, double val, const vector<Token> & tokens, int fir
 			}*/
 			return true;
 		}
+
+		// [TODO] remove it : temp code cuz UNARY_OPERATOR are replaced by (binary) OPERATOR
+		if (token0.type == UNARY_OPERATOR)
+		{
+			double a = token1.GetDoubleValue();
+			switch(token0.strvalue[0])
+			{
+				case '-': result = -a; return true; break;
+				case '!': result = !a; return true;break;
+				default : printf("error unary operator"); result = 0.0;
+			}
+		}
 	}
 	return false;
 }
@@ -1148,6 +1160,16 @@ bool Compute3(double & result, const vector<Token> & tokens, int first)
 		if (token1.type == NUMBER || token1.type == VARIABLE_NAME || token1.type == STRING)
 		{
 			result = token1.GetDoubleValue();
+			return true;
+		}
+
+		// [TODO] remove it : temp code cuz UNARY_OPERATOR are replaced by (binary) OPERATOR
+		// !!N
+		if ((token0.type == UNARY_OPERATOR && token0.strvalue[0] == '!')
+			&& (token1.type == UNARY_OPERATOR  && token1.strvalue[0] == '!')
+			&& token2.cvalue == 'N')
+		{
+			result = !!token2.GetDoubleValue();
 			return true;
 		}
 	}
