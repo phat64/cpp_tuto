@@ -204,18 +204,12 @@ static const double pi = 3.14159265358979323846;
 static const size_t NUMBER_DIGITS_MAX = 32;
 static const size_t NAME_NB_CHARS_MAX = 32;
 
-// ---------------------- VARIABLES (TEMP CODE) ------------------------------
+// -------------------- VARIABLES TYPE (TEMP CODE) ---------------------------
+
 enum VariableType { VOID, DOUBLE, FLOAT, INT, BOOLEAN };
 
-void* GetVariablePtr(void *handle, const char * variableName, VariableType & type);
 double GetVariableValue(const char * variableName, void *variableAddr, VariableType variableType);
-double GetConstanteValue(void *handle, const char * constanteName, bool & found);
-unsigned int ComputeCRC32(const void * buffer, size_t len, unsigned int crc = 0xffffffff);
-
-// ---------------------- FUNCTIONS PROTOTYPES -------------------------------
-
-void* GetFunctionAddr(const char* functionName, size_t & nbParams);
-
+unsigned int ComputeCRC32(const void * buffer, size_t len, unsigned int crc = 0xffffffff); // used for STRING
 
 // ----------------------- EVALUATE PROTOTYPES -------------------------------
 
@@ -224,10 +218,9 @@ struct ScriptEngineContext;
 
 double Evaluate(const string & str, struct ScriptEngineContext * ctx = NULL);
 
-// -------------------------- SCRIPT CONTEXT ---------------------------------
+// -------------------------- SCRIPT ENGINE ---------------------------------
 
 typedef void* (*GetVariablePtrCallback) (void *handle, const char * variableName, VariableType & type);
-typedef double (*GetVariableValueCallback) (const char * variableName, void *variableAddr, VariableType variableType);
 typedef double (*GetConstanteValueCallback) (void *handle, const char * constanteName, bool & found);
 typedef void* (*GetFunctionAddrCallback) (const char* functionName, size_t & nbParams);
 
@@ -235,7 +228,6 @@ struct ScriptEngineContext
 {
 	void * pHandle;
 	GetVariablePtrCallback pGetVariablePtrCallback;
-	GetVariableValueCallback pGetVariableValueCallback;
 	GetConstanteValueCallback pGetConstanteValueCallback;
 	GetFunctionAddrCallback pGetFunctionAddrCallback;
 };
@@ -1241,75 +1233,6 @@ int FindToken(const vector<Token> & tokens, int first, int last, TokenType type,
 
 // ------------------------------ VARIABLES ----------------------------------
 
-void* GetVariablePtr(void *handle, const char * variableName, VariableType & type)
-{
-	static double abc = 0.0;
-	static int counter = 0;
-	static bool btest = false;
-
-	static struct VariableInfo {const char * name; void* addr; VariableType type;} table [] =
-	{
-		{"abc", (void*)&abc, DOUBLE},
-		{"counter", (void*)&counter, INT},
-		{"btest", (void*)&btest, BOOLEAN},
-		{NULL, NULL, VOID}
-	};
-
-
-	for (size_t i = 0; table[i].name; i++)
-	{
-		VariableInfo & info = table[i];
-		if (strcmp(variableName, info.name) == 0)
-		{
-			type = info.type;
-			return info.addr;
-		}
-	}
-
-	type = VOID;
-	return NULL;
-}
-
-double GetVariableValue(const char * variableName, void *variableAddr, VariableType variableType)
-{
-	assert(variableName != NULL);
-	assert(variableAddr != NULL);
-
-	switch(variableType)
-	{
-		case DOUBLE: return *((double*)variableAddr);
-		case FLOAT: return *((float*)variableAddr);
-		case INT: return *((int*)variableAddr);
-		case BOOLEAN: return *((bool*)variableAddr);
-		default : assert(0); return 0.0;
-	}
-}
-
-double GetConstanteValue(void *handle, const char * constanteName, bool & found)
-{
-	static struct ConstanteInfo {const char * name; double value;} table [] =
-	{
-		{"pi", pi},
-		{NULL, 0.0}
-	};
-
-	for (size_t i = 0; table[i].name; i++)
-	{
-		struct ConstanteInfo & info = table[i];
-
-		if (strcmp(constanteName, info.name) == 0)
-		{
-			found = true;
-			return info.value;
-		}
-
-	}
-
-	found = false;
-	return 0.0;
-}
-
-
 bool SetVariableValue(const char * variableName, void * variableAddress, double value, VariableType variableType)
 {
 	if (variableAddress)
@@ -1327,6 +1250,21 @@ bool SetVariableValue(const char * variableName, void * variableAddress, double 
 		}
 	}
 	return false;
+}
+
+double GetVariableValue(const char * variableName, void *variableAddr, VariableType variableType)
+{
+	assert(variableName != NULL);
+	assert(variableAddr != NULL);
+
+	switch(variableType)
+	{
+		case DOUBLE: return *((double*)variableAddr);
+		case FLOAT: return *((float*)variableAddr);
+		case INT: return *((int*)variableAddr);
+		case BOOLEAN: return *((bool*)variableAddr);
+		default : assert(0); return 0.0;
+	}
 }
 
 void UpdateVariablesAddr(struct ScriptEngineContext * ctx, vector<Token> & tokens, int first, int last)
@@ -1386,52 +1324,6 @@ void UpdateFunctionsAddr(struct ScriptEngineContext * ctx, vector<Token> & token
 }
 
 // ------------------------------ FUNCTIONS ----------------------------------
-
-double myEmptyFunction()
-{
-	return 1.0;
-}
-
-double myMin(double a, double b)
-{
-	return a < b? a : b;
-}
-
-double myMax(double a, double b)
-{
-	return a > b? a : b;
-}
-
-double myCos(double rad)
-{
-	return cos(rad);
-}
-
-void* GetFunctionAddr(const char* functionName, size_t & nbParams)
-{
-	assert(functionName != NULL);
-	static struct FunctionInfo {const char*name; size_t nbParams; void * addr;} functionTable[] =
-	{
-		{"print", -1, (void*)&myEmptyFunction},
-		{"min", 2, (void*)&myMin},
-		{"max", 2, (void*)&myMax},
-		{"cos", 1, (void*)&myCos},
-		{NULL, 0, NULL}
-	};
-
-	for (size_t i = 0; functionTable[i].name; i++)
-	{
-		struct FunctionInfo & info = functionTable[i];
-
-		if (strcmp(functionName, info.name) == 0)
-		{
-			nbParams = info.nbParams;
-			return info.addr;
-		}
-	}
-
-	return NULL;
-}
 
 
 double CallFunction(const Token& function, vector<double> & args)
@@ -2260,16 +2152,116 @@ double Evaluate(const string & str, struct ScriptEngineContext * ctx)
 
 // -------------------------------- TESTER -----------------------------------
 
+void* myGetVariablePtr(void *handle, const char * variableName, VariableType & type)
+{
+	static double abc = 0.0;
+	static int counter = 0;
+	static bool btest = false;
+
+	static struct VariableInfo {const char * name; void* addr; VariableType type;} table [] =
+	{
+		{"abc", (void*)&abc, DOUBLE},
+		{"counter", (void*)&counter, INT},
+		{"btest", (void*)&btest, BOOLEAN},
+		{NULL, NULL, VOID}
+	};
+
+
+	for (size_t i = 0; table[i].name; i++)
+	{
+		VariableInfo & info = table[i];
+		if (strcmp(variableName, info.name) == 0)
+		{
+			type = info.type;
+			return info.addr;
+		}
+	}
+
+	type = VOID;
+	return NULL;
+}
+
+double myGetConstanteValue(void *handle, const char * constanteName, bool & found)
+{
+	static struct ConstanteInfo {const char * name; double value;} table [] =
+	{
+		{"pi", pi},
+		{NULL, 0.0}
+	};
+
+	for (size_t i = 0; table[i].name; i++)
+	{
+		struct ConstanteInfo & info = table[i];
+
+		if (strcmp(constanteName, info.name) == 0)
+		{
+			found = true;
+			return info.value;
+		}
+
+	}
+
+	found = false;
+	return 0.0;
+}
+
+double myEmptyFunction()
+{
+	return 1.0;
+}
+
+double myMin(double a, double b)
+{
+	return a < b? a : b;
+}
+
+double myMax(double a, double b)
+{
+	return a > b? a : b;
+}
+
+double myCos(double rad)
+{
+	return cos(rad);
+}
+
+void* myGetFunctionAddr(const char* functionName, size_t & nbParams)
+{
+	assert(functionName != NULL);
+	static struct FunctionInfo {const char*name; size_t nbParams; void * addr;} functionTable[] =
+	{
+		{"print", -1, (void*)&myEmptyFunction},
+		{"min", 2, (void*)&myMin},
+		{"max", 2, (void*)&myMax},
+		{"cos", 1, (void*)&myCos},
+		{NULL, 0, NULL}
+	};
+
+	for (size_t i = 0; functionTable[i].name; i++)
+	{
+		struct FunctionInfo & info = functionTable[i];
+
+		if (strcmp(functionName, info.name) == 0)
+		{
+			nbParams = info.nbParams;
+			return info.addr;
+		}
+	}
+
+	return NULL;
+}
+
+// --------------------------------- MAIN ------------------------------------
+
 int main(int argc, char ** argv)
 {
 	struct ScriptEngineContext ctx = { 0 };
 
 	// init the context
 	ctx.pHandle = NULL;
-	ctx.pGetVariablePtrCallback = GetVariablePtr;
-	ctx.pGetVariableValueCallback = GetVariableValue;
-	ctx.pGetConstanteValueCallback = GetConstanteValue;
-	ctx.pGetFunctionAddrCallback = GetFunctionAddr;
+	ctx.pGetVariablePtrCallback = myGetVariablePtr;
+	ctx.pGetConstanteValueCallback = myGetConstanteValue;
+	ctx.pGetFunctionAddrCallback = myGetFunctionAddr;
 
 	struct ScriptEngine script(&ctx);
 
