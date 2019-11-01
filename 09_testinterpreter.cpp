@@ -226,6 +226,14 @@ typedef void* (*GetFunctionAddrCallback) (const char* functionName, size_t & nbP
 
 struct ScriptEngineContext
 {
+	ScriptEngineContext()
+	{
+		pHandle = NULL;
+		pGetVariablePtrCallback = NULL;
+		pGetConstanteValueCallback = NULL;
+		pGetFunctionAddrCallback = NULL;
+	}
+
 	void * pHandle;
 	GetVariablePtrCallback pGetVariablePtrCallback;
 	GetConstanteValueCallback pGetConstanteValueCallback;
@@ -2255,7 +2263,7 @@ void* myGetFunctionAddr(const char* functionName, size_t & nbParams)
 
 int main(int argc, char ** argv)
 {
-	struct ScriptEngineContext ctx = { 0 };
+	struct ScriptEngineContext ctx;
 
 	// init the context
 	ctx.pHandle = NULL;
