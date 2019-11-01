@@ -2479,7 +2479,14 @@ int main(int argc, char ** argv)
 	assert(5.0 == script.Evaluate("-max((-5), -8)"));
 	assert(1.0 == script.Evaluate("!0"));
 	assert(0.0 == script.Evaluate("!1"));
+	assert(0.0 == script.Evaluate("!5"));
 	assert(1.0 == script.Evaluate("!!5"));
+	assert(0.0 == script.Evaluate("!!!5"));
+	assert(1.0 == script.Evaluate("!!!!5"));
+	assert(0.0 == script.Evaluate("!!!!!5"));
+	assert(1.0 == script.Evaluate("!!!!!!5"));
+	assert(0.0 == script.Evaluate("!!!!!!!5"));
+	assert(1.0 == script.Evaluate("!!!!!!!!5"));
 	assert(0.0 == script.Evaluate("!2 == 2"));
 	assert(1.0 == script.Evaluate("!2 != 2"));
 	assert((!!2==2) == script.Evaluate("!!2==2"));
