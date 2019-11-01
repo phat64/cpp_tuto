@@ -224,6 +224,24 @@ typedef void* (*GetVariablePtrCallback) (void *handle, const char * variableName
 typedef double (*GetConstanteValueCallback) (void *handle, const char * constanteName, bool & found);
 typedef void* (*GetFunctionAddrCallback) (const char* functionName, size_t & nbParams);
 
+static void* emptyGetVariablePtrCallback(void *handle, const char * variableName, VariableType & type)
+{
+	type = VOID;
+	return NULL;
+}
+
+double emptyGetConstanteValueCallback(void *handle, const char * constanteName, bool & found)
+{
+	found = false;
+	return 0.0;
+}
+
+void* emptyGetFunctionAddrCallback(const char* functionName, size_t & nbParams)
+{
+	nbParams = 0;
+	return NULL;
+}
+
 struct ScriptEngineContext
 {
 	ScriptEngineContext()
@@ -1277,11 +1295,26 @@ double GetVariableValue(const char * variableName, void *variableAddr, VariableT
 
 void UpdateVariablesAddr(struct ScriptEngineContext * ctx, vector<Token> & tokens, int first, int last)
 {
-	if (ctx == NULL)
+	void* handle = NULL;
+	GetConstanteValueCallback pGetConstanteValueCallback = NULL;
+	GetVariablePtrCallback pGetVariablePtrCallback = NULL;
+
+	if (ctx != NULL)
 	{
-		return;
+		handle = ctx->pHandle;
+		pGetConstanteValueCallback = ctx->pGetConstanteValueCallback;
+		pGetVariablePtrCallback = ctx->pGetVariablePtrCallback;
 	}
-	void* handle = ctx->pHandle;
+
+	if (pGetConstanteValueCallback == NULL)
+	{
+		pGetConstanteValueCallback = emptyGetConstanteValueCallback;
+	}
+
+	if (pGetVariablePtrCallback == NULL)
+	{
+		pGetVariablePtrCallback = emptyGetVariablePtrCallback;
+	}
 
 	for (int i = first; i < last; i++)
 	{
@@ -1297,15 +1330,12 @@ void UpdateVariablesAddr(struct ScriptEngineContext * ctx, vector<Token> & token
 			currentToken.variableType = VOID;
 
 			// Get Constante Value
-			if (ctx->pGetConstanteValueCallback)
-			{
-				currentToken.dvalue = ctx->pGetConstanteValueCallback(handle, currentToken.strvalue, currentToken.isConstante);
-			}
+			currentToken.dvalue = pGetConstanteValueCallback(handle, currentToken.strvalue, currentToken.isConstante);
 
 			// Get Variable Ptr
-			if (!currentToken.isConstante && ctx->pGetVariablePtrCallback)
+			if (!currentToken.isConstante)
 			{
-				currentToken.ptrvalue = ctx->pGetVariablePtrCallback(handle, currentToken.strvalue, currentToken.variableType);
+				currentToken.ptrvalue = pGetVariablePtrCallback(handle, currentToken.strvalue, currentToken.variableType);
 			}
 
 			// check if the variable or the constante is found
