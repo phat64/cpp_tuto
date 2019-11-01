@@ -1289,17 +1289,24 @@ void UpdateVariablesAddr(struct ScriptEngineContext * ctx, vector<Token> & token
 		if (currentToken.type == VARIABLE_NAME)
 		{
 			// apply relocation : symbole -> addr
-			currentToken.dvalue = ctx->pGetConstanteValueCallback(handle, currentToken.strvalue, currentToken.isConstante);
-			if (currentToken.isConstante)
+
+			// default values
+			currentToken.isConstante = false;
+			currentToken.dvalue = 0.0;
+			currentToken.ptrvalue = NULL;
+			currentToken.variableType = VOID;
+
+			// Get Constante Value
+			if (ctx->pGetConstanteValueCallback)
 			{
-				currentToken.ptrvalue = NULL;
-				currentToken.variableType = VOID;
+				currentToken.dvalue = ctx->pGetConstanteValueCallback(handle, currentToken.strvalue, currentToken.isConstante);
 			}
-			else
+
+			// Get Variable Ptr
+			if (!currentToken.isConstante && ctx->pGetVariablePtrCallback)
 			{
 				currentToken.ptrvalue = ctx->pGetVariablePtrCallback(handle, currentToken.strvalue, currentToken.variableType);
 			}
-
 
 			// check if the variable or the constante is found
 			if (!currentToken.isConstante && !currentToken.ptrvalue)
