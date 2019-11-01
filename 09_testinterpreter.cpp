@@ -714,70 +714,89 @@ void TokenizePostProcess(vector<Token> & tokens)
 		}
 
 		// Step 3.1
+		// [TODO] need more optimisation : too much loops when too much '!!'
 		// Replace NEG(-) by '0 - '
+		// Replace NOT(!) by '0 == '
 		bool restart = true;
-		int restartIdx = 0;
-		while (restart)
-{
-		restart = false;
-		for (int i = restartIdx; i < tokens.size() - 1; i++)
+		size_t restartIdx = 0;
+		size_t counter = 0; // [optimisation] unary operators counter
+		for (size_t i = 0; i < tokens.size() - 1; i++)
 		{
 			Token & cur = tokens[i];
-			Token & next = tokens[i + 1];
-			if (cur.type == UNARY_OPERATOR && (cur.strvalue[0] == '-'  || cur.strvalue[0] == '!'))
+			if (cur.type == UNARY_OPERATOR && (cur.strvalue[0] == '-' || cur.strvalue[0] == '!'))
 			{
-				static const Token ZERO("0");
-				static const Token SUB('-');
-				static const Token EQUALS('=', '=');
-				static const Token PARENTHESIS_OPEN('(');
-				static const Token PARENTHESIS_CLOSE(')');
-
-				const Token & REPLACE = cur.strvalue[0] == '-' ? SUB : EQUALS;
-
-				if (next.cvalue == 'N')
-				{
-					cur = REPLACE;
-					tokens.insert(tokens.begin() + i, /* Token("(") */ PARENTHESIS_OPEN);
-					tokens.insert(tokens.begin() + i + 1, /* Token("0")*/ ZERO);
-					tokens.insert(tokens.begin() + i + 4, /* Token(")") */ PARENTHESIS_CLOSE);
-				}
-				else if (next.cvalue == '(')
-				{
-					int firstIdx;
-					int lastIdx;
-
-					if (GetParenthesedExpression(tokens, 0, tokens.size(), i + 1,
-						firstIdx, lastIdx))
-					{
-						cur = REPLACE;
-						tokens.insert(tokens.begin() + i, /* Token("(") */ PARENTHESIS_OPEN);
-						tokens.insert(tokens.begin() + i + 1, /* Token("0")*/ ZERO);
-						tokens.insert(tokens.begin() + lastIdx + 2, /* Token(")") */ PARENTHESIS_CLOSE);
-					}
-				}
-				else if (next.type == FUNCTION_NAME)
-				{
-					int firstIdx;
-					int lastIdx;
-
-					if (GetFunctionExpression(tokens, 0, tokens.size(), i + 1,
-						firstIdx, lastIdx))
-					{
-						cur = REPLACE;
-						tokens.insert(tokens.begin() + i, /* Token("(") */ PARENTHESIS_OPEN);
-						tokens.insert(tokens.begin() + i + 1, /* Token("0")*/ ZERO);
-						tokens.insert(tokens.begin() + lastIdx + 2, /* Token(")") */ PARENTHESIS_CLOSE);
-						i--;
-					}
-				}
-				else if (next.type == UNARY_OPERATOR)
-				{
-					restart = true;
-					restartIdx = i;
-				}
+				counter++;
 			}
 		}
-}
+		while (restart)
+		{
+			restart = false;
+			for (size_t i = restartIdx; i < tokens.size() - 1; i++)
+			{
+				Token & cur = tokens[i];
+				Token & next = tokens[i + 1];
+				if (cur.type == UNARY_OPERATOR && (cur.strvalue[0] == '-'  || cur.strvalue[0] == '!'))
+				{
+					static const Token ZERO("0");
+					static const Token SUB('-');
+					static const Token EQUALS('=', '=');
+					static const Token PARENTHESIS_OPEN('(');
+					static const Token PARENTHESIS_CLOSE(')');
+
+					const Token & REPLACE = cur.strvalue[0] == '-' ? SUB : EQUALS;
+
+					if (next.cvalue == 'N')
+					{
+						counter--;
+						cur = REPLACE;
+						tokens.insert(tokens.begin() + i, /* Token("(") */ PARENTHESIS_OPEN);
+						tokens.insert(tokens.begin() + i + 1, /* Token("0")*/ ZERO);
+						tokens.insert(tokens.begin() + i + 4, /* Token(")") */ PARENTHESIS_CLOSE);
+					}
+					else if (next.cvalue == '(')
+					{
+						int firstIdx;
+						int lastIdx;
+
+						if (GetParenthesedExpression(tokens, 0, tokens.size(), i + 1,
+							firstIdx, lastIdx))
+						{
+							counter--;
+							cur = REPLACE;
+							tokens.insert(tokens.begin() + i, /* Token("(") */ PARENTHESIS_OPEN);
+							tokens.insert(tokens.begin() + i + 1, /* Token("0")*/ ZERO);
+							tokens.insert(tokens.begin() + lastIdx + 2, /* Token(")") */ PARENTHESIS_CLOSE);
+						}
+					}
+					else if (next.type == FUNCTION_NAME)
+					{
+						int firstIdx;
+						int lastIdx;
+
+						if (GetFunctionExpression(tokens, 0, tokens.size(), i + 1,
+							firstIdx, lastIdx))
+						{
+							counter--;
+							cur = REPLACE;
+							tokens.insert(tokens.begin() + i, /* Token("(") */ PARENTHESIS_OPEN);
+							tokens.insert(tokens.begin() + i + 1, /* Token("0")*/ ZERO);
+							tokens.insert(tokens.begin() + lastIdx + 2, /* Token(")") */ PARENTHESIS_CLOSE);
+							i--;
+						}
+					}
+					else if (next.type == UNARY_OPERATOR)
+					{
+						restart = true;
+						restartIdx = (i == 0 ? 0: i - 1); // [fix] for '!!!!5' or more
+					}
+
+					if (counter == 0)
+					{
+						break; // optimisation when too much restart
+					}
+				}
+			}
+		} // end of the while
 	}
 }
 
