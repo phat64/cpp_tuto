@@ -714,10 +714,10 @@ void TokenizePostProcess(vector<Token> & tokens)
 			Token & next = tokens[i + 1];
 			if (cur.type == UNARY_OPERATOR && cur.strvalue[0] == '-')
 			{
-				static Token ZERO("0");
-				static Token SUB('-');
-				static Token PARENTHESIS_OPEN('(');
-				static Token PARENTHESIS_CLOSE(')');
+				static const Token ZERO("0");
+				static const Token SUB('-');
+				static const Token PARENTHESIS_OPEN('(');
+				static const Token PARENTHESIS_CLOSE(')');
 
 				if (next.cvalue == 'N')
 				{
