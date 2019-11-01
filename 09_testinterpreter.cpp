@@ -2403,6 +2403,11 @@ int main(int argc, char ** argv)
 	assert(-5.0 == script.Evaluate("max((-5), (-8))"));
 	assert(-5.0 == script.Evaluate("max(-5, (-8))"));
 	assert(-5.0 == script.Evaluate("max((-5), -8)"));
+	assert(-9.0 == script.Evaluate("-max(5, 9)"));
+	assert(5.0 == script.Evaluate("-max(-5, -8)"));
+	assert(5.0 == script.Evaluate("-max((-5), (-8))"));
+	assert(5.0 == script.Evaluate("-max(-5, (-8))"));
+	assert(5.0 == script.Evaluate("-max((-5), -8)"));
 	assert(1.0 == script.Evaluate("!0"));
 	assert(0.0 == script.Evaluate("!1"));
 	assert(0.0 == script.Evaluate("!2 == 2"));
