@@ -796,6 +796,11 @@ bool Check2(const vector<Token> & tokens, int idx)
 			&& (token1.type == NUMBER || token1.type == VARIABLE_NAME || token1.type == STRING)
 		)
 		||
+		(
+			(token0.type == UNARY_OPERATOR && token0.strvalue[0] == '!')
+			&& (token1.type == NUMBER || token1.type == VARIABLE_NAME)
+		)
+		||
 			(token0.type == SCOPE && token0.cvalue == '{'
 			&& token1.type == SCOPE && token1.cvalue == '}');
 }
@@ -821,6 +826,14 @@ bool Check3(const vector<Token> & tokens, int idx)
 	// special case : 'Variable = Number' or 'Variable = Variable' or 'Variable = ('
 	if (token0.type == VARIABLE_NAME
 		&& token1.cvalue == '='
+		&& token2.cvalue == 'N')
+	{
+		return true;
+	}
+
+	// special case : !! Number
+	if ((token0.type == UNARY_OPERATOR && token0.strvalue[0] == '!')
+		&& (token1.type == UNARY_OPERATOR && token1.strvalue[0] == '!')
 		&& token2.cvalue == 'N')
 	{
 		return true;
@@ -859,6 +872,13 @@ bool CheckCombo(const vector<Token> & tokens, int idx0, int idx1)
 	// special case : only 'Variable ='  is accepted
 	if (token0.type == VARIABLE_NAME
 		&& token1.cvalue == '=')
+	{
+		return true;
+	}
+
+	// special case : !!
+	if ((token0.type == UNARY_OPERATOR && token0.strvalue[0] == '!')
+		&& (token1.type == UNARY_OPERATOR && token1.strvalue[0] == '!'))
 	{
 		return true;
 	}
