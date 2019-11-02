@@ -714,18 +714,38 @@ void TokenizePostProcess(vector<Token> & tokens)
 		}
 
 		// Step 3.1
+		// '++' is forbiden
 		// '--' is forbiden
+		bool hasIncrementError = false;
+		bool hasDecrementError = false;
 		for (size_t i = 0; i < tokens.size() - 1; i++)
 		{
 			const Token & cur = tokens[i];
 			const Token & next = tokens[i + 1];
 
-			if (((cur.type == OPERATOR || cur.type == UNARY_OPERATOR) && cur.strvalue[0] == '-')
+			if ((cur.type == OPERATOR && cur.strvalue[0] == '+')
+				&& (next.type == OPERATOR && next.strvalue[0] == '+'))
+			{
+				hasIncrementError = true;
+			}
+			else if (((cur.type == OPERATOR || cur.type == UNARY_OPERATOR) && cur.strvalue[0] == '-')
 				&& ((next.type == OPERATOR || next.type == UNARY_OPERATOR) && next.strvalue[0] == '-'))
 			{
-				printf("error : '--' is forbiden\n");
-				return;
+				hasDecrementError = true;
 			}
+		}
+
+		if (hasIncrementError)
+		{
+			printf("error : '++' is forbiden\n");
+		}
+		if (hasDecrementError)
+		{
+			printf("error : '--' is forbiden\n");
+		}
+		if (hasIncrementError || hasDecrementError)
+		{
+			return;
 		}
 
 		// Step 3.2
