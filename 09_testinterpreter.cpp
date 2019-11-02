@@ -714,6 +714,21 @@ void TokenizePostProcess(vector<Token> & tokens)
 		}
 
 		// Step 3.1
+		// '--' is forbiden
+		for (size_t i = 0; i < tokens.size() - 1; i++)
+		{
+			const Token & cur = tokens[i];
+			const Token & next = tokens[i + 1];
+
+			if (((cur.type == OPERATOR || cur.type == UNARY_OPERATOR) && cur.strvalue[0] == '-')
+				&& ((next.type == OPERATOR || next.type == UNARY_OPERATOR) && next.strvalue[0] == '-'))
+			{
+				printf("error : '--' is forbiden\n");
+				return;
+			}
+		}
+
+		// Step 3.2
 		// Replace NEG(-) by '0 - '
 		// Replace NOT(!) by '0 == '
 		bool restart = true;
