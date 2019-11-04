@@ -748,14 +748,17 @@ void TokenizePostProcess(vector<Token> & tokens)
 			return;
 		}
 
+
 		// Step 3.2
 		// Replace NEG(-) by '0 - '
 		// Replace NOT(!) by '0 == '
+		bool changed = true; // to avoid infinite loop with '5!'
 		bool restart = true;
 		size_t restartIdx = 0;
-		while (restart)
+		while (restart && changed)
 		{
 			restart = false;
+			changed = false;
 			for (size_t i = restartIdx; i < tokens.size() - 1; i++)
 			{
 				Token & cur = tokens[i];
@@ -772,6 +775,7 @@ void TokenizePostProcess(vector<Token> & tokens)
 
 					if (next.cvalue == 'N')
 					{
+						changed = true;
 						cur = REPLACE;
 						tokens.insert(tokens.begin() + i, /* Token("(") */ PARENTHESIS_OPEN);
 						tokens.insert(tokens.begin() + i + 1, /* Token("0")*/ ZERO);
@@ -785,6 +789,7 @@ void TokenizePostProcess(vector<Token> & tokens)
 						if (GetParenthesedExpression(tokens, 0, tokens.size(), i + 1,
 							firstIdx, lastIdx))
 						{
+							changed = true;
 							cur = REPLACE;
 							tokens.insert(tokens.begin() + i, /* Token("(") */ PARENTHESIS_OPEN);
 							tokens.insert(tokens.begin() + i + 1, /* Token("0")*/ ZERO);
@@ -799,6 +804,7 @@ void TokenizePostProcess(vector<Token> & tokens)
 						if (GetFunctionExpression(tokens, 0, tokens.size(), i + 1,
 							firstIdx, lastIdx))
 						{
+							changed = true;
 							cur = REPLACE;
 							tokens.insert(tokens.begin() + i, /* Token("(") */ PARENTHESIS_OPEN);
 							tokens.insert(tokens.begin() + i + 1, /* Token("0")*/ ZERO);
@@ -818,6 +824,13 @@ void TokenizePostProcess(vector<Token> & tokens)
 				}
 			}
 		} // end of the while
+
+		const Token & last = tokens[tokens.size() - 1];
+		if (last.type == UNARY_OPERATOR)
+		{
+			printf("error : UNARY OPERATOR for the last token is forbiden : %s\n", last.strvalue);
+			return;
+		}
 	}
 }
 
