@@ -1956,7 +1956,7 @@ double Evaluate(const vector<Token> & tokens, int first, int last)
 }
 
 bool GetGenericExpression(const vector<Token> & tokens, int first, int last, int idx, int &firstIdx, int &lastIdx,
-	enum TokenType token_type, char token_cvalue_begin, char token_cvalue_end)
+	enum TokenType token_type1, enum TokenType token_type2, char token_cvalue_begin, char token_cvalue_end)
 {
 #if defined(DEBUG)
 	cout << "GetGenericExpression : " << endl;
@@ -1975,7 +1975,7 @@ bool GetGenericExpression(const vector<Token> & tokens, int first, int last, int
 	}
 
 	const Token & currentToken = tokens[idx];
-	if (currentToken.type == token_type)
+	if (currentToken.type == token_type1 || currentToken.type == token_type2)
 	{
 		int depth = 0;
 		if (currentToken.cvalue == token_cvalue_begin)
@@ -1984,7 +1984,7 @@ bool GetGenericExpression(const vector<Token> & tokens, int first, int last, int
 			for(;idx < last;idx++)
 			{
 				const Token & currentToken = tokens[idx];
-				if (currentToken.type == token_type)
+				if (currentToken.type == token_type1 || currentToken.type == token_type2)
 				{
 					if (currentToken.cvalue == token_cvalue_begin)
 					{
@@ -2008,7 +2008,7 @@ bool GetGenericExpression(const vector<Token> & tokens, int first, int last, int
 			for(;idx >= first;idx--)
 			{
 				const Token & currentToken = tokens[idx];
-				if (currentToken.type == token_type)
+				if (currentToken.type == token_type1 || currentToken.type == token_type2)
 				{
 					if (currentToken.cvalue == token_cvalue_begin)
 					{
@@ -2035,13 +2035,13 @@ bool GetGenericExpression(const vector<Token> & tokens, int first, int last, int
 bool GetParenthesedExpression(const vector<Token> & tokens, int first, int last, int idx, int &firstIdx, int &lastIdx)
 {
 	return GetGenericExpression(tokens, first, last, idx, firstIdx,
-		lastIdx, PARENTHESIS, '(', ')');
+		lastIdx, PARENTHESIS, PARENTHESIS, '(', ')');
 }
 
 bool GetScopedExpression(const vector<Token> & tokens, int first, int last, int idx, int &firstIdx, int &lastIdx)
 {
 	return GetGenericExpression(tokens, first, last, idx, firstIdx,
-		lastIdx, SCOPE, '{', '}');
+		lastIdx, SCOPE, SCOPE, '{', '}');
 }
 
 bool GetScopedExpression(const vector<Token> & tokens, int first, int last, int idx, int &firstIdx, int &lastIdx,
@@ -2096,71 +2096,26 @@ bool GetScopedExpression(const vector<Token> & tokens, int first, int last, int 
 
 bool GetFunctionExpression(const vector<Token> & tokens, int first, int last, int idx, int &firstIdx, int &lastIdx)
 {
-	// [TODO] need to refactor with GetGenericExpression(...)
-	if (idx < first)
+	if (tokens[idx].type == FUNCTION_NAME)
 	{
-		return false;
-	}
-
-	if (idx >= last)
-	{
-		return false;
-	}
-
-	if (tokens[idx].type == FUNCTION_NAME || tokens[idx].type == FUNCTION_ARGS_END)
-	{
-		int depth = 0;
-		if (tokens[idx + 1].cvalue == '[')
+		if (GetGenericExpression(tokens, first, last, idx + 1, firstIdx, lastIdx,
+			FUNCTION_ARGS_BEGIN, FUNCTION_ARGS_END, '[', ']'))
 		{
-			firstIdx = idx;
-			idx++;
-			for(;idx < last;idx++)
-			{
-				if (tokens[idx].type == FUNCTION_ARGS_BEGIN || tokens[idx].type == FUNCTION_ARGS_END)
-				{
-					if (tokens[idx].cvalue == '[')
-					{
-						depth++;
-					}
-					else if (tokens[idx].cvalue == ']')
-					{
-						depth--;
-						if (depth == 0)
-						{
-							lastIdx = idx + 1;
-							return true; // found
-						}
-					}
-				}
-			}
-		}
-		else if (tokens[idx].cvalue == ']')
+			firstIdx--;
+			return firstIdx>= first && tokens[firstIdx].type == FUNCTION_NAME;
+		};
+	}
+	else if (tokens[idx].type == FUNCTION_ARGS_END)
+	{
+		if (GetGenericExpression(tokens, first, last, idx, firstIdx, lastIdx,
+			FUNCTION_ARGS_BEGIN, FUNCTION_ARGS_END, '[', ']'))
 		{
-			lastIdx = idx + 1;
-			for(;idx >= first;idx--)
-			{
-				if (tokens[idx].type == FUNCTION_ARGS_BEGIN || tokens[idx].type == FUNCTION_ARGS_END)
-				{
-					if (tokens[idx].cvalue == '[')
-					{
-						depth++;
-						if (depth == 0)
-						{
-							firstIdx = idx - 1;
-							return firstIdx >= first && tokens[firstIdx].type == FUNCTION_NAME; // found
-						}
-
-					}
-					else if (tokens[idx].cvalue == ']')
-					{
-						depth--;
-					}
-				}
-			}
-		}
+			firstIdx--;
+			return firstIdx >= first && tokens[firstIdx].type == FUNCTION_NAME;
+		};
 	}
 
-	return false; // not found
+	return false;
 }
 
 void PriorizeFunctions(vector<Token> & tokens, int & first, int & last);
