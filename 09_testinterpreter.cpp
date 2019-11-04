@@ -619,7 +619,7 @@ void Tokenize(vector<Token> & tokens, const string & str)
 
 void TokenizePostProcess(vector<Token> & tokens)
 {
-	if (tokens.size() > 0)
+	if (!tokens.empty())
 	{
 		// Step 2
 		// Post process :
