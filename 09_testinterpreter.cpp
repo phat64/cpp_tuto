@@ -231,12 +231,16 @@ enum VariableType { VOID, DOUBLE, FLOAT, INT, BOOLEAN };
 double GetVariableValue(const char * variableName, void *variableAddr, VariableType variableType);
 unsigned int ComputeCRC32(const void * buffer, size_t len, unsigned int crc = 0xffffffff); // used for STRING
 
-// ----------------------- EVALUATE PROTOTYPES -------------------------------
+// ------------------ EVALUATE/COMPILE/EXECUTE PROTOTYPES --------------------
 
 class string;
+struct Token;
 struct ScriptEngineContext;
 
 double Evaluate(const string & str, struct ScriptEngineContext * ctx = NULL);
+
+vector<Token> Compile(const string & str, struct ScriptEngineContext * ctx = NULL);
+double Execute(const vector<Token> & tokens);
 
 // -------------------------- SCRIPT ENGINE ---------------------------------
 
@@ -287,6 +291,17 @@ public:
 	{
 		return ::Evaluate(str, pCtx);
 	}
+
+	vector<Token> Compile(const string & str)
+	{
+		return ::Compile(str, pCtx);
+	}
+
+	double Execute(const vector<Token> & code)
+	{
+		return ::Execute(code);
+	}
+
 
 private:
 	ScriptEngineContext * pCtx;
