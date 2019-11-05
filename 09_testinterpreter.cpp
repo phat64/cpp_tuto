@@ -2262,25 +2262,6 @@ void PriorizeFunctions(vector<Token> & tokens, int & first, int & last)
 	}
 }
 
-double Evaluate(const string & str, struct ScriptEngineContext * ctx)
-{
-	vector<Token> tokens;
-	Tokenize(tokens, str);
-	UpdateVariablesAddr(ctx, tokens, 0, tokens.size());
-	UpdateFunctionsAddr(ctx, tokens, 0, tokens.size());
-	if (Check(tokens, 0, tokens.size()))
-	{
-		Priorize(tokens, 0, tokens.size());
-		return Evaluate(tokens, 0, tokens.size());
-	}
-#if USE_STL
-	cout << "error : " << str << endl;
-#else
-	printf("error %s\n", str.c_str());
-#endif
-	return 0;
-}
-
 vector<Token> Compile(const string & str, struct ScriptEngineContext * ctx)
 {
 	vector<Token> tokens;
@@ -2304,6 +2285,17 @@ double Execute(const vector<Token> & tokens)
 {
 	return Evaluate(tokens, 0, tokens.size());
 }
+
+double Evaluate(const string & str, struct ScriptEngineContext * ctx)
+{
+	vector<Token> code = Compile(str, ctx);
+	if (!code.empty())
+	{
+		return Execute(code);
+	}
+	return 0.0;
+}
+
 
 // -------------------------------- TESTER -----------------------------------
 
