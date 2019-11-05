@@ -2627,13 +2627,13 @@ int main(int argc, char ** argv)
 	assert(777.0 == script.Evaluate("return abc;"));
 
 	// check compile (more complexe test)
-	vector<Token> code = Compile("max(max(abc,44) + 1, max(11,22) + 1)", &ctx);
+	vector<Token> code = script.Compile("max(max(abc,44) + 1, max(11,22) + 1)");
 	assert(10.0 == script.Evaluate("abc = 10"));
 	assert(10.0 == script.Evaluate("abc"));
-	assert(45.0 == Execute(code));
+	assert(45.0 == script.Execute(code));
 	assert(99.0 == script.Evaluate("abc = 99"));
 	assert(99.0 == script.Evaluate("abc"));
-	assert(100.0 == Execute(code));
+	assert(100.0 == script.Execute(code));
 
 	// reset abc
 	assert(0.0 == script.Evaluate("abc = 0"));
