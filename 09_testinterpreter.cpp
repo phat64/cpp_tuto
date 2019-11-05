@@ -1562,6 +1562,7 @@ typedef double (*function6_t) (double, double, double, double, double, double);
 
 	return result;
 }
+
 // ------------------------------ EVALUATOR ----------------------------------
 
 int EvaluateWithoutParenthesis(const vector<Token> & tokens, int first, int last)
@@ -2277,6 +2278,18 @@ void PriorizeFunctions(vector<Token> & tokens, int & first, int & last)
 	}
 }
 
+double Evaluate(const string & str, struct ScriptEngineContext * ctx)
+{
+	vector<Token> code = Compile(str, ctx);
+	if (!code.empty())
+	{
+		return Execute(code);
+	}
+	return 0.0;
+}
+
+// ------------------------------ COMPILER -----------------------------------
+
 vector<Token> Compile(const string & str, struct ScriptEngineContext * ctx)
 {
 	vector<Token> tokens;
@@ -2299,16 +2312,6 @@ vector<Token> Compile(const string & str, struct ScriptEngineContext * ctx)
 double Execute(const vector<Token> & tokens)
 {
 	return Evaluate(tokens, 0, tokens.size());
-}
-
-double Evaluate(const string & str, struct ScriptEngineContext * ctx)
-{
-	vector<Token> code = Compile(str, ctx);
-	if (!code.empty())
-	{
-		return Execute(code);
-	}
-	return 0.0;
 }
 
 
