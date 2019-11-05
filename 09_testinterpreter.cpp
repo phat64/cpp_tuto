@@ -2261,6 +2261,30 @@ double Evaluate(const string & str, struct ScriptEngineContext * ctx)
 	return 0;
 }
 
+vector<Token> Compile(const string & str, struct ScriptEngineContext * ctx)
+{
+	vector<Token> tokens;
+	Tokenize(tokens, str);
+	UpdateVariablesAddr(ctx, tokens, 0, tokens.size());
+	UpdateFunctionsAddr(ctx, tokens, 0, tokens.size());
+	if (Check(tokens, 0, tokens.size()))
+	{
+		Priorize(tokens, 0, tokens.size());
+		return tokens;
+	}
+#if USE_STL
+	cout << "error : " << str << endl;
+#else
+	printf("error %s\n", str.c_str());
+#endif
+	return vector<Token>();
+}
+
+double Execute(const vector<Token> & tokens)
+{
+	return Evaluate(tokens, 0, tokens.size());
+}
+
 // -------------------------------- TESTER -----------------------------------
 
 void* myGetVariablePtr(void *handle, const char * variableName, VariableType & type)
