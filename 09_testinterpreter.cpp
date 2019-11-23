@@ -2395,7 +2395,7 @@ void* myGetFunctionAddr(const char* functionName, size_t & nbParams)
 	assert(functionName != NULL);
 	static struct FunctionInfo {const char*name; size_t nbParams; void * addr;} functionTable[] =
 	{
-		{"print", -1, (void*)&myEmptyFunction},
+		{"print", size_t(-1), (void*)&myEmptyFunction},
 		{"min", 2, (void*)&myMin},
 		{"max", 2, (void*)&myMax},
 		{"cos", 1, (void*)&myCos},
