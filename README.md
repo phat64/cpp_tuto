@@ -9,5 +9,6 @@ C++ tutorials
 7. Object Oriented Programming in C : How to dev with the OOP paradigm in C ?
 8. Calculator : How to write a calculator (with 4 operators and parenthesis) in C++ ?
 9. Interpreter : How to write a small script interpreter in C++ ?
+10. Magic : How to modify a local variable outside the scope in C or C++ ?
 
 (c) phat64
